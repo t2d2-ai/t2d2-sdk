@@ -262,6 +262,11 @@ class T2D2(object):
             results.append(res)
 
         return results
+    
+    def add_assets(self, payload):
+        """Add assets"""
+        url = f"{self.project['id']}/assets/bulk.create"
+        return self.request(url, RequestType.POST, data=payload)
 
     def upload_images(self, image_paths, image_type=1):
         """Upload images"""
@@ -288,16 +293,13 @@ class T2D2(object):
             )
 
         # Add images to project
-        url = f"{self.project['id']}/assets/bulk.create"
         payload = {
             "project_id": self.project["id"],
             "asset_type": 1,
             "image_type": image_type,
             "assets": assets,
         }
-        res = self.request(url, RequestType.POST, data=payload)
-
-        return res
+        return self.add_assets(payload)
 
     def upload_drawings(self, drawing_paths):
         """Upload drawings"""
