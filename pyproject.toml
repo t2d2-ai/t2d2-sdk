@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t2d2-sdk"
+version = "1.0.0"
+authors = [
+  { name="Badri Hiriyur", email="badri@t2d2.ai" },
+]
+description = "T2D2 SDK"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/t2d2/sampleproject"
+Issues = "https://github.com/pypa/sampleproject/issues"
