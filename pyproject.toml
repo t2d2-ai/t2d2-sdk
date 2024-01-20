@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "t2d2-sdk"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name="Badri Hiriyur", email="badri@t2d2.ai" },
 ]
