@@ -11,6 +11,7 @@ import requests
 TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 
+
 ####################################################################################################
 def random_string(length: int = 6) -> str:
     """Generate a random string of fixed length"""
@@ -180,6 +181,19 @@ class T2D2(object):
         self.bucket = res.netloc.split(".")[0]
         return
 
+    def get_assets(self, asset_type=1, asset_ids=None):
+        """Return asset list based on specified ids"""
+        if asset_ids is None:
+            return []
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/assets"
+        payload = {"asset_type": asset_type, "asset_ids": asset_ids}
+        json_data = self.request(url, RequestType.POST, data=payload)
+        return json_data["data"]
+
     def get_images(self, image_ids=None, params=None):
         """Return image list based on specified ids"""
         if image_ids is None:
@@ -262,7 +276,7 @@ class T2D2(object):
             results.append(res)
 
         return results
-    
+
     def add_assets(self, payload):
         """Add assets"""
         url = f"{self.project['id']}/assets/bulk.create"
