@@ -9,7 +9,7 @@ import boto3
 import requests
 
 TIMEOUT = 60
-
+BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 
 ####################################################################################################
 def random_string(length: int = 6) -> str:
@@ -68,7 +68,7 @@ class T2D2(object):
     api_key: str
     project: dict = None
 
-    def __init__(self, credentials, base_url="https://api-v3.t2d2.ai/api/"):
+    def __init__(self, credentials, base_url=BASE_URL):
         """Initialize / login"""
         if not base_url.endswith("/"):
             base_url += "/"
