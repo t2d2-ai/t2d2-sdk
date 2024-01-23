@@ -30,7 +30,7 @@ def download_file(url: str, file_path: str):
         s3.download_file(bucket, key, file_path)
         return {"success": True, "message": "File downloaded"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        return {"success": False, "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}"}
 
 
 def upload_file(file_path: str, url: str):
