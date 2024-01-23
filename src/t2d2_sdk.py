@@ -38,12 +38,12 @@ def upload_file(file_path: str, url: str):
     try:
         s3 = boto3.client("s3")
         parsed_url = urlparse(url)
-        bucket = parsed_url.netloc
+        bucket = parsed_url.netloc.split(".")[0]
         key = parsed_url.path[1:]
         s3.upload_file(file_path, bucket, key, ExtraArgs={"ACL": "public-read"})
         return {"success": True, "message": "File uploaded"}
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        return {"success": False, "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}"}
 
 
 ####################################################################################################
