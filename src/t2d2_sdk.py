@@ -25,7 +25,7 @@ def download_file(url: str, file_path: str):
     try:
         s3 = boto3.client("s3")
         parsed_url = urlparse(url)
-        bucket = parsed_url.netloc
+        bucket = parsed_url.netloc.split(".")[0]
         key = parsed_url.path[1:]
         s3.download_file(bucket, key, file_path)
         return {"success": True, "message": "File downloaded"}
