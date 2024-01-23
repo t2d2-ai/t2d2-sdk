@@ -163,6 +163,9 @@ class T2D2(object):
 
         return
 
+    ################################################################################################
+    # Project Get/Set
+    ################################################################################################
     def get_project(self, project_id):
         """Return project list"""
         url = f"project/{project_id}"
@@ -181,6 +184,9 @@ class T2D2(object):
         self.bucket = res.netloc.split(".")[0]
         return
 
+    ################################################################################################
+    # Get Assets
+    ################################################################################################
     def get_assets(self, asset_type=1, asset_ids=None):
         """Return asset list based on specified ids"""
         if asset_ids is None:
@@ -197,7 +203,7 @@ class T2D2(object):
     def get_images(self, image_ids=None, params=None):
         """Return image list based on specified ids"""
         if image_ids is None:
-            return {}
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
@@ -212,7 +218,7 @@ class T2D2(object):
     def get_drawings(self, drawing_ids=None, params=None):
         """Return drawing list based on specified ids"""
         if drawing_ids is None:
-            return {}
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
@@ -227,7 +233,7 @@ class T2D2(object):
     def get_videos(self, video_ids=None, params=None):
         """Return video list based on specified ids"""
         if video_ids is None:
-            return {}
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
@@ -242,7 +248,7 @@ class T2D2(object):
     def get_reports(self, report_ids=None, params=None):
         """Return report list based on specified ids"""
         if report_ids is None:
-            return {}
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
@@ -257,7 +263,7 @@ class T2D2(object):
     def get_geotags(self, drawing_id=None, params=None):
         """Return annotation list based on specified ids"""
         if drawing_id is None:
-            return {}
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
@@ -267,6 +273,9 @@ class T2D2(object):
 
         return json_data["data"]
 
+    ################################################################################################
+    # Add / Upload methods
+    ################################################################################################
     def add_annotations(self, payloads):
         """Add annotations"""
         results = []

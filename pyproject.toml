@@ -4,13 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "t2d2-sdk"
-version = "1.0.7"
+version = "1.0.8"
 authors = [
   { name="Badri Hiriyur", email="badri@t2d2.ai" },
 ]
 description = "T2D2 SDK"
 readme = "README.md"
 requires-python = ">=3.8"
+dependencies = [
+  "boto3",
+  "requests",
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: BSD License",
