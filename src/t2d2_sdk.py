@@ -10,7 +10,7 @@ import requests
 
 TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
-
+# DEV https://api-v3-dev.t2d2.ai/api/
 
 ####################################################################################################
 def random_string(length: int = 6) -> str:
