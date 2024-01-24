@@ -29,3 +29,4 @@ Issues = "https://github.com/t2d2-ai/t2d2-sdk/issues"
 [tool.setuptools_scm]
 # can be empty if no extra settings are needed, presence enables setuptools_scm
 local_scheme = "no-local-version"
+version_file = "src/_version.py"
