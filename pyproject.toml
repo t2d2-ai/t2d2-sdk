@@ -1,10 +1,11 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "t2d2-sdk"
-version = "1.0.11"
+# version = "1.0.11"
+dynamic = ["version"]
 authors = [
   { name="Badri Hiriyur", email="badri@t2d2.ai" },
 ]
@@ -22,5 +23,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/t2d2/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://t2d2.ai"
+Issues = "https://github.com/t2d2-ai/t2d2-sdk/issues"
+
+[tool.setuptools_scm]
+# can be empty if no extra settings are needed, presence enables setuptools_scm
