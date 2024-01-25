@@ -400,7 +400,10 @@ class T2D2(object):
             s3_path = (
                 self.s3_base_url + f"/projects/{self.project['id']}/reports/{filename}"
             )
-            upload_file(file_path, s3_path)
+            response = upload_file(file_path, s3_path)
+            if not response["success"]:
+                raise ValueError(response["message"])
+            
             assets.append(
                 {
                     "name": base,
