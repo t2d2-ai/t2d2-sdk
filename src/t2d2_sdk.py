@@ -403,7 +403,7 @@ class T2D2(object):
             upload_file(file_path, s3_path)
             assets.append(
                 {
-                    "name": base + ext,
+                    "name": base,
                     "filename": base + ext,
                     "url": filename,
                     "size": {"filesize": os.path.getsize(file_path)},
