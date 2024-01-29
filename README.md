@@ -38,6 +38,7 @@ With this client, you can interface with the app and get access to most of the f
 
 ```python
 t2d2.set_project(PROJECT_ID)
+project = t2d2.get_project()
 data = t2d2.get_images()
 ...
 ```
