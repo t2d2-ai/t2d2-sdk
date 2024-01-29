@@ -25,10 +25,10 @@ def gen_random_polygons(n=5):
 def gen_random_box():
     """Return random box points"""
     points = [
-        0.1 + 0.01 * random.random(),
-        0.2 + 0.01 * random.random(),
-        0.4 + 0.01 * random.random(),
-        0.8 + 0.01 * random.random(),
+        0.1 + 0.05 * random.random(),
+        0.2 + 0.05 * random.random(),
+        0.4 + 0.05 * random.random(),
+        0.8 + 0.05 * random.random(),
     ]
     return points
 
@@ -63,8 +63,19 @@ class T2D2APITests(unittest.TestCase):
 
     def test_project(self):
         # Test project function
+        res = self.t2d2.get_project()
+        project_count = res["total_projects"]
+        # print("Total Projects: ", project_count)
+        self.assertEqual(project_count, 273)
+
         project = self.t2d2.get_project(PROJECT_ID)
         self.assertEqual(project["id"], PROJECT_ID)
+
+    def test_unauthorized(self):
+        # Test unauthorized function
+        t2d2 = T2D2(credentials={"api_key": "test"}, base_url=BASE_URL)
+        t2d2.debug = False
+        self.assertRaises(ValueError, t2d2.get_project, PROJECT_ID)
 
     def test_images(self):
         # Get Images

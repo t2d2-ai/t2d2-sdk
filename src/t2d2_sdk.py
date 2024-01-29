@@ -75,6 +75,7 @@ class T2D2(object):
     access_token: str
     api_key: str
     project: dict = None
+    debug: bool = True
 
     def __init__(self, credentials, base_url=BASE_URL):
         """Initialize / login"""
@@ -135,18 +136,19 @@ class T2D2(object):
         else:
             raise ValueError("Request type not yet supported. Coming soon")
 
-        if res.status_code == 200:
+        if res.status_code in (200, 201):
             try:
                 return res.json()
             except Exception as e:
                 print("JSON Conversion Error: ", e)
                 return {"content": res.content}
         else:
-            print(f"URL: {req_type} {url}")
-            print(f"HEADERS: {headers}")
-            print(f"PARAMS: {params}")
-            print(f"DATA: {data}")
-            print(res.status_code, res.content)
+            if self.debug:
+                print(f"URL: {req_type} {url}")
+                print(f"HEADERS: {headers}")
+                print(f"PARAMS: {params}")
+                print(f"DATA: {data}")
+                print(res.status_code, res.content)
             raise ValueError(f"Error code received: {res.status_code}")
 
     def login(self, credentials):
@@ -173,15 +175,21 @@ class T2D2(object):
     ################################################################################################
     # Project Get/Set
     ################################################################################################
-    def get_project(self, project_id):
+    def get_project(self, project_id=None):
         """Return project list"""
-        url = f"project/{project_id}"
+        if project_id is None:
+            url = "project"
+        else:
+            url = f"project/{project_id}"
         json_data = self.request(url, RequestType.GET)
         return json_data["data"]
 
     def set_project(self, project_id):
         """Set project by project_id"""
         json_data = self.request(f"project/{project_id}", RequestType.GET)
+        if not json_data["success"]:
+            raise ValueError(json_data["message"])
+        
         project = json_data["data"]
         self.project = project
 
