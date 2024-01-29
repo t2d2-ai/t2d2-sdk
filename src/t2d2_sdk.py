@@ -12,6 +12,7 @@ TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 # DEV https://api-v3-dev.t2d2.ai/api/
 
+
 ####################################################################################################
 def random_string(length: int = 6) -> str:
     """Generate a random string of fixed length"""
@@ -30,7 +31,10 @@ def download_file(url: str, file_path: str):
         s3.download_file(bucket, key, file_path)
         return {"success": True, "message": "File downloaded"}
     except Exception as e:
-        return {"success": False, "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}"}
+        return {
+            "success": False,
+            "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}",
+        }
 
 
 def upload_file(file_path: str, url: str):
@@ -43,7 +47,10 @@ def upload_file(file_path: str, url: str):
         s3.upload_file(file_path, bucket, key, ExtraArgs={"ACL": "public-read"})
         return {"success": True, "message": "File uploaded"}
     except Exception as e:
-        return {"success": False, "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}"}
+        return {
+            "success": False,
+            "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}",
+        }
 
 
 ####################################################################################################
@@ -202,12 +209,17 @@ class T2D2(object):
 
     def get_images(self, image_ids=None, params=None):
         """Return image list based on specified ids"""
-        if image_ids is None:
-            return []
-
         if not self.project:
             raise ValueError("Project not set")
 
+        # all images in project
+        if image_ids is None:
+            url = f"{self.project['id']}/images"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["image_list"]
+            return results
+
+        # Specified image_ids
         results = []
         for img_id in image_ids:
             url = f"{self.project['id']}/images/{img_id}"
@@ -260,32 +272,9 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
-    def get_geotags(self, drawing_id=None, params=None):
-        """Return annotation list based on specified ids"""
-        if drawing_id is None:
-            return []
-
-        if not self.project:
-            raise ValueError("Project not set")
-
-        url = f"{self.project['id']}/geotags?drawing_id={drawing_id}"
-        json_data = self.request(url, RequestType.GET, params=params)
-
-        return json_data["data"]
-
     ################################################################################################
-    # Add / Upload methods
+    # Add / Upload Asset methods
     ################################################################################################
-    def add_annotations(self, payloads):
-        """Add annotations"""
-        results = []
-        for payload in payloads:
-            url = "annotation"
-            res = self.request(url, RequestType.POST, data=payload)
-            results.append(res)
-
-        return results
-
     def add_assets(self, payload):
         """Add assets"""
         url = f"{self.project['id']}/assets/bulk.create"
@@ -403,7 +392,7 @@ class T2D2(object):
             response = upload_file(file_path, s3_path)
             if not response["success"]:
                 raise ValueError(response["message"])
-            
+
             assets.append(
                 {
                     "name": base,
@@ -419,3 +408,77 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
+
+    ################################################################################################
+    # Annotation methods
+    ################################################################################################
+    def get_annotations(self, image_id=None, params=None):
+        """TODO: Return annotation list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        if params is None:
+            params = {}
+
+        if image_id is None:
+            images = self.get_images(params=params)
+            image_ids = [img["id"] for img in images]
+        else:
+            image_ids = [image_id]
+
+        images = self.get_images(image_ids=image_ids, params=params)
+        annotations = []
+        for img in images:
+            annotations.extend(img["annotations"])
+
+        return annotations
+
+    def delete_annotations(self, image_id, annotation_ids=None):
+        """Delete annotations"""
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        if annotation_ids is None:
+            # Get annotation_ids for all annotations in image
+            annotations = self.get_annotations(image_id)
+            annotation_ids = [ann["id"] for ann in annotations]
+
+        payload = {
+            "project_id": self.project["id"],
+            "image_id": image_id,
+            "annotation_ids": annotation_ids,
+        }
+
+        return self.request("annotation", RequestType.DELETE, data=payload)
+
+    def add_annotations(self, image_id, annotations):
+        """TODO: Add annotations"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = "annotation"
+        payload = {
+            "project_id": self.project["id"],
+            "image_id": image_id,
+            "annotations": annotations,
+        }
+        results = self.request(url, RequestType.POST, data=payload)
+
+        return results
+
+    ################################################################################################
+    # Geotag methods
+    ################################################################################################
+    def get_geotags(self, drawing_id, params=None):
+        """Return annotation list based on specified ids"""
+        if drawing_id is None:
+            return []
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/geotags?drawing_id={drawing_id}"
+        json_data = self.request(url, RequestType.GET, params=params)
+
+        return json_data["data"]
