@@ -210,7 +210,7 @@ class T2D2(object):
     def get_images(self, image_ids=None, params=None):
         """Return image list based on specified ids"""
         if not self.project:
-            raise ValueError("Project not set")
+            raise ValueError("Project not set yet")
 
         # all images in project
         if image_ids is None:
