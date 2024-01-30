@@ -1,4 +1,5 @@
 """T2D2 SDK API wrapper"""
+import json
 import os
 import random
 import string
@@ -105,15 +106,19 @@ class T2D2(object):
             data = {}
 
         headers.update(self.headers)
+        params_enc = {key: json.dumps(val) for key, val in params.items()}
         if req_type == RequestType.GET:
             res = requests.get(
-                url, headers=headers, params=urlencode(params), timeout=TIMEOUT
+                url,
+                headers=headers,
+                params=urlencode(params_enc),
+                timeout=TIMEOUT,
             )
         elif req_type == RequestType.POST:
             res = requests.post(
                 url,
                 headers=headers,
-                params=urlencode(params),
+                params=urlencode(params_enc),
                 json=data,
                 timeout=TIMEOUT,
             )
@@ -121,7 +126,7 @@ class T2D2(object):
             res = requests.put(
                 url,
                 headers=headers,
-                params=urlencode(params),
+                params=urlencode(params_enc),
                 json=data,
                 timeout=TIMEOUT,
             )
@@ -129,7 +134,7 @@ class T2D2(object):
             res = requests.delete(
                 url,
                 headers=headers,
-                params=urlencode(params),
+                params=urlencode(params_enc),
                 json=data,
                 timeout=TIMEOUT,
             )
@@ -144,7 +149,7 @@ class T2D2(object):
                 return {"content": res.content}
         else:
             if self.debug:
-                print(f"URL: {req_type} {url}")
+                print(f"URL: {req_type} {res.url}")
                 print(f"HEADERS: {headers}")
                 print(f"PARAMS: {params}")
                 print(f"DATA: {data}")
@@ -189,7 +194,7 @@ class T2D2(object):
         json_data = self.request(f"project/{project_id}", RequestType.GET)
         if not json_data["success"]:
             raise ValueError(json_data["message"])
-        
+
         project = json_data["data"]
         self.project = project
 
