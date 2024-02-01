@@ -293,7 +293,7 @@ class T2D2(object):
         url = f"{self.project['id']}/assets/bulk.create"
         return self.request(url, RequestType.POST, data=payload)
 
-    def upload_images(self, image_paths, image_type=1):
+    def upload_images(self, image_paths, image_type=1, params=None):
         """Upload images"""
 
         if not self.project:
@@ -307,15 +307,16 @@ class T2D2(object):
             s3_path = (
                 self.s3_base_url + f"/projects/{self.project['id']}/images/{filename}"
             )
-            upload_file(file_path, s3_path)
-            assets.append(
-                {
-                    "name": base,
-                    "filename": base + ext,
-                    "url": filename,
-                    "size": {"filesize": os.path.getsize(file_path)},
-                }
-            )
+            result = upload_file(file_path, s3_path)
+            if result.get("success", False):
+                assets.append(
+                    {
+                        "name": base,
+                        "filename": base + ext,
+                        "url": filename,
+                        "size": {"filesize": os.path.getsize(file_path)},
+                    }
+                )
 
         # Add images to project
         payload = {
@@ -324,6 +325,10 @@ class T2D2(object):
             "image_type": image_type,
             "assets": assets,
         }
+
+        if params is not None:
+            payload.update(params)
+
         return self.add_assets(payload)
 
     def upload_drawings(self, drawing_paths):
