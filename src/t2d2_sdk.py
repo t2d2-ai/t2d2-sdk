@@ -285,6 +285,24 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
+    def download_assets(self, asset_ids, asset_type=1, download_dir="./"):
+        """Download assets"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        assets = self.get_assets(asset_type, asset_ids)
+        if len(assets) != len(asset_ids):
+            raise ValueError("Some assets not found")
+        
+        for asset in assets:
+            url = asset["url"]
+            file_path = os.path.join(download_dir, asset["filename"])
+            response = download_file(url, file_path)
+            if not response["success"]:
+                raise ValueError(response["message"])
+
+        return
+
     ################################################################################################
     # Add / Upload Asset methods
     ################################################################################################
