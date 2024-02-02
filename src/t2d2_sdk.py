@@ -294,7 +294,7 @@ class T2D2(object):
         if len(assets) != len(asset_ids):
             raise ValueError("Some assets not found")
         
-        output = []
+        output = {}
         for asset in assets:
             url = asset["url"]
             if original_filename:
@@ -303,7 +303,7 @@ class T2D2(object):
                 ext = os.path.splitext(asset["filename"])[1]
                 file_name = f"img_{asset['id']}{ext}"
             file_path = os.path.join(download_dir, file_name)
-            output.append(file_path)
+            output[asset["id"]] = file_path
             response = download_file(url, file_path)
             if not response["success"]:
                 raise ValueError(response["message"])
