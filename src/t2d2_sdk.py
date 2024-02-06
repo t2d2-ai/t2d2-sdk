@@ -525,3 +525,17 @@ class T2D2(object):
         json_data = self.request(url, RequestType.GET, params=params)
 
         return json_data["data"]
+    
+    def add_geotags(self, drawing_id, geotags):
+        """Add geotags"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/geotags/bulk.create"
+        payload = {
+            "drawing_id": drawing_id,
+            "geotags": geotags,
+        }
+        results = self.request(url, RequestType.POST, data=payload)
+
+        return results
