@@ -1,4 +1,5 @@
 """T2D2 SDK API wrapper"""
+
 import json
 import os
 import random
@@ -19,6 +20,12 @@ def random_string(length: int = 6) -> str:
     """Generate a random string of fixed length"""
     letters = string.ascii_lowercase
     return "".join(random.choice(letters) for i in range(length))
+
+
+def random_color() -> str:
+    """Generate a random color"""
+    r = lambda: random.randint(0, 255)
+    return "#%02X%02X%02X" % (r(), r(), r())
 
 
 ####################################################################################################
@@ -285,7 +292,9 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
-    def download_assets(self, asset_ids, asset_type=1, download_dir="./", original_filename=False):
+    def download_assets(
+        self, asset_ids, asset_type=1, download_dir="./", original_filename=False
+    ):
         """Download assets"""
         if not self.project:
             raise ValueError("Project not set")
@@ -293,7 +302,7 @@ class T2D2(object):
         assets = self.get_assets(asset_type, asset_ids)
         if len(assets) != len(asset_ids):
             raise ValueError("Some assets not found")
-        
+
         output = {}
         for asset in assets:
             url = asset["url"]
@@ -510,6 +519,74 @@ class T2D2(object):
 
         return results
 
+    def get_materials(self):
+        """Return material list"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = "material"
+        params = {"project_id": self.project["id"]}
+        json_data = self.request(url, RequestType.GET, params=params)
+        return json_data["data"]
+
+    def get_annotation_classes(self, params=None):
+        """Return annotation class list"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = "annotation-class"
+        params_ = {
+            "project_id": self.project["id"],
+            "scope": "DEFAULT",
+            "sortBy": "id:asc",
+        }
+        if params is not None:
+            params_.update(params)
+
+        print(params_)
+
+        json_data = self.request(url, RequestType.GET, params=params_)
+        return json_data["data"]
+
+    def add_annotation_class(self, name, color=None, materials=None):
+        """Add annotation class"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        if materials is None:
+            materials = []
+
+        if color is None:
+            color = random_color()
+
+        url = "annotation-class/create-annotation-class"
+        payload = {
+            "project_id": self.project["id"],
+            "name": name,
+            "materials": materials,
+            "color": color,
+        }
+        results = self.request(url, RequestType.POST, data=payload)
+
+        return results
+
+    def delete_annotation_classes(self, annotation_class_ids):
+        """Delete annotation class"""
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        if isinstance(annotation_class_ids, int):
+            annotation_class_ids = [annotation_class_ids]
+
+        if len(annotation_class_ids) == 0:
+            return {"success": False, "message": "No annotation class ids provided"}
+
+        url = f"{self.project['id']}/annotation-class/bulk.delete"
+        payload = {"annotation_class_ids": annotation_class_ids}
+        results = self.request(url, RequestType.DELETE, data=payload)
+
+        return results
+
     ################################################################################################
     # Geotag methods
     ################################################################################################
@@ -525,7 +602,7 @@ class T2D2(object):
         json_data = self.request(url, RequestType.GET, params=params)
 
         return json_data["data"]
-    
+
     def add_geotags(self, drawing_id, geotags):
         """Add geotags"""
         if not self.project:
@@ -537,5 +614,53 @@ class T2D2(object):
             "geotags": geotags,
         }
         results = self.request(url, RequestType.POST, data=payload)
+
+        return results
+
+    def delete_geotags(self, drawing_id, geotag_ids):
+        """Delete geotags"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/geotags/bulk.delete"
+        payload = {
+            "drawing_id": drawing_id,
+            "geotag_ids": geotag_ids,
+        }
+        results = self.request(url, RequestType.POST, data=payload)
+
+        return results
+
+    # TODO: Update Geotags
+
+    ################################################################################################
+    # Tag methods
+    ################################################################################################
+    def get_tags(self, params=None):
+        """Return tag list"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/tags"
+        json_data = self.request(url, RequestType.GET, params=params)
+        return json_data["data"]
+
+    def add_tags(self, tags):
+        """Add tags"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/tags"
+        if isinstance(tags, str):
+            tags = [tags]
+
+        results = []
+        for tag in tags:
+            payload = {"name": tag}
+            try:
+                result = self.request(url, RequestType.POST, data=payload)
+                results.append(result)
+            except Exception as e:
+                print("*WARNING* Tag already exists: ", e)
 
         return results
