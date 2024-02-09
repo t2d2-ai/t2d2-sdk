@@ -320,6 +320,19 @@ class T2D2(object):
         return output
 
     ################################################################################################
+    # Update methods
+    ################################################################################################
+    def update_images(self, image_ids, payload):
+        """Update images"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/images/bulk.update"
+        payload["image_ids"] = image_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    ################################################################################################
     # Add / Upload Asset methods
     ################################################################################################
     def add_assets(self, payload):
@@ -515,6 +528,7 @@ class T2D2(object):
             "image_id": image_id,
             "annotations": annotations,
         }
+
         results = self.request(url, RequestType.POST, data=payload)
 
         return results
@@ -574,7 +588,7 @@ class T2D2(object):
         """Delete annotation class"""
         if not self.project:
             raise ValueError("Project not set")
-        
+
         if isinstance(annotation_class_ids, int):
             annotation_class_ids = [annotation_class_ids]
 
