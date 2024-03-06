@@ -113,7 +113,12 @@ class T2D2(object):
             data = {}
 
         headers.update(self.headers)
-        params_enc = {key: json.dumps(val) for key, val in params.items()}
+        params_enc = {}
+        for key, val in params.items():
+            if isinstance(val, list):
+                params_enc[key] = json.dumps(val)
+            else:
+                params_enc[key] = val
         if req_type == RequestType.GET:
             res = requests.get(
                 url,
