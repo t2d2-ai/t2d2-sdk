@@ -353,15 +353,16 @@ class T2D2(object):
 
         # Upload images to S3
         assets = []
-        image_root = 'images'
+        image_root = "images"
         if image_type == 3:
-            image_root = 'orthomosaics'
+            image_root = "orthomosaics"
 
         for file_path in image_paths:
             base, ext = os.path.splitext(os.path.basename(file_path))
             filename = f"{base}_{random_string(6)}{ext}"
             s3_path = (
-                self.s3_base_url + f"/projects/{self.project['id']}/{image_root}/{filename}"
+                self.s3_base_url
+                + f"/projects/{self.project['id']}/{image_root}/{filename}"
             )
             result = upload_file(file_path, s3_path)
             if result.get("success", False):
@@ -482,6 +483,24 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
+
+    def upload_downloads(self, file_paths):
+        """Upload downloads to project folder"""
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        for file_path in file_paths:
+            filename = os.path.basename(file_path)
+            s3_path = (
+                self.s3_base_url
+                + f"/projects/{self.project['id']}/downloads/{filename}"
+            )
+            response = upload_file(file_path, s3_path)
+            if not response["success"]:
+                raise ValueError(response["message"])
+
+        return {"success": True, "message": "Files uploaded"}
 
     ################################################################################################
     # Annotation methods
