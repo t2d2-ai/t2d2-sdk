@@ -189,6 +189,12 @@ class T2D2(object):
 
         return
 
+    def notify_user(self, title, message):
+        """Notify user"""
+        url = "notifications"
+        payload = {"title": title, "message": message}
+        return self.request(url, RequestType.POST, data=payload)
+
     ################################################################################################
     # Project Get/Set
     ################################################################################################
