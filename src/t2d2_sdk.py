@@ -260,11 +260,15 @@ class T2D2(object):
 
     def get_drawings(self, drawing_ids=None, params=None):
         """Return drawing list based on specified ids"""
-        if drawing_ids is None:
-            return []
-
         if not self.project:
             raise ValueError("Project not set")
+
+        # all drawings in project
+        if drawing_ids is None:
+            url = f"{self.project['id']}/drawings"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["drawing_list"]
+            return results
 
         results = []
         for dwg_id in drawing_ids:
@@ -275,11 +279,15 @@ class T2D2(object):
 
     def get_videos(self, video_ids=None, params=None):
         """Return video list based on specified ids"""
-        if video_ids is None:
-            return []
-
         if not self.project:
             raise ValueError("Project not set")
+
+        # all videos in project
+        if video_ids is None:
+            url = f"{self.project['id']}/videos"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["video_list"]
+            return results
 
         results = []
         for vid_id in video_ids:
