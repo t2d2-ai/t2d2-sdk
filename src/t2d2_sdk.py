@@ -485,6 +485,37 @@ class T2D2(object):
 
         return res
         
+    def upload_threed(self, threed_paths):
+        """Upload 3d"""
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # Upload images to S3
+        assets = []
+        for file_path in threed_paths:
+            base, ext = os.path.splitext(os.path.basename(file_path))
+            filename = f"{base}_{random_string(6)}{ext}"
+            s3_path = (
+                self.s3_base_url + f"/projects/{self.project['id']}/3d_models/{filename}"
+            )
+            upload_file(file_path, s3_path)
+            assets.append(
+                {
+                    "name": base,
+                    "filename": base + ext,
+                    "url": filename,
+                    "size": {"filesize": os.path.getsize(file_path)},
+                }
+            )
+
+        # Add images to project
+        url = f"{self.project['id']}/assets/bulk.create"
+        payload = {"project_id": self.project["id"], "asset_type": 5, "assets": assets}
+        res = self.request(url, RequestType.POST, data=payload)
+
+        return res
+    
 
     def upload_reports(self, report_paths):
         """Upload reports"""
