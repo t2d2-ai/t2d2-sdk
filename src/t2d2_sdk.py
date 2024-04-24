@@ -511,7 +511,7 @@ class T2D2(object):
 
         # Add images to project
         url = f"{self.project['id']}/assets/bulk.create"
-        payload = {"project_id": self.project["id"], "asset_type": 5, "assets": assets}
+        payload = {"project_id": self.project["id"], "asset_type": 6, "assets": assets}
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
