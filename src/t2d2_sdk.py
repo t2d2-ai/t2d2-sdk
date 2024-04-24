@@ -4,6 +4,8 @@ import json
 import os
 import random
 import string
+from collections import defaultdict
+from datetime import datetime
 from enum import Enum, auto
 from urllib.parse import urlencode, urlparse
 
@@ -26,6 +28,11 @@ def random_color() -> str:
     """Generate a random color"""
     r = lambda: random.randint(0, 255)
     return "#%02X%02X%02X" % (r(), r(), r())
+
+
+def ts2date(ts):
+    """Convert timestamp to date"""
+    return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
 
 
 ####################################################################################################
@@ -221,6 +228,20 @@ class T2D2(object):
         res = urlparse(self.s3_base_url)
         self.bucket = res.netloc.split(".")[0]
         return
+
+    def get_project_info(self):
+        """Return project info"""
+        if not self.project:
+            raise ValueError("Project not set")
+        return {
+            "id": self.project["id"],
+            "name": self.project["profile"]["name"],
+            "address": self.project["location"]["address"],
+            "description": self.project.get("description", ""),
+            "created_by": self.project.get("created_by", ""),
+            "created_at": ts2date(self.project["created_at"]),
+            "statistics": self.project.get("statistics", {}),
+        }
 
     ################################################################################################
     # Get Assets
@@ -463,6 +484,7 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
+        
 
     def upload_reports(self, report_paths):
         """Upload reports"""
@@ -720,3 +742,60 @@ class T2D2(object):
                 print("*WARNING* Tag already exists: ", e)
 
         return results
+
+    ################################################################################################
+    # Classes and Conditions methods
+    ################################################################################################
+    def get_classes(self):
+        """Return classes"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # Get full class data
+        class_map = {}
+        classes = self.get_annotation_classes()
+        for lbl in classes["label_list"]:
+            class_map[lbl["id"]] = lbl
+
+        url = f"{self.project['id']}/conditions"
+        json_data = self.request(url, RequestType.GET)
+        output = []
+        for lbl in json_data["data"]["condition_list"]:
+            lbl["name"] = class_map[lbl["annotation_class_id"]]["name"]
+            output.append(lbl)
+        return
+
+    def summarize_images(self):
+        """Summarize images"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # Return image summary
+        images = self.get_images()
+        if len(images) == 0:
+            return {
+                "region_group": {},
+                "date_group": {},
+                "tag_group": {},
+            }
+        # Group by region, date and tags
+        region_group, date_group, tag_group = (
+            defaultdict(int),
+            defaultdict(int),
+            defaultdict(int),
+        )
+        for img in images:
+            img_region = img["region"]['name']
+            img_date = ts2date(img["captured_date"]).split(' ')[0]
+            img_tags = img["tags"]
+
+            region_group[img_region] += 1
+            date_group[img_date] += 1
+            for img_tag in img_tags:
+                tag_group[img_tag['name']] += 1
+
+        return {
+            "region_group": region_group,
+            "date_group": date_group,
+            "tag_group": tag_group,
+        }
