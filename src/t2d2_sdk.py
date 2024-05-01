@@ -830,3 +830,43 @@ class T2D2(object):
             "date_group": date_group,
             "tag_group": tag_group,
         }
+
+
+    def summarize_conditions(self):
+        """Summarize conditions by region, label and rating"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        imgs = self.get_images()
+
+        anns = defaultdict(list)
+        for img in imgs:
+            reg = img['region']['name']
+            anns_img = self.get_annotations(image_id=img['id'])
+            anns[reg] += anns_img
+
+        result = {}
+        for reg, annotations in anns.items():
+            sublist = {}
+            for ann in annotations:
+                label = ann['annotation_class']['annotation_class_name']
+                rating = ann.get('condition', {}).get('rating_name', 'default')
+                area = ann['area']
+                length = ann['length']
+                ann_id = ann['id']
+                key = (label, rating)
+                if key in sublist:
+                    sublist[key]['count'] += 1
+                    sublist[key]['length'] += length
+                    sublist[key]['area'] += area
+                    sublist[key]['annotation_ids'].append(ann_id)
+                else:
+                    sublist[key] = {}
+                    sublist[key]['count'] = 1
+                    sublist[key]['length'] = length
+                    sublist[key]['area'] = area
+                    sublist[key]['annotation_ids'] = []
+                    
+            result[reg] = sublist
+
+        return result
