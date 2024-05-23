@@ -243,6 +243,15 @@ class T2D2(object):
             "statistics": self.project.get("statistics", {}),
         }
 
+    def add_region(self, region_name:str):
+        """Add region to project"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/categories/regions"
+        json_data = self.request(url, RequestType.POST, data={'name': region_name})
+        return json_data    
+
     ################################################################################################
     # Get Assets
     ################################################################################################
