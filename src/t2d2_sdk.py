@@ -16,7 +16,8 @@ TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 # DEV https://api-v3-dev.t2d2.ai/api/
 
-
+####################################################################################################
+# COMMON HELPER FUNCTIONS
 ####################################################################################################
 def random_string(length: int = 6) -> str:
     """Generate a random string of fixed length"""
@@ -35,7 +36,6 @@ def ts2date(ts):
     return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
 
 
-####################################################################################################
 def download_file(url: str, file_path: str):
     """Download a file from a url to a local path"""
     try:
@@ -243,6 +243,9 @@ class T2D2(object):
             "statistics": self.project.get("statistics", {}),
         }
 
+    ################################################################################################
+    # CRUD Regions
+    ################################################################################################
     def add_region(self, region_name:str):
         """Add region to project"""
         if not self.project:
@@ -253,7 +256,7 @@ class T2D2(object):
         return json_data    
 
     ################################################################################################
-    # Get Assets
+    # CRUD Assets
     ################################################################################################
     def get_assets(self, asset_type=1, asset_ids=None):
         """Return asset list based on specified ids"""
@@ -268,78 +271,10 @@ class T2D2(object):
         json_data = self.request(url, RequestType.POST, data=payload)
         return json_data["data"]
 
-    def get_images(self, image_ids=None, params=None):
-        """Return image list based on specified ids"""
-        if not self.project:
-            raise ValueError("Project not set yet")
-
-        # all images in project
-        if image_ids is None:
-            url = f"{self.project['id']}/images"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results = json_data["data"]["image_list"]
-            return results
-
-        # Specified image_ids
-        results = []
-        for img_id in image_ids:
-            url = f"{self.project['id']}/images/{img_id}"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results.append(json_data["data"])
-        return results
-
-    def get_drawings(self, drawing_ids=None, params=None):
-        """Return drawing list based on specified ids"""
-        if not self.project:
-            raise ValueError("Project not set")
-
-        # all drawings in project
-        if drawing_ids is None:
-            url = f"{self.project['id']}/drawings"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results = json_data["data"]["drawing_list"]
-            return results
-
-        results = []
-        for dwg_id in drawing_ids:
-            url = f"{self.project['id']}/drawings/{dwg_id}"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results.append(json_data["data"])
-        return results
-
-    def get_videos(self, video_ids=None, params=None):
-        """Return video list based on specified ids"""
-        if not self.project:
-            raise ValueError("Project not set")
-
-        # all videos in project
-        if video_ids is None:
-            url = f"{self.project['id']}/videos"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results = json_data["data"]["video_list"]
-            return results
-
-        results = []
-        for vid_id in video_ids:
-            url = f"{self.project['id']}/videos/{vid_id}"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results.append(json_data["data"])
-        return results
-
-    def get_reports(self, report_ids=None, params=None):
-        """Return report list based on specified ids"""
-        if report_ids is None:
-            return []
-
-        if not self.project:
-            raise ValueError("Project not set")
-
-        results = []
-        for report_id in report_ids:
-            url = f"{self.project['id']}/reports/{report_id}"
-            json_data = self.request(url, RequestType.GET, params=params)
-            results.append(json_data["data"])
-        return results
+    def add_assets(self, payload):
+        """Add assets"""
+        url = f"{self.project['id']}/assets/bulk.create"
+        return self.request(url, RequestType.POST, data=payload)
 
     def download_assets(
         self, asset_ids, asset_type=1, download_dir="./", original_filename=False
@@ -369,26 +304,8 @@ class T2D2(object):
         return output
 
     ################################################################################################
-    # Update methods
+    # CRUD Images
     ################################################################################################
-    def update_images(self, image_ids, payload):
-        """Update images"""
-        if not self.project:
-            raise ValueError("Project not set")
-
-        url = f"{self.project['id']}/images/bulk.update"
-        payload["image_ids"] = image_ids
-        payload["project_id"] = self.project["id"]
-        return self.request(url, RequestType.PUT, data=payload)
-
-    ################################################################################################
-    # Add / Upload Asset methods
-    ################################################################################################
-    def add_assets(self, payload):
-        """Add assets"""
-        url = f"{self.project['id']}/assets/bulk.create"
-        return self.request(url, RequestType.POST, data=payload)
-
     def upload_images(self, image_paths, image_type=1, params=None):
         """Upload images"""
 
@@ -432,6 +349,39 @@ class T2D2(object):
 
         return self.add_assets(payload)
 
+    def get_images(self, image_ids=None, params=None):
+        """Return image list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set yet")
+
+        # all images in project
+        if image_ids is None:
+            url = f"{self.project['id']}/images"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["image_list"]
+            return results
+
+        # Specified image_ids
+        results = []
+        for img_id in image_ids:
+            url = f"{self.project['id']}/images/{img_id}"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results.append(json_data["data"])
+        return results
+
+    def update_images(self, image_ids, payload):
+        """Update images"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/images/bulk.update"
+        payload["image_ids"] = image_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    ################################################################################################
+    # CRUD Drawings
+    ################################################################################################
     def upload_drawings(self, drawing_paths):
         """Upload drawings"""
 
@@ -463,6 +413,28 @@ class T2D2(object):
 
         return res
 
+    def get_drawings(self, drawing_ids=None, params=None):
+        """Return drawing list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # all drawings in project
+        if drawing_ids is None:
+            url = f"{self.project['id']}/drawings"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["drawing_list"]
+            return results
+
+        results = []
+        for dwg_id in drawing_ids:
+            url = f"{self.project['id']}/drawings/{dwg_id}"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results.append(json_data["data"])
+        return results
+
+    ################################################################################################
+    # CRUD Videos
+    ################################################################################################
     def upload_videos(self, video_paths):
         """Upload videos"""
 
@@ -493,7 +465,29 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
-        
+
+    def get_videos(self, video_ids=None, params=None):
+        """Return video list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # all videos in project
+        if video_ids is None:
+            url = f"{self.project['id']}/videos"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["video_list"]
+            return results
+
+        results = []
+        for vid_id in video_ids:
+            url = f"{self.project['id']}/videos/{vid_id}"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results.append(json_data["data"])
+        return results
+
+    ################################################################################################
+    # CRUD 3D
+    ################################################################################################
     def upload_threed(self, threed_paths):
         """Upload 3d"""
 
@@ -524,8 +518,10 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
-    
 
+    ################################################################################################
+    # CRUD Reports
+    ################################################################################################
     def upload_reports(self, report_paths):
         """Upload reports"""
 
@@ -560,83 +556,56 @@ class T2D2(object):
 
         return res
 
-    def upload_downloads(self, file_paths):
-        """Upload downloads to project folder"""
+    def get_reports(self, report_ids=None, params=None):
+        """Return report list based on specified ids"""
+        if report_ids is None:
+            return []
 
         if not self.project:
             raise ValueError("Project not set")
 
-        for file_path in file_paths:
-            filename = os.path.basename(file_path)
-            s3_path = (
-                self.s3_base_url
-                + f"/projects/{self.project['id']}/downloads/{filename}"
-            )
-            response = upload_file(file_path, s3_path)
-            if not response["success"]:
-                raise ValueError(response["message"])
-
-        return {"success": True, "message": "Files uploaded"}
+        results = []
+        for report_id in report_ids:
+            url = f"{self.project['id']}/reports/{report_id}"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results.append(json_data["data"])
+        return results
 
     ################################################################################################
-    # Annotation methods
+    # CRUD Tags
     ################################################################################################
-    def get_annotations(self, image_id=None, params=None):
-        """TODO: Return annotation list based on specified ids"""
+    def get_tags(self, params=None):
+        """Return tag list"""
         if not self.project:
             raise ValueError("Project not set")
 
-        if params is None:
-            params = {}
+        url = f"{self.project['id']}/tags"
+        json_data = self.request(url, RequestType.GET, params=params)
+        return json_data["data"]
 
-        if image_id is None:
-            images = self.get_images(params=params)
-            image_ids = [img["id"] for img in images]
-        else:
-            image_ids = [image_id]
-
-        images = self.get_images(image_ids=image_ids, params=params)
-        annotations = []
-        for img in images:
-            annotations.extend(img["annotations"])
-
-        return annotations
-
-    def delete_annotations(self, image_id, annotation_ids=None):
-        """Delete annotations"""
-
+    def add_tags(self, tags):
+        """Add tags"""
         if not self.project:
             raise ValueError("Project not set")
 
-        if annotation_ids is None:
-            # Get annotation_ids for all annotations in image
-            annotations = self.get_annotations(image_id)
-            annotation_ids = [ann["id"] for ann in annotations]
+        url = f"{self.project['id']}/tags"
+        if isinstance(tags, str):
+            tags = [tags]
 
-        payload = {
-            "project_id": self.project["id"],
-            "image_id": image_id,
-            "annotation_ids": annotation_ids,
-        }
-
-        return self.request("annotation", RequestType.DELETE, data=payload)
-
-    def add_annotations(self, image_id, annotations):
-        """TODO: Add annotations"""
-        if not self.project:
-            raise ValueError("Project not set")
-
-        url = "annotation"
-        payload = {
-            "project_id": self.project["id"],
-            "image_id": image_id,
-            "annotations": annotations,
-        }
-
-        results = self.request(url, RequestType.POST, data=payload)
+        results = []
+        for tag in tags:
+            payload = {"name": tag}
+            try:
+                result = self.request(url, RequestType.POST, data=payload)
+                results.append(result)
+            except Exception as e:
+                print("*WARNING* Tag already exists: ", e)
 
         return results
 
+    ################################################################################################
+    # CRUD Annotation Classes
+    ################################################################################################
     def get_materials(self):
         """Return material list"""
         if not self.project:
@@ -706,7 +675,66 @@ class T2D2(object):
         return results
 
     ################################################################################################
-    # Geotag methods
+    # CRUD Annotations
+    ################################################################################################
+    def get_annotations(self, image_id=None, params=None):
+        """TODO: Return annotation list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        if params is None:
+            params = {}
+
+        if image_id is None:
+            images = self.get_images(params=params)
+            image_ids = [img["id"] for img in images]
+        else:
+            image_ids = [image_id]
+
+        images = self.get_images(image_ids=image_ids, params=params)
+        annotations = []
+        for img in images:
+            annotations.extend(img["annotations"])
+
+        return annotations
+
+    def delete_annotations(self, image_id, annotation_ids=None):
+        """Delete annotations"""
+
+        if not self.project:
+            raise ValueError("Project not set")
+
+        if annotation_ids is None:
+            # Get annotation_ids for all annotations in image
+            annotations = self.get_annotations(image_id)
+            annotation_ids = [ann["id"] for ann in annotations]
+
+        payload = {
+            "project_id": self.project["id"],
+            "image_id": image_id,
+            "annotation_ids": annotation_ids,
+        }
+
+        return self.request("annotation", RequestType.DELETE, data=payload)
+
+    def add_annotations(self, image_id, annotations):
+        """TODO: Add annotations"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = "annotation"
+        payload = {
+            "project_id": self.project["id"],
+            "image_id": image_id,
+            "annotations": annotations,
+        }
+
+        results = self.request(url, RequestType.POST, data=payload)
+
+        return results
+
+    ################################################################################################
+    # CRUD Geotags
     ################################################################################################
     def get_geotags(self, drawing_id, params=None):
         """Return annotation list based on specified ids"""
@@ -749,39 +777,26 @@ class T2D2(object):
 
         return results
 
-    # TODO: Update Geotags
+    ################################################################################################
+    # CRUD Downloads
+    ################################################################################################
+    def upload_downloads(self, file_paths):
+        """Upload downloads to project folder"""
 
-    ################################################################################################
-    # Tag methods
-    ################################################################################################
-    def get_tags(self, params=None):
-        """Return tag list"""
         if not self.project:
             raise ValueError("Project not set")
 
-        url = f"{self.project['id']}/tags"
-        json_data = self.request(url, RequestType.GET, params=params)
-        return json_data["data"]
+        for file_path in file_paths:
+            filename = os.path.basename(file_path)
+            s3_path = (
+                self.s3_base_url
+                + f"/projects/{self.project['id']}/downloads/{filename}"
+            )
+            response = upload_file(file_path, s3_path)
+            if not response["success"]:
+                raise ValueError(response["message"])
 
-    def add_tags(self, tags):
-        """Add tags"""
-        if not self.project:
-            raise ValueError("Project not set")
-
-        url = f"{self.project['id']}/tags"
-        if isinstance(tags, str):
-            tags = [tags]
-
-        results = []
-        for tag in tags:
-            payload = {"name": tag}
-            try:
-                result = self.request(url, RequestType.POST, data=payload)
-                results.append(result)
-            except Exception as e:
-                print("*WARNING* Tag already exists: ", e)
-
-        return results
+        return {"success": True, "message": "Files uploaded"}
 
     ################################################################################################
     # Classes and Conditions methods
@@ -839,7 +854,6 @@ class T2D2(object):
             "date_group": date_group,
             "tag_group": tag_group,
         }
-
 
     def summarize_conditions(self):
         """Summarize conditions by region, label and rating"""
