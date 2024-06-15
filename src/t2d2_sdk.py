@@ -379,6 +379,15 @@ class T2D2(object):
         payload["project_id"] = self.project["id"]
         return self.request(url, RequestType.PUT, data=payload)
 
+    def delete_images(self, image_ids):
+        """Delete images"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/images/bulk.delete"
+        payload = {"image_ids" : image_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
+
     ################################################################################################
     # CRUD Drawings
     ################################################################################################
@@ -432,6 +441,25 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
+    def update_drawings(self, drawing_ids, payload):
+        """Update images"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/drawings/bulk.update"
+        payload["drawing_ids"] = drawing_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    def delete_drawings(self, drawing_ids):
+        """Delete drawings"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/drawings/bulk.delete"
+        payload = {"drawing_ids" : drawing_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
+
     ################################################################################################
     # CRUD Videos
     ################################################################################################
@@ -479,11 +507,30 @@ class T2D2(object):
             return results
 
         results = []
-        for vid_id in video_ids:
-            url = f"{self.project['id']}/videos/{vid_id}"
+        for video_id in video_ids:
+            url = f"{self.project['id']}/videos/{video_id}"
             json_data = self.request(url, RequestType.GET, params=params)
             results.append(json_data["data"])
         return results
+
+    def update_videos(self, video_ids, payload):
+        """Update videos"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/videos/bulk.update"
+        payload["video_ids"] = video_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    def delete_videos(self, video_ids):
+        """Delete drawings"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/videos/bulk.delete"
+        payload = {"video_ids" : video_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
     # CRUD 3D
@@ -518,6 +565,44 @@ class T2D2(object):
         res = self.request(url, RequestType.POST, data=payload)
 
         return res
+
+    def get_threed(self, model_ids=None, params=None):
+        """Return video list based on specified ids"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        # all videos in project
+        if model_ids is None:
+            url = f"{self.project['id']}/3d-models"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results = json_data["data"]["model_list"]
+            return results
+
+        results = []
+        for model_id in model_ids:
+            url = f"{self.project['id']}/3d-models/{model_id}"
+            json_data = self.request(url, RequestType.GET, params=params)
+            results.append(json_data["data"])
+        return results
+
+    def update_threed(self, model_ids, payload):
+        """Update videos"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/3d-models/bulk.update"
+        payload["model_ids"] = model_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    def delete_threed(self, model_ids):
+        """Delete drawings"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/3d-models/bulk.delete"
+        payload = {"model_ids" : model_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
     # CRUD Reports
@@ -571,6 +656,7 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
+    # TODO: Delete / Update Reports
     ################################################################################################
     # CRUD Tags
     ################################################################################################
@@ -603,6 +689,7 @@ class T2D2(object):
 
         return results
 
+    # TODO: Delete / Update Tags
     ################################################################################################
     # CRUD Annotation Classes
     ################################################################################################
@@ -674,6 +761,7 @@ class T2D2(object):
 
         return results
 
+    # TODO: Update Annotation Classes
     ################################################################################################
     # CRUD Annotations
     ################################################################################################
@@ -733,6 +821,7 @@ class T2D2(object):
 
         return results
 
+    # TODO: Update Annotations
     ################################################################################################
     # CRUD Geotags
     ################################################################################################
