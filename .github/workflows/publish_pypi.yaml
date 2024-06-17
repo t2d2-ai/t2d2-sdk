@@ -17,6 +17,8 @@ jobs:
         id: version
         with:
           scheme: conventional_commits
+      - name: Push git tags
+        run: git tag -a v${{ steps.version.outputs.version }} -m "v${{ steps.version.outputs.version }}"
   pypi-publish:
     name: upload release to PyPI
     runs-on: ubuntu-latest
