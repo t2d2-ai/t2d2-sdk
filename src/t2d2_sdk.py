@@ -16,6 +16,7 @@ TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 # DEV https://api-v3-dev.t2d2.ai/api/
 
+
 ####################################################################################################
 # COMMON HELPER FUNCTIONS
 ####################################################################################################
@@ -246,14 +247,14 @@ class T2D2(object):
     ################################################################################################
     # CRUD Regions
     ################################################################################################
-    def add_region(self, region_name:str):
+    def add_region(self, region_name: str):
         """Add region to project"""
         if not self.project:
             raise ValueError("Project not set")
 
         url = f"{self.project['id']}/categories/regions"
-        json_data = self.request(url, RequestType.POST, data={'name': region_name})
-        return json_data    
+        json_data = self.request(url, RequestType.POST, data={"name": region_name})
+        return json_data
 
     ################################################################################################
     # CRUD Assets
@@ -385,7 +386,7 @@ class T2D2(object):
             raise ValueError("Project not set")
 
         url = f"{self.project['id']}/images/bulk.delete"
-        payload = {"image_ids" : image_ids}
+        payload = {"image_ids": image_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
@@ -457,7 +458,7 @@ class T2D2(object):
             raise ValueError("Project not set")
 
         url = f"{self.project['id']}/drawings/bulk.delete"
-        payload = {"drawing_ids" : drawing_ids}
+        payload = {"drawing_ids": drawing_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
@@ -529,7 +530,7 @@ class T2D2(object):
             raise ValueError("Project not set")
 
         url = f"{self.project['id']}/videos/bulk.delete"
-        payload = {"video_ids" : video_ids}
+        payload = {"video_ids": video_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
@@ -547,7 +548,8 @@ class T2D2(object):
             base, ext = os.path.splitext(os.path.basename(file_path))
             filename = f"{base}_{random_string(6)}{ext}"
             s3_path = (
-                self.s3_base_url + f"/projects/{self.project['id']}/3d_models/{filename}"
+                self.s3_base_url
+                + f"/projects/{self.project['id']}/3d_models/{filename}"
             )
             upload_file(file_path, s3_path)
             assets.append(
@@ -601,7 +603,7 @@ class T2D2(object):
             raise ValueError("Project not set")
 
         url = f"{self.project['id']}/3d-models/bulk.delete"
-        payload = {"model_ids" : model_ids}
+        payload = {"model_ids": model_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
     ################################################################################################
@@ -656,7 +658,25 @@ class T2D2(object):
             results.append(json_data["data"])
         return results
 
-    # TODO: Delete / Update Reports
+    def update_reports(self, report_ids, payload):
+        """Update reports"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/reports/bulk.update"
+        payload["report_ids"] = report_ids
+        payload["project_id"] = self.project["id"]
+        return self.request(url, RequestType.PUT, data=payload)
+
+    def delete_reports(self, report_ids):
+        """Delete reports"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        url = f"{self.project['id']}/reports/bulk.delete"
+        payload = {"report_ids": report_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
+
     ################################################################################################
     # CRUD Tags
     ################################################################################################
@@ -929,14 +949,14 @@ class T2D2(object):
             defaultdict(int),
         )
         for img in images:
-            img_region = img["region"]['name']
-            img_date = ts2date(img["captured_date"]).split(' ')[0]
+            img_region = img["region"]["name"]
+            img_date = ts2date(img["captured_date"]).split(" ")[0]
             img_tags = img["tags"]
 
             region_group[img_region] += 1
             date_group[img_date] += 1
             for img_tag in img_tags:
-                tag_group[img_tag['name']] += 1
+                tag_group[img_tag["name"]] += 1
 
         return {
             "region_group": region_group,
@@ -953,32 +973,32 @@ class T2D2(object):
 
         anns = defaultdict(list)
         for img in imgs:
-            reg = img['region']['name']
-            anns_img = self.get_annotations(image_id=img['id'])
+            reg = img["region"]["name"]
+            anns_img = self.get_annotations(image_id=img["id"])
             anns[reg] += anns_img
 
         result = {}
         for reg, annotations in anns.items():
             sublist = {}
             for ann in annotations:
-                label = ann['annotation_class']['annotation_class_name']
-                rating = ann.get('condition', {}).get('rating_name', 'default')
-                area = ann['area']
-                length = ann['length']
-                ann_id = ann['id']
+                label = ann["annotation_class"]["annotation_class_name"]
+                rating = ann.get("condition", {}).get("rating_name", "default")
+                area = ann["area"]
+                length = ann["length"]
+                ann_id = ann["id"]
                 key = (label, rating)
                 if key in sublist:
-                    sublist[key]['count'] += 1
-                    sublist[key]['length'] += length
-                    sublist[key]['area'] += area
-                    sublist[key]['annotation_ids'].append(ann_id)
+                    sublist[key]["count"] += 1
+                    sublist[key]["length"] += length
+                    sublist[key]["area"] += area
+                    sublist[key]["annotation_ids"].append(ann_id)
                 else:
                     sublist[key] = {}
-                    sublist[key]['count'] = 1
-                    sublist[key]['length'] = length
-                    sublist[key]['area'] = area
-                    sublist[key]['annotation_ids'] = []
-                    
+                    sublist[key]["count"] = 1
+                    sublist[key]["length"] = length
+                    sublist[key]["area"] = area
+                    sublist[key]["annotation_ids"] = []
+
             result[reg] = sublist
 
         return result
