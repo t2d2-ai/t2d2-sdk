@@ -690,7 +690,7 @@ class T2D2(object):
         return json_data["data"]
 
     def add_tags(self, tags):
-        """Add tags"""
+        """Add tags to project"""
         if not self.project:
             raise ValueError("Project not set")
 
