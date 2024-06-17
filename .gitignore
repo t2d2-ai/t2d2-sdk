@@ -1,3 +1,6 @@
+# Documentation
+docs/*
+
 # Rest files
 *.rest
 tests/run_local.py

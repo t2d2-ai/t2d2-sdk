@@ -6,6 +6,18 @@ on:
       - main
 
 jobs:
+  increment-version:
+    name: Increment version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Get next version
+        uses: reecetech/version-increment@2024.4.3
+        id: version
+        with:
+          scheme: semver
+          increment: patch
   pypi-publish:
     name: upload release to PyPI
     runs-on: ubuntu-latest
