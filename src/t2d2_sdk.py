@@ -702,6 +702,7 @@ class T2D2(object):
         for tag in tags:
             payload = {"name": tag}
             try:
+                # Use POST to create new tag
                 result = self.request(url, RequestType.POST, data=payload)
                 results.append(result)
             except Exception as e:

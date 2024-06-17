@@ -16,7 +16,7 @@ jobs:
         uses: reecetech/version-increment@2024.4.3
         id: version
         with:
-          scheme: semver
+          scheme: conventional_commits
   pypi-publish:
     name: upload release to PyPI
     runs-on: ubuntu-latest
