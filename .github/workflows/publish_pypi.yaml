@@ -18,9 +18,13 @@ jobs:
         with:
           scheme: conventional_commits
       - name: Push git tags
-        run: git tag -a v${{ steps.version.outputs.version }} -m "v${{ steps.version.outputs.version }}"
+        run: 
+          git config --local user.email "bhiriyur@t2d2.ai"
+          git config --local user.name "Badri Hiriyur"
+          git tag -a v${{ steps.version.outputs.version }} -m "v${{ steps.version.outputs.version }}"
   pypi-publish:
     name: upload release to PyPI
+    needs: increment-version
     runs-on: ubuntu-latest
     environment:
       name: pypi
