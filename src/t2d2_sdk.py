@@ -264,7 +264,7 @@ class T2D2(object):
         region_id = None
         for region in self.project["regions"]:
             if region["name"] == region_name:
-                region_id = region["id"]
+                region_id = region["_id"]
                 break
 
         if region_id is None:
