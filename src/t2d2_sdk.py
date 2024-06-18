@@ -256,6 +256,24 @@ class T2D2(object):
         json_data = self.request(url, RequestType.POST, data={"name": region_name})
         return json_data
 
+    def update_region(self, region_name: str, new_region: dict):
+        """Update region"""
+        if not self.project:
+            raise ValueError("Project not set")
+
+        region_id = None
+        for region in self.project["regions"]:
+            if region["name"] == region_name:
+                region_id = region["id"]
+                break
+
+        if region_id is None:
+            raise ValueError("Region not found")
+
+        url = f"{self.project['id']}/categories/regions/{region_id}"
+        json_data = self.request(url, RequestType.PUT, data=new_region)
+        return json_data
+
     ################################################################################################
     # CRUD Assets
     ################################################################################################
