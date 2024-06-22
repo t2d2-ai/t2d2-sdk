@@ -1,18 +1,15 @@
-# T2D2 Python SDK
-
 ## Description
 
 T2D2 SDK python wrapper to API to interface with T2D2 projects and related assets.
 
 ## Table of Contents
 
-- [T2D2 Python SDK](#t2d2-python-sdk)
-  - [Description](#description)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Contributing](#contributing)
-  - [License](#license)
+- [Description](#description)
+- [Table of Contents](#table-of-contents)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -23,7 +20,7 @@ This SDK is published to PyPI and the latest version can be installed as follows
 
 These instructions assume that you have an account at T2D2 (<https://t2d2.ai>). If you do not have an account, you can sign up here: (<https://app.t2d2.ai/auth/register>). Subscription pricing details may be found here: (<https://t2d2.ai/pricing>).
 
-Once you have an account created, you can either use your email/password or an _API KEY_ to instantiate the T2D2 client.
+Once you have an account created, you can either use your email/password or an API KEY to instantiate the T2D2 client.
 
 ```python
 from t2d2_sdk import T2D2

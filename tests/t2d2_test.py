@@ -66,7 +66,7 @@ class T2D2APITests(unittest.TestCase):
         res = self.t2d2.get_project()
         project_count = res["total_projects"]
         # print("Total Projects: ", project_count)
-        self.assertEqual(project_count, 273)
+        self.assertEqual(project_count, 427)
 
         project = self.t2d2.get_project(PROJECT_ID)
         self.assertEqual(project["id"], PROJECT_ID)
@@ -80,7 +80,7 @@ class T2D2APITests(unittest.TestCase):
     def test_images(self):
         # Get Images
         images = self.t2d2.get_images(params={"image_types": [1, 2, 4]})
-        self.assertEqual(len(images), 205)
+        self.assertEqual(len(images), 266)
 
         # Get Images
         orthos = self.t2d2.get_images(params={"image_types": [3]})
