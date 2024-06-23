@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Welcome to T2D2 SDK’s documentation! &#8212; T2D2 SDK v1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=cb25574f" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=99a04888"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-t2d2-sdk-s-documentation">
+<h1>Welcome to T2D2 SDK’s documentation!<a class="headerlink" href="#welcome-to-t2d2-sdk-s-documentation" title="Permalink to this heading">¶</a></h1>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h2>
+<p>T2D2 SDK python wrapper to API to interface with T2D2 projects and related assets.</p>
+</section>
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#description"><span class="xref myst">Description</span></a></p></li>
+<li><p><a class="reference internal" href="#table-of-contents"><span class="xref myst">Table of Contents</span></a></p></li>
+<li><p><a class="reference internal" href="#installation"><span class="xref myst">Installation</span></a></p></li>
+<li><p><a class="reference internal" href="#usage"><span class="xref myst">Usage</span></a></p></li>
+<li><p><a class="reference internal" href="#contributing"><span class="xref myst">Contributing</span></a></p></li>
+<li><p><a class="reference internal" href="#license"><span class="xref myst">License</span></a></p></li>
+</ul>
+</section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h2>
+<p>This SDK is published to PyPI and the latest version can be installed as follows:
+<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">--upgrade</span> <span class="pre">t2d2-sdk</span></code></p>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<p>These instructions assume that you have an account at T2D2 (<a class="reference external" href="https://t2d2.ai">https://t2d2.ai</a>). If you do not have an account, you can sign up here: (<a class="reference external" href="https://app.t2d2.ai/auth/register">https://app.t2d2.ai/auth/register</a>). Subscription pricing details may be found here: (<a class="reference external" href="https://t2d2.ai/pricing">https://t2d2.ai/pricing</a>).</p>
+<p>Once you have an account created, you can either use your email/password or an API KEY to instantiate the T2D2 client.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">t2d2_sdk</span> <span class="kn">import</span> <span class="n">T2D2</span>
+
+<span class="n">credentials</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;email&#39;</span><span class="p">:</span> <span class="s2">&quot;my@email.com&quot;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;MYPASSWORD&gt;&quot;</span><span class="p">}</span>
+<span class="n">credentials</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;api_key&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;MY_API_KEY&gt;&quot;</span><span class="p">}</span>
+
+<span class="n">t2d2</span> <span class="o">=</span> <span class="n">T2D2</span><span class="p">(</span><span class="n">credentials</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With this client, you can interface with the app and get access to most of the features of the web interface. More documentation coming soon at <a class="reference external" href="https://docs.t2d2.ai">https://docs.t2d2.ai</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t2d2</span><span class="o">.</span><span class="n">set_project</span><span class="p">(</span><span class="n">PROJECT_ID</span><span class="p">)</span>
+<span class="n">project</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">get_project</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">get_images</span><span class="p">()</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h2>
+<p>Please contact <a class="reference external" href="mailto:bhiriyur&#37;&#52;&#48;t2d2&#46;ai">bhiriyur<span>&#64;</span>t2d2<span>&#46;</span>ai</a> for further information on contributing to this project.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
+<p>Information about the project’s license.</p>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">T2D2 SDK</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, Badri Hiriyur.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
