@@ -1,2 +1,4 @@
 myst-parser
 jinja2==3.1
+requests
+boto3
