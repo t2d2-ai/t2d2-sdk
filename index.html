@@ -20,6 +20,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
       </ul>
@@ -80,6 +83,1309 @@
 <h2>License<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h2>
 <p>Information about the project’s license.</p>
 </section>
+<span class="target" id="module-t2d2_sdk"></span><section id="t2d2-sdk-client-library">
+<h2>T2D2 SDK Client Library<a class="headerlink" href="#t2d2-sdk-client-library" title="Permalink to this heading">¶</a></h2>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="t2d2_sdk.RequestType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">RequestType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.RequestType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request types</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">T2D2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api-v3.t2d2.ai/api/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to interact with the T2D2 API, providing methods for authentication, data retrieval, and data manipulation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.base_url">
+<span class="sig-name descname"><span class="pre">base_url</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.base_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base URL for the T2D2 API endpoints.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.headers">
+<span class="sig-name descname"><span class="pre">headers</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Headers to be sent with each API request. Typically includes content type and authorization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.s3_base_url">
+<span class="sig-name descname"><span class="pre">s3_base_url</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.s3_base_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base URL for S3 storage where data might be stored or retrieved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.aws_region">
+<span class="sig-name descname"><span class="pre">aws_region</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.aws_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>The AWS region for S3 interactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.bucket">
+<span class="sig-name descname"><span class="pre">bucket</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.bucket" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the S3 bucket used for storing data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.access_token">
+<span class="sig-name descname"><span class="pre">access_token</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.access_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>The token used for authenticating API requests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.api_key">
+<span class="sig-name descname"><span class="pre">api_key</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.api_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The API key used for authenticating with the T2D2 API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.project">
+<span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.project" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dictionary representing the current project’s data. Default is None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><a class="headerlink" href="#t2d2_sdk.T2D2.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>A flag to enable or disable debug mode. Default is True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BASE_URL</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the T2D2 object with credentials and optional base URL override.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>credentials</strong> (<em>dict</em>) – A dictionary containing necessary credentials for API interaction.</p></li>
+<li><p><strong>base_url</strong> (<em>str</em><em>, </em><em>optional</em>) – The base URL for the T2D2 API. Defaults to BASE_URL.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the <cite>base_url</cite> does not end with a forward slash.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_annotation_class">
+<span class="sig-name descname"><span class="pre">add_annotation_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">materials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotation_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new annotation classes to the current project.</p>
+<p>This method allows for the creation of new annotation classes within the project. Each annotation class is defined by a name and can optionally include a list of attributes. The method returns the IDs of the newly created annotation classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annotation_classes</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each representing an annotation class to be added. Each dictionary must include a ‘name’ key, and can optionally include an ‘attributes’ key with a list of attribute names.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of the IDs of the newly created annotation classes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>annotation_classes</cite> is empty, not a list, or if any dictionary in the list does not contain a ‘name’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to add the annotation classes.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation_classes_to_add</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Pedestrian&#39;</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">,</span> <span class="s1">&#39;gender&#39;</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Traffic Light&#39;</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_annotation_class_ids</span> <span class="o">=</span> <span class="n">add_annotation_classes</span><span class="p">(</span><span class="n">annotation_classes_to_add</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_annotation_class_ids</span><span class="p">)</span>
+<span class="go">[&#39;new_class1_id&#39;, &#39;new_class2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_annotations">
+<span class="sig-name descname"><span class="pre">add_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new annotations to the current project.</p>
+<p>This method allows for the creation of new annotations within the project. Each annotation is defined by its associated class ID and can include a set of attributes. The method returns the IDs of the newly created annotations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annotations</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each representing an annotation to be added. Each dictionary must include a ‘class_id’ key, and can optionally include an ‘attributes’ key with a dictionary of attribute names and values.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of the IDs of the newly created annotations.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>annotations</cite> is empty, not a list, or if any dictionary in the list does not contain a ‘class_id’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to add the annotations.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotations_to_add</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="s1">&#39;vehicle&#39;</span><span class="p">,</span> <span class="s1">&#39;attributes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;make&#39;</span><span class="p">:</span> <span class="s1">&#39;Toyota&#39;</span><span class="p">}},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="s1">&#39;pedestrian&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_annotation_ids</span> <span class="o">=</span> <span class="n">add_annotations</span><span class="p">(</span><span class="n">annotations_to_add</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_annotation_ids</span><span class="p">)</span>
+<span class="go">[&#39;new_annotation1_id&#39;, &#39;new_annotation2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_assets">
+<span class="sig-name descname"><span class="pre">add_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add assets to project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>payload</strong> (<em>dict</em>) – A dictionary containing the assets to add.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_geotags">
+<span class="sig-name descname"><span class="pre">add_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_geotags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new geotags to the current project.</p>
+<p>This method allows for the creation of new geotags within the project. Each geotag is defined by its location (latitude and longitude) and can optionally include a set of associated tags. The method returns the IDs of the newly created geotags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>geotags</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each representing a geotag to be added. Each dictionary must include a ‘location’ key with a tuple of latitude and longitude, and can optionally include a ‘tags’ key with a list of tag IDs.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of the IDs of the newly created geotags.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>geotags</cite> is empty, not a list, or if any dictionary in the list does not contain a ‘location’ key or the ‘location’ value is not a tuple of latitude and longitude.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to add the geotags.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">geotags_to_add</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">40.7128</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0060</span><span class="p">),</span> <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;tag1&#39;</span><span class="p">,</span> <span class="s1">&#39;tag2&#39;</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">34.0522</span><span class="p">,</span> <span class="o">-</span><span class="mf">118.2437</span><span class="p">)}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_geotag_ids</span> <span class="o">=</span> <span class="n">add_geotags</span><span class="p">(</span><span class="n">geotags_to_add</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_geotag_ids</span><span class="p">)</span>
+<span class="go">[&#39;new_geotag1_id&#39;, &#39;new_geotag2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_region">
+<span class="sig-name descname"><span class="pre">add_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>region_name</strong> (<em>str</em>) – The name of the region to add.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_tags">
+<span class="sig-name descname"><span class="pre">add_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds new tags to the project.</p>
+<p>This method allows for the creation of new tags within the project. Each tag is defined by a name and can optionally be associated with a list of resource IDs at the time of creation. The method returns the IDs of the newly created tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tags</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each representing a tag to be added. Each dictionary must include a ‘name’ key, and can optionally include a ‘resources’ key with a list of resource IDs to associate with the tag.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of the IDs of the newly created tags.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>tags</cite> is empty, not a list, or if any dictionary in the list does not contain a ‘name’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to add the tags.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tags_to_add</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;New Tag 1&#39;</span><span class="p">,</span> <span class="s1">&#39;resources&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;resource1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;resource2_id&#39;</span><span class="p">]},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;New Tag 2&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_tag_ids</span> <span class="o">=</span> <span class="n">add_tags</span><span class="p">(</span><span class="n">tags_to_add</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">new_tag_ids</span><span class="p">)</span>
+<span class="go">[&#39;new_tag1_id&#39;, &#39;new_tag2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_annotation_classes">
+<span class="sig-name descname"><span class="pre">delete_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation_class_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotation_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes specified annotation classes from the current project.</p>
+<p>This method removes annotation classes identified by their unique IDs from the project. If an annotation class ID does not correspond to an existing class within the project, it is silently ignored. This operation is irreversible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>class_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of annotation class IDs indicating the classes to be deleted from the project.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of annotation class IDs that were successfully deleted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>class_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to delete the annotation classes.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">class_ids_to_delete</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;class1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;class2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deleted_class_ids</span> <span class="o">=</span> <span class="n">delete_annotation_classes</span><span class="p">(</span><span class="n">class_ids_to_delete</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">deleted_class_ids</span><span class="p">)</span>
+<span class="go">[&#39;class1_id&#39;, &#39;class2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_annotations">
+<span class="sig-name descname"><span class="pre">delete_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes specified annotations from the current project.</p>
+<p>This method removes annotations identified by their unique IDs from the project. If an annotation ID does not correspond to an existing annotation within the project, it is silently ignored. This operation is irreversible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annotation_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of annotation IDs indicating the annotations to be deleted from the project.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of annotation IDs that were successfully deleted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>annotation_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to delete the annotations.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation_ids_to_delete</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;annotation1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;annotation2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deleted_annotation_ids</span> <span class="o">=</span> <span class="n">delete_annotations</span><span class="p">(</span><span class="n">annotation_ids_to_delete</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">deleted_annotation_ids</span><span class="p">)</span>
+<span class="go">[&#39;annotation1_id&#39;, &#39;annotation2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_drawings">
+<span class="sig-name descname"><span class="pre">delete_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_drawings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete drawings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>drawing_ids</strong> (<em>list</em>) – A list of drawing IDs to delete.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_geotags">
+<span class="sig-name descname"><span class="pre">delete_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotag_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_geotags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes specified geotags from a drawing in the current project.</p>
+<p>This method removes geotags identified by their unique IDs from a specified drawing within the project. If a geotag ID does not correspond to an existing geotag within the specified drawing, it is silently ignored. This operation is irreversible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>drawing_id</strong> (<em>str</em>) – The ID of the drawing from which the geotags will be deleted.</p></li>
+<li><p><strong>geotag_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of geotag IDs indicating the geotags to be deleted from the drawing.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the status of the deletion operation, including any errors encountered.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>drawing_id</cite> is empty or not a string, or if <cite>geotag_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to delete the geotags.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">drawing_id</span> <span class="o">=</span> <span class="s1">&#39;drawing123&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geotag_ids_to_delete</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;geotag1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;geotag2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deletion_status</span> <span class="o">=</span> <span class="n">delete_geotags</span><span class="p">(</span><span class="n">drawing_id</span><span class="p">,</span> <span class="n">geotag_ids_to_delete</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">deletion_status</span><span class="p">)</span>
+<span class="go">{&#39;success&#39;: True, &#39;errors&#39;: []}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_images">
+<span class="sig-name descname"><span class="pre">delete_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_ids</strong> (<em>list</em>) – A list of image IDs to delete.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_reports">
+<span class="sig-name descname"><span class="pre">delete_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_reports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a list of reports from the current project based on specified report IDs.</p>
+<p>This method removes reports identified by their unique IDs from the project. If a report ID does not correspond to an existing report within the project, it is silently ignored. This operation is irreversible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>report_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of report IDs indicating the reports to be deleted from the project.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of report IDs that were successfully deleted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>report_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to delete the reports.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;report1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;report2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deleted_reports</span> <span class="o">=</span> <span class="n">delete_reports</span><span class="p">(</span><span class="n">report_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">deleted_reports</span><span class="p">)</span>
+<span class="go">[&#39;report1_id&#39;, &#39;report2_id&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_threed">
+<span class="sig-name descname"><span class="pre">delete_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_threed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete drawings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_videos">
+<span class="sig-name descname"><span class="pre">delete_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes a list of videos from the current project based on specified video IDs.</p>
+<p>This method removes videos identified by their unique IDs from the project. If a video ID does not correspond to an existing video within the project, it is silently ignored. This operation is irreversible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of video IDs indicating the videos to be deleted from the project.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of video IDs that were successfully deleted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>video_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to delete the videos.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">video_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;abc123&#39;</span><span class="p">,</span> <span class="s1">&#39;def456&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">deleted_videos</span> <span class="o">=</span> <span class="n">delete_videos</span><span class="p">(</span><span class="n">video_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">deleted_videos</span><span class="p">)</span>
+<span class="go">[&#39;abc123&#39;, &#39;def456&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.download_assets">
+<span class="sig-name descname"><span class="pre">download_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.download_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download assets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_ids</strong> (<em>list</em>) – A list of asset IDs to download.</p></li>
+<li><p><strong>asset_type</strong> (<em>int</em><em>, </em><em>optional</em>) – The type of asset to download. Defaults to 1.</p></li>
+<li><p><strong>download_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – The directory to download the assets to. Defaults to “./”.</p></li>
+<li><p><strong>original_filename</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to use the original filename. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the asset IDs and their corresponding file paths.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set or some assets are not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_annotation_classes">
+<span class="sig-name descname"><span class="pre">get_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotation_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of annotation classes from the current project.</p>
+<p>This method queries the project’s database for a list of all annotation classes that have been defined within the project. It returns a list of dictionaries, each representing an annotation class with details such as its ID, name, and associated attributes. If the project is not set or initialized, it raises an error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – A dictionary of parameters to filter the annotation classes. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing dictionaries, each with details of an annotation class.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If the project is not set or initialized.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation_classes</span> <span class="o">=</span> <span class="n">get_annotation_classes</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">annotation_classes</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;class1&#39;, &#39;name&#39;: &#39;Vehicle&#39;, &#39;attributes&#39;: [&#39;color&#39;, &#39;make&#39;]}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_annotations">
+<span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of annotations from the current project based on specified criteria.</p>
+<p>This method queries the project’s database for annotations that match the given criteria, such as annotation class, attributes, and creation date range. It returns a list of dictionaries, each representing an annotation with details such as its ID, associated class, attributes, and creation date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>criteria</strong> (<em>dict</em>) – A dictionary specifying the criteria for filtering annotations. Possible keys include ‘class_id’, ‘attributes’, and ‘date_range’, with their corresponding values used to filter the results.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing dictionaries, each with details of an annotation that matches the specified criteria.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>criteria</cite> is not a dictionary or if required keys are missing.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to retrieve the annotations.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criteria</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;class_id&#39;</span><span class="p">:</span> <span class="s1">&#39;vehicle&#39;</span><span class="p">,</span> <span class="s1">&#39;date_range&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">,</span> <span class="s1">&#39;2023-01-31&#39;</span><span class="p">)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotations</span> <span class="o">=</span> <span class="n">get_annotations</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">annotations</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;annotation1&#39;, &#39;class_id&#39;: &#39;vehicle&#39;, &#39;attributes&#39;: {&#39;color&#39;: &#39;red&#39;}, &#39;creation_date&#39;: &#39;2023-01-15&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_assets">
+<span class="sig-name descname"><span class="pre">get_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_assets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return asset list based on specified ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asset_type</strong> (<em>int</em><em>, </em><em>optional</em>) – The type of asset to retrieve. Defaults to 1.</p></li>
+<li><p><strong>asset_ids</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of asset IDs to retrieve. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries containing the asset data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_classes">
+<span class="sig-name descname"><span class="pre">get_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return classes</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_drawings">
+<span class="sig-name descname"><span class="pre">get_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_drawings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return drawing list based on specified ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>drawing_ids</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of drawing IDs to retrieve. Defaults to None.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional parameters to include in the request. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries containing the drawing data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_geotags">
+<span class="sig-name descname"><span class="pre">get_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_geotags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of geotags from the current project based on specified criteria.</p>
+<p>This method queries the project’s database for geotags that match the given criteria, such as location, radius, and associated tags. It returns a list of dictionaries, each representing a geotag with details such as its ID, location (latitude and longitude), and associated tags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>criteria</strong> (<em>dict</em>) – A dictionary specifying the criteria for filtering geotags. Possible keys include ‘location’ (a tuple of latitude and longitude), ‘radius’ (in meters), and ‘tags’ (a list of tag IDs).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list containing dictionaries, each with details of a geotag that matches the specified criteria.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>criteria</cite> is not a dictionary, if required keys are missing, or if the values are not in the expected format.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the database to retrieve the geotags.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">criteria</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">40.7128</span><span class="p">,</span> <span class="o">-</span><span class="mf">74.0060</span><span class="p">),</span> <span class="s1">&#39;radius&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;tag1&#39;</span><span class="p">,</span> <span class="s1">&#39;tag2&#39;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">geotags</span> <span class="o">=</span> <span class="n">get_geotags</span><span class="p">(</span><span class="n">criteria</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">geotags</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;geotag1&#39;, &#39;location&#39;: (40.7138, -74.0065), &#39;tags&#39;: [&#39;tag1&#39;]}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_images">
+<span class="sig-name descname"><span class="pre">get_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return image list based on specified ids</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_ids</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of image IDs to retrieve. Defaults to None.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional parameters to include in the request. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries containing the image data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_materials">
+<span class="sig-name descname"><span class="pre">get_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_materials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of materials from the current project.</p>
+<p>This method queries the project’s database for a list of all materials that have been defined within the project. It returns a list of material names. If the project is not set or initialized, it raises an error.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list containing the names of all materials in the project.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of str</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If the project is not set or initialized.</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">materials</span> <span class="o">=</span> <span class="n">get_materials</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">materials</span><span class="p">)</span>
+<span class="go">[&#39;Concrete&#39;, &#39;Steel&#39;, &#39;Wood&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_project">
+<span class="sig-name descname"><span class="pre">get_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return project list or project by project_id</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project_id</strong> (<em>str</em><em>, </em><em>optional</em>) – The ID of the project to retrieve. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the project data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set or the project_id is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_project_info">
+<span class="sig-name descname"><span class="pre">get_project_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return project information</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the project information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_reports">
+<span class="sig-name descname"><span class="pre">get_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_reports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of reports based on specified report IDs.</p>
+<p>This method queries the project for details on reports identified by their unique IDs. It returns information about each report, including its title, creation date, and status. If a report ID does not correspond to an existing report within the project, it is silently ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>report_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of report IDs for which details are to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the details of a report. Each dictionary contains keys such as ‘id’, ‘title’, ‘creation_date’, and ‘status’, providing information about the report.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>report_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to retrieve the report details.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;report1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;report2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">report_details</span> <span class="o">=</span> <span class="n">get_reports</span><span class="p">(</span><span class="n">report_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">report_details</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;report1_id&#39;, &#39;title&#39;: &#39;Report One&#39;, &#39;creation_date&#39;: &#39;2023-01-01&#39;, &#39;status&#39;: &#39;Completed&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_tags">
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_tags" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of tags based on specified tag IDs.</p>
+<p>This method queries the project for details on tags identified by their unique IDs. It returns information about each tag, including its name, associated resources, and creation date. If a tag ID does not correspond to an existing tag within the project, it is silently ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of tag IDs for which details are to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the details of a tag. Each dictionary contains keys such as ‘id’, ‘name’, ‘resources’, and ‘creation_date’, providing information about the tag.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>tag_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to retrieve the tag details.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">tag_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;tag1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;tag2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tag_details</span> <span class="o">=</span> <span class="n">get_tags</span><span class="p">(</span><span class="n">tag_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">tag_details</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;tag1_id&#39;, &#39;name&#39;: &#39;Tag One&#39;, &#39;resources&#39;: [&#39;resource1_id&#39;, &#39;resource2_id&#39;], &#39;creation_date&#39;: &#39;2023-01-01&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_threed">
+<span class="sig-name descname"><span class="pre">get_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_threed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves details of 3D models from the current project based on specified 3D model IDs.</p>
+<p>This method queries the project for details on 3D models identified by their unique IDs. It returns information about each model, including its file name, size, and upload status. If a 3D model ID does not correspond to an existing model within the project, it is silently ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threed_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of 3D model IDs for which details are to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the details of a 3D model. Each dictionary contains keys such as ‘id’, ‘name’, ‘size’, and ‘status’, providing information about the model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>threed_ids</cite> is empty or not a list.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to retrieve the model details.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">threed_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;model1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;model2_id&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">threed_details</span> <span class="o">=</span> <span class="n">get_threed</span><span class="p">(</span><span class="n">threed_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">threed_details</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;model1_id&#39;, &#39;name&#39;: &#39;model1.obj&#39;, &#39;size&#39;: &#39;2MB&#39;, &#39;status&#39;: &#39;Uploaded&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_videos">
+<span class="sig-name descname"><span class="pre">get_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a list of videos based on specified video IDs.</p>
+<p>This method queries the T2D2 API to fetch details for a list of videos identified by their unique IDs. It returns a list of video details, including metadata such as title, duration, and resolution. If a video ID does not correspond to an existing video, it is silently ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video_ids</strong> (<em>list</em><em> of </em><em>str</em>) – A list of video IDs for which details are to be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the details of a video. Each dictionary contains keys such as ‘id’, ‘title’, ‘duration’, and ‘resolution’.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>video_ids</cite> is empty or not a list.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">video_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;abc123&#39;</span><span class="p">,</span> <span class="s1">&#39;def456&#39;</span><span class="p">,</span> <span class="s1">&#39;ghi789&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">videos</span> <span class="o">=</span> <span class="n">get_videos</span><span class="p">(</span><span class="n">video_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">videos</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;abc123&#39;, &#39;title&#39;: &#39;Video One&#39;, &#39;duration&#39;: &#39;5 minutes&#39;, &#39;resolution&#39;: &#39;1080p&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.login">
+<span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.login" title="Permalink to this definition">¶</a></dt>
+<dd><p>Login and update header with authorization credentials</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>credentials</strong> (<em>dict</em>) – A dictionary containing necessary credentials for API interaction.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the credentials are invalid or missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.notify_user">
+<span class="sig-name descname"><span class="pre">notify_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.notify_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a notification to the user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em>) – The title of the notification.</p></li>
+<li><p><strong>message</strong> (<em>str</em>) – The message content of the notification.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the notification could not be sent.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.request">
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#t2d2_sdk.RequestType" title="t2d2_sdk.RequestType"><span class="pre">RequestType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">RequestType.GET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#t2d2_sdk.T2D2.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a request and handle response</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.set_project">
+<span class="sig-name descname"><span class="pre">set_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.set_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the current project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project_id</strong> (<em>str</em>) – The ID of the project to set.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If the project_id is invalid or the project could not be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.summarize_conditions">
+<span class="sig-name descname"><span class="pre">summarize_conditions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize conditions by region, label and rating</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.summarize_images">
+<span class="sig-name descname"><span class="pre">summarize_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Summarize images</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_drawings">
+<span class="sig-name descname"><span class="pre">update_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_drawings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update drawings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>drawing_ids</strong> (<em>list</em>) – A list of drawing IDs to update.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em>) – A dictionary containing the updates to apply.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_images">
+<span class="sig-name descname"><span class="pre">update_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_ids</strong> (<em>list</em>) – A list of image IDs to update.</p></li>
+<li><p><strong>payload</strong> (<em>dict</em>) – A dictionary containing the updates to apply.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_region">
+<span class="sig-name descname"><span class="pre">update_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>region_name</strong> (<em>str</em>) – The name of the region to update.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set or the region is not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_reports">
+<span class="sig-name descname"><span class="pre">update_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_reports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the details of multiple reports in the current project.</p>
+<p>This method accepts a list of dictionaries, each representing updates to a specific report identified by its ID. The updates can include changes to report metadata such as title, creation date, and status. The method applies these updates to each corresponding report in the project. If a report ID does not exist within the project, that update is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>report_updates</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each containing updates for a specific report. Each dictionary must include an ‘id’ key corresponding to the report ID, along with any other keys representing the fields to be updated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the updated details of a report. Each dictionary contains keys such as ‘id’, ‘title’, ‘creation_date’, and ‘status’, reflecting the applied updates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>report_updates</cite> is empty, not a list, or if any dictionary in the list does not contain an ‘id’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to apply the updates.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">report_updates</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;report1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Updated Report One&#39;</span><span class="p">,</span> <span class="s1">&#39;creation_date&#39;</span><span class="p">:</span> <span class="s1">&#39;2023-02-01&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;report2_id&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;In Progress&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated_reports</span> <span class="o">=</span> <span class="n">update_reports</span><span class="p">(</span><span class="n">report_updates</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">updated_reports</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;report1_id&#39;, &#39;title&#39;: &#39;Updated Report One&#39;, &#39;creation_date&#39;: &#39;2023-02-01&#39;, &#39;status&#39;: &#39;Completed&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_threed">
+<span class="sig-name descname"><span class="pre">update_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_threed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update videos</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_videos">
+<span class="sig-name descname"><span class="pre">update_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the details of multiple videos in the current project.</p>
+<p>This method accepts a list of dictionaries, each representing updates to a specific video identified by its ID. The updates can include changes to video metadata such as title, duration, and resolution. The method applies these updates to each corresponding video in the project. If a video ID does not exist within the project, that update is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video_updates</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each containing updates for a specific video. Each dictionary must include an ‘id’ key corresponding to the video ID, along with any other keys representing the fields to be updated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the updated details of a video. Each dictionary contains keys such as ‘id’, ‘title’, ‘duration’, and ‘resolution’, reflecting the applied updates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>video_updates</cite> is empty, not a list, or if any dictionary in the list does not contain an ‘id’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to apply the updates.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">video_updates</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;abc123&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Updated Video One&#39;</span><span class="p">,</span> <span class="s1">&#39;duration&#39;</span><span class="p">:</span> <span class="s1">&#39;6 minutes&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;def456&#39;</span><span class="p">,</span> <span class="s1">&#39;resolution&#39;</span><span class="p">:</span> <span class="s1">&#39;720p&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated_videos</span> <span class="o">=</span> <span class="n">update_videos</span><span class="p">(</span><span class="n">video_updates</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">updated_videos</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;abc123&#39;, &#39;title&#39;: &#39;Updated Video One&#39;, &#39;duration&#39;: &#39;6 minutes&#39;, &#39;resolution&#39;: &#39;1080p&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_downloads">
+<span class="sig-name descname"><span class="pre">upload_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_downloads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads and processes download requests for a specified project within the T2D2 SDK.</p>
+<p>This method is responsible for uploading files associated with download requests for a given project. It uploads each file to the server, links it to the project, and optionally sends a notification to the requester upon successful upload. The method returns a summary of the upload process, detailing the status of each request and any errors that occurred.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project_id</strong> (<em>str</em>) – The unique identifier of the project for which downloads are being processed.</p></li>
+<li><p><strong>download_requests</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each representing a download request. Each dictionary must include ‘request_id’ and ‘file_path’, and may optionally include ‘notify’ to indicate if the requester should be notified upon completion.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A summary of the upload process for each download request, including ‘request_id’, ‘status’ (success or failure), and ‘error’ message in case of failure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>project_id</cite> is not provided, <cite>download_requests</cite> is not a list, or any request dictionary is missing required keys.</p></li>
+<li><p><strong>FileNotFoundError</strong> – If any ‘file_path’ does not point to an existing file.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is an issue connecting to the server to upload the files.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">project_id</span> <span class="o">=</span> <span class="s1">&#39;projectABC123&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">download_requests</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;request_id&#39;</span><span class="p">:</span> <span class="s1">&#39;download1&#39;</span><span class="p">,</span> <span class="s1">&#39;file_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/file1.zip&#39;</span><span class="p">,</span> <span class="s1">&#39;notify&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;request_id&#39;</span><span class="p">:</span> <span class="s1">&#39;download2&#39;</span><span class="p">,</span> <span class="s1">&#39;file_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/path/to/file2.zip&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">upload_results</span> <span class="o">=</span> <span class="n">upload_downloads</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">download_requests</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">upload_results</span><span class="p">)</span>
+<span class="go">[{&#39;request_id&#39;: &#39;download1&#39;, &#39;status&#39;: &#39;success&#39;}, {&#39;request_id&#39;: &#39;download2&#39;, &#39;status&#39;: &#39;failure&#39;, &#39;error&#39;: &#39;File not found&#39;}]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_drawings">
+<span class="sig-name descname"><span class="pre">upload_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_drawings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload drawings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>drawing_paths</strong> (<em>list</em>) – A list of drawing paths to upload.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_images">
+<span class="sig-name descname"><span class="pre">upload_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_paths</strong> (<em>list</em>) – A list of image paths to upload.</p></li>
+<li><p><strong>image_type</strong> (<em>int</em><em>, </em><em>optional</em>) – The type of image to upload. Defaults to 1.</p></li>
+<li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional parameters to include in the upload. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_reports">
+<span class="sig-name descname"><span class="pre">upload_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_reports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the details of multiple 3D models in the current project.</p>
+<p>This method accepts a list of dictionaries, each representing updates to a specific 3D model identified by its ID. The updates can include changes to model metadata such as name, size, and status. The method applies these updates to each corresponding model in the project. If a 3D model ID does not exist within the project, that update is ignored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threed_updates</strong> (<em>list</em><em> of </em><em>dict</em>) – A list of dictionaries, each containing updates for a specific 3D model. Each dictionary must include an ‘id’ key corresponding to the model ID, along with any other keys representing the fields to be updated.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the updated details of a 3D model. Each dictionary contains keys such as ‘id’, ‘name’, ‘size’, and ‘status’, reflecting the applied updates.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If <cite>threed_updates</cite> is empty, not a list, or if any dictionary in the list does not contain an ‘id’ key.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API to apply the updates.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">threed_updates</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;model1_id&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;updated_model1.obj&#39;</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="s1">&#39;3MB&#39;</span><span class="p">},</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;model2_id&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;Processing&#39;</span><span class="p">}</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated_models</span> <span class="o">=</span> <span class="n">update_threed</span><span class="p">(</span><span class="n">threed_updates</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">updated_models</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;model1_id&#39;, &#39;name&#39;: &#39;updated_model1.obj&#39;, &#39;size&#39;: &#39;3MB&#39;, &#39;status&#39;: &#39;Uploaded&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_threed">
+<span class="sig-name descname"><span class="pre">upload_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threed_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_threed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads 3D model files to the current project.</p>
+<p>This method takes a list of file paths pointing to 3D model files and uploads them to the T2D2 project associated with this instance. Each file is uploaded to a pre-specified storage location and is then registered within the project with a unique identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threed_paths</strong> (<em>list</em><em> of </em><em>str</em>) – A list of file paths, each pointing to a 3D model file to be uploaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries, each representing the upload status of a 3D model. Each dictionary contains keys such as ‘id’, ‘path’, and ‘status’, indicating the unique identifier for the uploaded model, the path of the uploaded file, and the upload status, respectively.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If any of the paths in <cite>threed_paths</cite> does not point to an existing file.</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API or the storage location to upload the files.</p></li>
+<li><p><strong>ValueError</strong> – If <cite>threed_paths</cite> is empty or not a list.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">threed_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;/path/to/model1.obj&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/model2.stl&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">upload_status</span> <span class="o">=</span> <span class="n">upload_threed</span><span class="p">(</span><span class="n">threed_paths</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">upload_status</span><span class="p">)</span>
+<span class="go">[{&#39;id&#39;: &#39;model1_id&#39;, &#39;path&#39;: &#39;/path/to/model1.obj&#39;, &#39;status&#39;: &#39;Uploaded&#39;}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_videos">
+<span class="sig-name descname"><span class="pre">upload_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_videos" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload videos</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>video_paths</strong> (<em>list</em>) – A list of video paths to upload.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the response from the API.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the project is not set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="t2d2_sdk.download_file">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">download_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.download_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file from a url to a local path</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="t2d2_sdk.random_color">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">random_color</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#t2d2_sdk.random_color" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random color</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="t2d2_sdk.random_string">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#t2d2_sdk.random_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random string of fixed length</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="t2d2_sdk.ts2date">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">ts2date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.ts2date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert timestamp to date</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="t2d2_sdk.upload_file">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">upload_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.upload_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload a file from a local path to a url</p>
+</dd></dl>
+
 <div class="toctree-wrapper compound">
 </div>
 </section>
@@ -109,6 +1415,73 @@
 <li><a class="reference internal" href="#usage">Usage</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#t2d2-sdk-client-library">T2D2 SDK Client Library</a></li>
+<li><a class="reference internal" href="#t2d2_sdk.RequestType"><code class="docutils literal notranslate"><span class="pre">RequestType</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2"><code class="docutils literal notranslate"><span class="pre">T2D2</span></code></a><ul>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.base_url</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.headers"><code class="docutils literal notranslate"><span class="pre">T2D2.headers</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.s3_base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.s3_base_url</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.aws_region"><code class="docutils literal notranslate"><span class="pre">T2D2.aws_region</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.bucket"><code class="docutils literal notranslate"><span class="pre">T2D2.bucket</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.access_token"><code class="docutils literal notranslate"><span class="pre">T2D2.access_token</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.api_key"><code class="docutils literal notranslate"><span class="pre">T2D2.api_key</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.project"><code class="docutils literal notranslate"><span class="pre">T2D2.project</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.debug"><code class="docutils literal notranslate"><span class="pre">T2D2.debug</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.__init__"><code class="docutils literal notranslate"><span class="pre">T2D2.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotation_class"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotation_class()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.add_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_region"><code class="docutils literal notranslate"><span class="pre">T2D2.add_region()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_tags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotation_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_images"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.download_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.download_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotation_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.get_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_images"><code class="docutils literal notranslate"><span class="pre">T2D2.get_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_materials"><code class="docutils literal notranslate"><span class="pre">T2D2.get_materials()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project_info"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project_info()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.get_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_tags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.get_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.get_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.login"><code class="docutils literal notranslate"><span class="pre">T2D2.login()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.notify_user"><code class="docutils literal notranslate"><span class="pre">T2D2.notify_user()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.request"><code class="docutils literal notranslate"><span class="pre">T2D2.request()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.set_project"><code class="docutils literal notranslate"><span class="pre">T2D2.set_project()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_conditions"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_conditions()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_images"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.update_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_region"><code class="docutils literal notranslate"><span class="pre">T2D2.update_region()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.update_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.update_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.update_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_downloads"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_downloads()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_images"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_videos()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#t2d2_sdk.download_file"><code class="docutils literal notranslate"><span class="pre">download_file()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.random_color"><code class="docutils literal notranslate"><span class="pre">random_color()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.ts2date"><code class="docutils literal notranslate"><span class="pre">ts2date()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.upload_file"><code class="docutils literal notranslate"><span class="pre">upload_file()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -142,6 +1515,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
       </ul>
