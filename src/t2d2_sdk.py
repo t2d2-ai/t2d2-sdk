@@ -4,15 +4,18 @@ T2D2 SDK Client Library
 ========================
 """
 
-# pylint: disable=wildcard-import, unused-wildcard-import
 import json
 import os
+# pylint: disable=wildcard-import, unused-wildcard-import
+import random
+import string
 from collections import defaultdict
+from datetime import datetime
+from enum import Enum, auto
 from urllib.parse import urlencode, urlparse
 
+import boto3
 import requests
-
-from utils import *
 
 TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
@@ -42,7 +45,7 @@ class T2D2(object):
             Args:
                 credentials (dict): A dictionary containing necessary credentials for API interaction.
                 base_url (str, optional): The base URL for the T2D2 API. Defaults to BASE_URL.
-            
+
             Raises:
                 ValueError: If the `base_url` does not end with a forward slash.
     """
@@ -580,7 +583,7 @@ class T2D2(object):
     def get_drawings(self, drawing_ids=None, params=None):
         """
         Return drawing list based on specified ids
-        
+
         Args:
             drawing_ids (list, optional): A list of drawing IDs to retrieve. Defaults to None.
             params (dict, optional): Additional parameters to include in the request. Defaults to None.
@@ -1666,3 +1669,68 @@ class T2D2(object):
             result[reg] = sublist
 
         return result
+
+
+####################################################################################################
+# COMMON HELPER FUNCTIONS
+####################################################################################################
+def random_string(length: int = 6) -> str:
+    """Generate a random string of fixed length"""
+    letters = string.ascii_lowercase
+    return "".join(random.choice(letters) for i in range(length))
+
+
+def random_color() -> str:
+    """Generate a random color"""
+    r = lambda: random.randint(0, 255)
+    return "#%02X%02X%02X" % (r(), r(), r())
+
+
+def ts2date(ts):
+    """Convert timestamp to date"""
+    return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def download_file(url: str, file_path: str):
+    """Download a file from a url to a local path"""
+    try:
+        s3 = boto3.client("s3")
+        parsed_url = urlparse(url)
+        bucket = parsed_url.netloc.split(".")[0]
+        key = parsed_url.path[1:]
+        s3.download_file(bucket, key, file_path)
+        return {"success": True, "message": "File downloaded"}
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}",
+        }
+
+
+def upload_file(file_path: str, url: str):
+    """Upload a file from a local path to a url"""
+    try:
+        s3 = boto3.client("s3")
+        parsed_url = urlparse(url)
+        bucket = parsed_url.netloc.split(".")[0]
+        key = parsed_url.path[1:]
+        s3.upload_file(file_path, bucket, key, ExtraArgs={"ACL": "public-read"})
+        return {"success": True, "message": "File uploaded"}
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}",
+        }
+
+
+####################################################################################################
+class RequestType(Enum):
+    """Request types"""
+
+    GET = auto()
+    PUT = auto()
+    POST = auto()
+    DELETE = auto()
+
+
+####################################################################################################
