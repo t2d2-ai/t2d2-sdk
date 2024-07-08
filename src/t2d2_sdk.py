@@ -1734,3 +1734,12 @@ class T2D2(object):
 
         return result
 
+    ################################################################################################
+    # Notifications
+    ################################################################################################
+
+    def slack_notification(self, payload):
+        """Send slack notification"""
+
+        url = "notifications/slack"
+        return self.request(url, RequestType.POST, data=payload)
