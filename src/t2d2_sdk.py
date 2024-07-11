@@ -1660,13 +1660,13 @@ class T2D2(object):
             output.append(lbl)
         return
 
-    def summarize_images(self):
+    def summarize_images(self, params=None):
         """Summarize images"""
         if not self.project:
             raise ValueError("Project not set")
 
         # Return image summary
-        images = self.get_images()
+        images = self.get_images(params=params)
         if len(images) == 0:
             return {
                 "region_group": {},
@@ -1695,12 +1695,12 @@ class T2D2(object):
             "tag_group": tag_group,
         }
 
-    def summarize_conditions(self):
+    def summarize_conditions(self, params=None):
         """Summarize conditions by region, label and rating"""
         if not self.project:
             raise ValueError("Project not set")
 
-        imgs = self.get_images()
+        imgs = self.get_images(params=params)
 
         anns = defaultdict(list)
         for img in imgs:
