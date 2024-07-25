@@ -1713,7 +1713,11 @@ class T2D2(object):
             sublist = {}
             for ann in annotations:
                 label = ann["annotation_class"]["annotation_class_name"]
-                rating = ann.get("condition", {}).get("rating_name", "default")
+                condition = ann.get("condition", {})
+                if isinstance(condition, dict):
+                    rating = condition.get("rating_name", "default")
+                else:
+                    rating = "default"
                 area = ann["area"]
                 length = ann["length"]
                 ann_id = ann["id"]
