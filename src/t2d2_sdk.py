@@ -982,28 +982,23 @@ class T2D2(object):
     ################################################################################################
     def upload_reports(self, report_paths):
         """
-        Updates the details of multiple 3D models in the current project.
+        Uploads reports into a project.
 
-        This method accepts a list of dictionaries, each representing updates to a specific 3D model identified by its ID. The updates can include changes to model metadata such as name, size, and status. The method applies these updates to each corresponding model in the project. If a 3D model ID does not exist within the project, that update is ignored.
+        This method accepts a list of string paths to locally available files (PDF or docx).
 
         Args:
-            threed_updates (list of dict): A list of dictionaries, each containing updates for a specific 3D model. Each dictionary must include an 'id' key corresponding to the model ID, along with any other keys representing the fields to be updated.
+            report_paths (list of str): A list of strings specifying local paths of files
 
         Returns:
-            list of dict: A list of dictionaries, each representing the updated details of a 3D model. Each dictionary contains keys such as 'id', 'name', 'size', and 'status', reflecting the applied updates.
+            dict: response from API.
 
         Raises:
-            ValueError: If `threed_updates` is empty, not a list, or if any dictionary in the list does not contain an 'id' key.
+            ValueError: If `report_paths` is empty, not a list
             ConnectionError: If there is a problem connecting to the T2D2 API to apply the updates.
 
         Example:
-            >>> threed_updates = [
-            ...     {'id': 'model1_id', 'name': 'updated_model1.obj', 'size': '3MB'},
-            ...     {'id': 'model2_id', 'status': 'Processing'}
-            ... ]
-            >>> updated_models = update_threed(threed_updates)
-            >>> print(updated_models)
-            [{'id': 'model1_id', 'name': 'updated_model1.obj', 'size': '3MB', 'status': 'Uploaded'}, ...]
+            >>> report_path = "./reports/report_123.pdf"
+            >>> t2d2.upload_reports([report_path])
         """
 
         if not self.project:
