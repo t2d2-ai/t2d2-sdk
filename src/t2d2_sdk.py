@@ -16,11 +16,22 @@ from urllib.parse import urlencode, urlparse
 
 import boto3
 import requests
+import sentry_sdk
+
 
 TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
 # DEV https://api-v3-dev.t2d2.ai/api/
 
+
+####################################################################################################
+sentry_sdk.init(
+    dsn="https://fdaf778d002a179fa64754611aa9ace0@sentry.t2d2.ai/5",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+)
+####################################################################################################
 
 ####################################################################################################
 # COMMON HELPER FUNCTIONS
