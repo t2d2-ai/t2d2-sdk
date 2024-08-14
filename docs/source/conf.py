@@ -22,7 +22,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.napoleon'
 templates_path = ['_templates']
 exclude_patterns = []
 
-
+myst_heading_anchors = 3
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
