@@ -1714,70 +1714,76 @@ class T2D2(object):
 
         return results
 
-    def delete_tags(self, tag_ids):
-        """
-        Delete tags from the current project.
+    # def delete_tags(self, tag_ids):
+    #     """
+    #     Delete tags from the current project.
         
-        This method removes tags identified by their IDs from the current project.
-        This operation is irreversible.
+    #     This method removes tags identified by their IDs from the current project.
+    #     This operation is irreversible.
         
-        :param tag_ids: A list of tag IDs to delete
-        :type tag_ids: list of str
+    #     :param tag_ids: A list of tag IDs to delete
+    #     :type tag_ids: list of int
         
-        :return: Response from the API indicating the status of the deletion operation
-        :rtype: dict
+    #     :return: Response from the API indicating the status of the deletion operation
+    #     :rtype: dict
         
-        :raises ValueError: If no project is currently set
-        :raises ConnectionError: If there is a problem connecting to the T2D2 API
-        
-        :example:
-        
-        >>> tag_ids = ['tag1', 'tag2']
-        >>> result = client.delete_tags(tag_ids)
-        >>> print(result)
-        """
-        if not self.project:
-            raise ValueError("Project not set")
+    #     :raises ValueError: If no project is currently set
+    #     :raises ConnectionError: If there is a problem connecting to the T2D2 API
+    #     """
+    #     if not self.project:
+    #         raise ValueError("Project not set")
 
-        url = f"{self.project['id']}/tags/bulk.delete"
-        payload = {"tag_ids": tag_ids}
-        result = self.request(url, RequestType.DELETE, data=payload)
-        
-        return result
+    #     # Make sure tag_ids are properly formatted
+    #     validated_tag_ids = []
+    #     for tag_id in tag_ids:
+    #         # If it's already a number, add it directly
+    #         if isinstance(tag_id, int) or (isinstance(tag_id, str) and tag_id.isdigit()):
+    #             validated_tag_ids.append(int(tag_id))
+    #         else:
+    #             # If it's a MongoDB ObjectId string, try to find the corresponding numeric ID
+    #             # from the tags list (this would require having the tags list cached or fetching it)
+    #             pass  # Implement if needed
 
-    def update_tags(self, tag_updates):
-        """
-        Update existing tags in the current project.
+    #     url = f"{self.project['id']}/tags/bulk.delete"
+    #     payload = {"ids": validated_tag_ids}
+    #     result = self.request(url, RequestType.DELETE, data=payload)
         
-        This method updates the properties of existing tags identified by their IDs.
-        Each update specification must include the tag ID and the new property values.
+    #     return result
+
+    # def update_tags(self, tag_updates):
+    #     """
+    #     Update existing tags in the current project.
         
-        :param tag_updates: A list of dictionaries, each containing a tag ID and the properties to update
-        :type tag_updates: list of dict
+    #     This method updates the properties of existing tags identified by their IDs.
+    #     Each update specification must include the tag ID and the new property values.
         
-        :return: Response from the API containing information about the updated tags
-        :rtype: dict
+    #     :param tag_updates: A list of dictionaries, each containing a tag ID and the properties to update
+    #     :type tag_updates: list of dict
         
-        :raises ValueError: If no project is currently set
-        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+    #     :return: Response from the API containing information about the updated tags
+    #     :rtype: dict
         
-        :example:
+    #     :raises ValueError: If no project is currently set
+    #     :raises ConnectionError: If there is a problem connecting to the T2D2 API
         
-        >>> tag_updates = [
-        ...     {'id': 'tag1', 'name': 'Updated Tag 1'},
-        ...     {'id': 'tag2', 'name': 'Updated Tag 2'}
-        ... ]
-        >>> result = client.update_tags(tag_updates)
-        >>> print(result)
-        """
-        if not self.project:
-            raise ValueError("Project not set")
+    #     :example:
         
-        url = f"{self.project['id']}/tags/bulk.update"
-        payload = {"updates": tag_updates}
-        result = self.request(url, RequestType.PUT, data=payload)
+    #     >>> tag_updates = [
+    #     ...     {'id': 'tag1', 'name': 'Updated Tag 1'},
+    #     ...     {'id': 'tag2', 'name': 'Updated Tag 2'}
+    #     ... ]
+    #     >>> result = client.update_tags(tag_updates)
+    #     >>> print(result)
+    #     """
+    #     if not self.project:
+    #         raise ValueError("Project not set")
         
-        return result
+    #     url = f"{self.project['id']}/tags/bulk.update"
+    #     payload = {"updates": tag_updates}
+    #     result = self.request(url, RequestType.PUT, data=payload)
+        
+    #     return result
+    
     ################################################################################################
     # CRUD Annotation Classes
     ################################################################################################
