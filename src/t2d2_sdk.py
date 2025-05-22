@@ -2462,3 +2462,133 @@ class T2D2(object):
 
         url = "notifications/slack"
         return self.request(url, RequestType.POST, data=payload)
+    
+
+    ################################################################################################
+    # AI Models
+    ################################################################################################
+
+    def get_ai_models(self):
+        """
+        Retrieve all AI models available in the current project.
+        
+        This method fetches all AI models associated with the current project from the T2D2 API.
+        It returns a list of dictionaries containing details about each AI model.
+        
+        :return: A list of dictionaries, each containing AI model details
+        :rtype: list of dict
+        
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> models = client.get_ai_models()
+        >>> print(models)
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/ai-models"
+        return self.request(url, RequestType.GET)
+    
+    def get_ai_model_by_id(self, model_id):
+        """
+        Retrieve details of a specific AI model by its ID.
+        
+        This method fetches detailed information about a specific AI model from the T2D2 API.
+        It returns a dictionary containing all the information available for the specified AI model.
+        
+        :param model_id: The ID of the AI model to retrieve
+        :type model_id: str
+        
+        :return: A dictionary containing AI model details
+        :rtype: dict
+        
+        """
+
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/ai-models/{model_id}"
+        return self.request(url, RequestType.GET)
+    
+    def run_ai_inferencer(self, image_ids, model_id, confidence_threshold=0.5, 
+                         replace_annotations=False, sliding_window=False, 
+                         whole_image=True, batch_size=1):
+        """
+        Run AI inference on specified images using a selected model.
+        
+        This method initiates an AI inference process on a set of images using the specified
+        model. It constructs the payload with model details and user parameters, then sends
+        the request to start the inference process.
+        
+        :param image_ids: List of image IDs to run inference on
+        :type image_ids: list of int
+        
+        :param model_id: ID of the AI model to use for inference
+        :type model_id: int
+        
+        :param confidence_threshold: Minimum confidence score for detections (0.0 to 1.0)
+        :type confidence_threshold: float
+        :default confidence_threshold: 0.5
+        
+        :param replace_annotations: Whether to replace existing annotations
+        :type replace_annotations: bool
+        :default replace_annotations: False
+        
+        :param sliding_window: Whether to use sliding window approach for inference
+        :type sliding_window: bool
+        :default sliding_window: False
+        
+        :param whole_image: Whether to process the whole image at once
+        :type whole_image: bool
+        :default whole_image: True
+        
+        :param batch_size: Number of images to process in each batch
+        :type batch_size: int
+        :default batch_size: 1
+        
+        :return: Response from the API containing the inference job details
+        :rtype: dict
+        
+        :raises ValueError: If no project is set or if required parameters are invalid
+        
+        :example:
+        
+        >>> image_ids = [602825, 602824, 602823]
+        >>> result = client.run_ai_inferencer(
+        ...     image_ids=image_ids,
+        ...     model_id=1,
+        ...     confidence_threshold=0.6
+        ... )
+        >>> print(result)
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+            
+        # Get model details
+        model_details = self.get_ai_model_by_id(model_id)
+        if not model_details["success"]:
+            raise ValueError(f"Failed to get model details: {model_details.get('message', 'Unknown error')}")
+            
+        model_data = model_details["data"]
+        
+        # Construct payload
+        payload = {
+            "confidence_threshold": confidence_threshold,
+            "replace_annotations": replace_annotations,
+            "whole_image": whole_image,
+            "batch_size": batch_size,
+            "ai_model": model_id,
+            "description": model_data["description"],
+            "image_ids": image_ids,
+            "labels": model_data["labels"],
+            "sliding_window": sliding_window
+        }
+        
+        # Make request to start inference
+        url = f"{self.project['id']}/tools/6/start"
+        return self.request(url, RequestType.POST, data=payload)
+
+    
