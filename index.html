@@ -686,6 +686,53 @@ or if downloading fails</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_ai_model_by_id">
+<span class="sig-name descname"><span class="pre">get_ai_model_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_model_by_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve details of a specific AI model by its ID.</p>
+<p>This method fetches detailed information about a specific AI model from the T2D2 API.
+It returns a dictionary containing all the information available for the specified AI model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>model_id</strong> (<em>str</em>) – The ID of the AI model to retrieve</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing AI model details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_ai_models">
+<span class="sig-name descname"><span class="pre">get_ai_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_models" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all AI models available in the current project.</p>
+<p>This method fetches all AI models associated with the current project from the T2D2 API.
+It returns a list of dictionaries containing details about each AI model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of dictionaries, each containing AI model details</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If no project is currently set</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">models</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_ai_models</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_annotation_classes">
 <span class="sig-name descname"><span class="pre">get_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotation_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve annotation classes from the current project.</p>
@@ -1320,6 +1367,63 @@ or if the authentication request fails</p>
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.request">
 <span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#t2d2_sdk.RequestType" title="t2d2_sdk.RequestType"><span class="pre">RequestType</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">RequestType.GET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#t2d2_sdk.T2D2.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a request and handle response</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.run_ai_inferencer">
+<span class="sig-name descname"><span class="pre">run_ai_inferencer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliding_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whole_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.run_ai_inferencer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run AI inference on specified images using a selected model.</p>
+<p>This method initiates an AI inference process on a set of images using the specified
+model. It constructs the payload with model details and user parameters, then sends
+the request to start the inference process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image_ids</strong> (<em>list</em><em> of </em><em>int</em>) – List of image IDs to run inference on</p></li>
+<li><p><strong>model_id</strong> (<em>int</em>) – ID of the AI model to use for inference</p></li>
+<li><p><strong>confidence_threshold</strong> (<em>float</em>) – Minimum confidence score for detections (0.0 to 1.0)</p></li>
+<li><p><strong>replace_annotations</strong> (<em>bool</em>) – Whether to replace existing annotations</p></li>
+<li><p><strong>sliding_window</strong> (<em>bool</em>) – Whether to use sliding window approach for inference</p></li>
+<li><p><strong>whole_image</strong> (<em>bool</em>) – Whether to process the whole image at once</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Number of images to process in each batch</p></li>
+</ul>
+</dd>
+<dt class="field-even">Default confidence_threshold<span class="colon">:</span></dt>
+<dd class="field-even"><p>0.5</p>
+</dd>
+<dt class="field-odd">Default replace_annotations<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
+</dd>
+<dt class="field-even">Default sliding_window<span class="colon">:</span></dt>
+<dd class="field-even"><p>False</p>
+</dd>
+<dt class="field-odd">Default whole_image<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+<dt class="field-even">Default batch_size<span class="colon">:</span></dt>
+<dd class="field-even"><p>1</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response from the API containing the inference job details</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If no project is set or if required parameters are invalid</p>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">image_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">602825</span><span class="p">,</span> <span class="mi">602824</span><span class="p">,</span> <span class="mi">602823</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">run_ai_inferencer</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">image_ids</span><span class="o">=</span><span class="n">image_ids</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">model_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">confidence_threshold</span><span class="o">=</span><span class="mf">0.6</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -2098,6 +2202,8 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_threed()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_videos()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.download_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.download_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_model_by_id"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_model_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_models"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_models()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotation_classes()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotations()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_assets()</span></code></a></li>
@@ -2116,6 +2222,7 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.login"><code class="docutils literal notranslate"><span class="pre">T2D2.login()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.notify_user"><code class="docutils literal notranslate"><span class="pre">T2D2.notify_user()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.request"><code class="docutils literal notranslate"><span class="pre">T2D2.request()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.run_ai_inferencer"><code class="docutils literal notranslate"><span class="pre">T2D2.run_ai_inferencer()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.set_project"><code class="docutils literal notranslate"><span class="pre">T2D2.set_project()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.slack_notification"><code class="docutils literal notranslate"><span class="pre">T2D2.slack_notification()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_conditions"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_conditions()</span></code></a></li>
