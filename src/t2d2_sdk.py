@@ -2556,7 +2556,7 @@ class T2D2(object):
         
         :example:
         
-        >>> image_ids = [602825, 602824, 602823]
+        >>> image_ids = [000000, 000000, 000000]
         >>> result = client.run_ai_inferencer(
         ...     image_ids=image_ids,
         ...     model_id=1,
