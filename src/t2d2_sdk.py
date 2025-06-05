@@ -2614,5 +2614,63 @@ class T2D2(object):
         # Make request to start inference
         url = f"{self.project['id']}/tools/6/start"
         return self.request(url, RequestType.POST, data=payload)
-
     
+    def get_task_list(self):
+        """
+        Get the list of tasks for the current project.
+        
+        This method fetches the list of tasks associated with the current project from the T2D2 API.
+        It returns a list of dictionaries containing details about each task.
+        
+        :return: A list of dictionaries, each containing task details
+        :rtype: list of dict
+
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> tasks = client.get_task_list()
+        >>> print(tasks)
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/task"
+        return self.request(url, RequestType.GET)
+    
+    def get_task_by_id(self, task_id):
+        """
+        Get the details of a specific task by its ID.
+        
+        This method fetches detailed information about a specific task from the T2D2 API.
+        It returns a dictionary containing all the information available for the specified task.
+        
+        :param task_id: The ID of the task to retrieve
+        :type task_id: str
+        
+        :return: A dictionary containing task details
+        :rtype: dict
+
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> task = client.get_task_by_id("9d9f28a5-df16-4f69-bbc9-4dc718ea204c")
+        >>> print(task)
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        # First get all tasks
+        url = f"{self.project['id']}/task"
+        response = self.request(url, RequestType.GET)
+        
+        # Find the task with matching task_id
+        for task in response["data"]["task_list"]:
+            if task["task_id"] == task_id:
+                return task
+                
+        raise ValueError(f"Task with ID {task_id} not found")
+            
