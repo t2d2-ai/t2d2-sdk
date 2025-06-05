@@ -2605,7 +2605,7 @@ class T2D2(object):
             "whole_image": whole_image,
             "batch_size": batch_size,
             "ai_model": model_id,
-            "description": model_data["description"],
+            "description": model_data.get("description",""),
             "image_ids": image_ids,
             "labels": model_data["labels"],
             "sliding_window": sliding_window
