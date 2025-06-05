@@ -1073,7 +1073,12 @@ if no IDs are specified.</p>
 - region_id: Filter images by region
 - tag_ids: Filter images by associated tags
 - date_range: Filter images by capture date
-- limit/offset: Pagination parameters</p></li>
+- limit/offset: Pagination parameters
+- search: Search term for filtering images
+- sortBy: Sort order (e.g. “id:-1” for descending)
+- page: Page number for pagination
+- regions: List of region IDs to filter by
+- image_types: List of image type IDs to filter by</p></li>
 </ul>
 </dd>
 <dt class="field-even">Default image_ids<span class="colon">:</span></dt>
@@ -1104,7 +1109,14 @@ if no IDs are specified.</p>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get images with filtering</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_images</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_images</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;region_id&quot;</span><span class="p">:</span> <span class="s2">&quot;region123&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_images</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_images</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;sortBy&quot;</span><span class="p">:</span> <span class="s2">&quot;id:-1&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;regions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;6841697bf8ab7deb15ededc8&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="s2">&quot;image_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="gp">... </span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Images in region: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_images</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
