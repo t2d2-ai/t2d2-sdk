@@ -838,6 +838,11 @@ class T2D2(object):
                     - tag_ids: Filter images by associated tags
                     - date_range: Filter images by capture date
                     - limit/offset: Pagination parameters
+                    - search: Search term for filtering images
+                    - sortBy: Sort order (e.g. "id:-1" for descending)
+                    - page: Page number for pagination
+                    - regions: List of region IDs to filter by
+                    - image_types: List of image type IDs to filter by
         :type params: dict or None
         :default params: None
         
@@ -857,7 +862,14 @@ class T2D2(object):
             ...     print(f"Image: {img['filename']}, Region: {img['region']['name']}")
             
             >>> # Get images with filtering
-            >>> filtered_images = client.get_images(params={"region_id": "region123"})
+            >>> filtered_images = client.get_images(params={
+            ...     "search": "",
+            ...     "sortBy": "id:-1",
+            ...     "page": 1,
+            ...     "limit": 10,
+            ...     "regions": ["6841697bf8ab7deb15ededc8"],
+            ...     "image_types": [1, 2, 4]
+            ... })
             >>> print(f"Images in region: {len(filtered_images)}")
         """
         if not self.project:
@@ -865,8 +877,20 @@ class T2D2(object):
 
         # all images in project
         if image_ids is None:
-            url = f"{self.project['id']}/images"
-            json_data = self.request(url, RequestType.GET, params=params)
+            base_url = f"{self.project['id']}/images"
+            if params:
+                # Convert list values to JSON strings
+                formatted_params = {}
+                for k, v in params.items():
+                    if isinstance(v, list):
+                        formatted_params[k] = json.dumps(v)
+                    else:
+                        formatted_params[k] = v
+                query_string = "&".join([f"{k}={v}" for k, v in formatted_params.items()])
+                url = f"{base_url}?{query_string}"
+            else:
+                url = base_url
+            json_data = self.request(url, RequestType.GET)
             results = json_data["data"]["image_list"]
             return results
 
@@ -874,7 +898,7 @@ class T2D2(object):
         results = []
         for img_id in image_ids:
             url = f"{self.project['id']}/images/{img_id}"
-            json_data = self.request(url, RequestType.GET, params=params)
+            json_data = self.request(url, RequestType.GET)
             results.append(json_data["data"])
         return results
 
