@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Welcome to T2D2 SDK’s documentation! &#8212; T2D2 SDK v1.1 documentation</title>
+    <title>Welcome to T2D2 SDK’s documentation! &#8212; T2D2 SDK v1.5 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css?v=8fc2db88" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=3dd8cc91"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c1a9d636"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -23,7 +23,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.5 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
       </ul>
     </div>  
@@ -447,6 +447,34 @@ for that tag is skipped.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_dataset">
+<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new dataset.</p>
+<p>This method creates a new dataset with the specified name.
+The dataset will be private by default and owned by the authenticated user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The name of the dataset to create</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the created dataset details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s2">&quot;My Training Dataset&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created dataset: </span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> with ID: </span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_annotation_classes">
 <span class="sig-name descname"><span class="pre">delete_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation_class_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotation_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete annotation classes from the current project.</p>
@@ -523,6 +551,42 @@ annotations in the image.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_datasets">
+<span class="sig-name descname"><span class="pre">delete_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete datasets by their IDs.</p>
+<p>This method removes datasets identified by their IDs from the T2D2 system.
+This operation is irreversible and will also delete all associated data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dataset_ids</strong> (<em>list</em><em> of </em><em>int</em>) – A list of dataset IDs to delete</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the API response with status and message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_datasets</span><span class="p">(</span><span class="n">dataset_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
+<span class="go">&#39;Dataset is deleted successfuly&#39;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Warning<span class="colon">:</span></dt>
+<dd class="field-odd"><p>This operation cannot be undone. All dataset data and associated
+information will be permanently removed.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -966,6 +1030,56 @@ objects enriched with the name of the annotation class they belong to.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">classes</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_classes</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">classes</span><span class="p">)</span>
 <span class="go">[{&#39;id&#39;: &#39;cond1&#39;, &#39;name&#39;: &#39;Crack&#39;, &#39;annotation_class_id&#39;: &#39;class1&#39;, ...}, ...]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_datasets">
+<span class="sig-name descname"><span class="pre">get_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve datasets from the T2D2 API.</p>
+<p>This method fetches all datasets available to the authenticated user.
+It supports filtering and pagination through the params parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em><em> or </em><em>None</em>) – Additional query parameters to filter datasets, which may include:
+- search: Search term for filtering datasets by name
+- sortBy: Sort order (e.g. “id:desc” for descending by ID)
+- page: Page number for pagination
+- limit: Number of datasets per page
+- public: Filter by public/private datasets (true/false)</p>
+</dd>
+<dt class="field-even">Default params<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary containing the dataset list and total count</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API</p>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get all datasets</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datasets</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_datasets</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total datasets: </span><span class="si">{</span><span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;total_datasets&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">[</span><span class="s1">&#39;dataset_list&#39;</span><span class="p">]:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset: </span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, ID: </span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get datasets with filtering</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">filtered_datasets</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_datasets</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;search&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;sortBy&quot;</span><span class="p">:</span> <span class="s2">&quot;id:desc&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;public&quot;</span><span class="p">:</span> <span class="kc">False</span>
+<span class="gp">... </span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">filtered_datasets</span><span class="p">[</span><span class="s1">&#39;dataset_list&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> datasets&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -1736,6 +1850,48 @@ Each containing counts of images per category</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_dataset_images">
+<span class="sig-name descname"><span class="pre">update_dataset_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_dataset_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add or remove images from a dataset.</p>
+<p>This method allows you to add or remove images from an existing dataset.
+The action parameter determines whether to add or remove the specified images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset_id</strong> (<em>int</em>) – The ID of the dataset to update</p></li>
+<li><p><strong>action</strong> (<em>str</em>) – The action to perform - either “add” or “remove”</p></li>
+<li><p><strong>image_ids</strong> (<em>list</em><em> of </em><em>int</em>) – A list of image IDs to add or remove from the dataset</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the updated dataset details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If action is not “add” or “remove”</p></li>
+<li><p><strong>ConnectionError</strong> – If there is a problem connecting to the T2D2 API</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add images to dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image_ids</span> <span class="o">=</span> <span class="p">[</span><span class="mi">660068</span><span class="p">,</span> <span class="mi">660069</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated_dataset</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_dataset_images</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">image_ids</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset now has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">updated_dataset</span><span class="p">[</span><span class="s1">&#39;image_ids&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> images&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Remove images from dataset</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">updated_dataset</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">update_dataset_images</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;remove&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">660068</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset now has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">updated_dataset</span><span class="p">[</span><span class="s1">&#39;image_ids&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2"> images&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_drawings">
 <span class="sig-name descname"><span class="pre">update_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_drawings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update properties of existing drawings in the current project.</p>
@@ -2372,8 +2528,10 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.add_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_geotags()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.add_region"><code class="docutils literal notranslate"><span class="pre">T2D2.add_region()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.add_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_tags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_dataset"><code class="docutils literal notranslate"><span class="pre">T2D2.create_dataset()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotation_classes()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_datasets()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_drawings()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_geotags()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_images"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_images()</span></code></a></li>
@@ -2387,6 +2545,7 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotations()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_assets()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_datasets()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.get_drawings()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_geotags()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.get_images"><code class="docutils literal notranslate"><span class="pre">T2D2.get_images()</span></code></a></li>
@@ -2408,6 +2567,7 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.slack_notification"><code class="docutils literal notranslate"><span class="pre">T2D2.slack_notification()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_conditions"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_conditions()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_images"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_dataset_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_dataset_images()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.update_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.update_drawings()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.update_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_images()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.update_region"><code class="docutils literal notranslate"><span class="pre">T2D2.update_region()</span></code></a></li>
@@ -2463,7 +2623,7 @@ then uploads the file from the specified local path with public-read ACL.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.5 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
       </ul>
     </div>
