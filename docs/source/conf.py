@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath('../../src'))
 project = 'T2D2 SDK'
 copyright = '2024, Badri Hiriyur'
 author = 'Badri Hiriyur'
-release = 'v1.1'
+release = 'v1.5'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

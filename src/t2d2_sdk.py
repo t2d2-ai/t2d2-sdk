@@ -2673,4 +2673,147 @@ class T2D2(object):
                 return task
                 
         raise ValueError(f"Task with ID {task_id} not found")
-            
+
+    ################################################################################################
+    # CRUD Datasets
+    ################################################################################################
+    def get_datasets(self, params=None):
+        """
+        Retrieve datasets from the T2D2 API.
+        
+        This method fetches all datasets available to the authenticated user.
+        It supports filtering and pagination through the params parameter.
+        
+        :param params: Additional query parameters to filter datasets, which may include:
+                    - search: Search term for filtering datasets by name
+                    - sortBy: Sort order (e.g. "id:desc" for descending by ID)
+                    - page: Page number for pagination
+                    - limit: Number of datasets per page
+                    - public: Filter by public/private datasets (true/false)
+        :type params: dict or None
+        :default params: None
+        
+        :return: A dictionary containing the dataset list and total count
+        :rtype: dict
+        
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> # Get all datasets
+        >>> datasets = client.get_datasets()
+        >>> print(f"Total datasets: {datasets['total_datasets']}")
+        >>> for dataset in datasets['dataset_list']:
+        ...     print(f"Dataset: {dataset['name']}, ID: {dataset['id']}")
+        
+        >>> # Get datasets with filtering
+        >>> filtered_datasets = client.get_datasets(params={
+        ...     "search": "test",
+        ...     "sortBy": "id:desc",
+        ...     "page": 1,
+        ...     "limit": 10,
+        ...     "public": False
+        ... })
+        >>> print(f"Found {len(filtered_datasets['dataset_list'])} datasets")
+        """
+        url = "datasets"
+        json_data = self.request(url, RequestType.GET, params=params)
+        return json_data["data"]
+
+    def create_dataset(self, name):
+        """
+        Create a new dataset.
+        
+        This method creates a new dataset with the specified name.
+        The dataset will be private by default and owned by the authenticated user.
+        
+        :param name: The name of the dataset to create
+        :type name: str
+        
+        :return: A dictionary containing the created dataset details
+        :rtype: dict
+        
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> dataset = client.create_dataset("My Training Dataset")
+        >>> print(f"Created dataset: {dataset['name']} with ID: {dataset['id']}")
+        """
+        url = "datasets"
+        payload = {"name": name}
+        json_data = self.request(url, RequestType.POST, data=payload)
+        return json_data["data"]
+
+    def delete_datasets(self, dataset_ids):
+        """
+        Delete datasets by their IDs.
+        
+        This method removes datasets identified by their IDs from the T2D2 system.
+        This operation is irreversible and will also delete all associated data.
+        
+        :param dataset_ids: A list of dataset IDs to delete
+        :type dataset_ids: list of int
+        
+        :return: A dictionary containing the API response with status and message
+        :rtype: dict
+        
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> dataset_ids = [8, 9]
+        >>> response = client.delete_datasets(dataset_ids)
+        >>> print(response["message"])
+        'Dataset is deleted successfuly'
+        
+        :warning: This operation cannot be undone. All dataset data and associated
+                information will be permanently removed.
+        """
+        url = "datasets/bulk.delete"
+        payload = {"dataset_ids": dataset_ids}
+        return self.request(url, RequestType.DELETE, data=payload)
+
+    def update_dataset_images(self, dataset_id, action, image_ids):
+        """
+        Add or remove images from a dataset.
+        
+        This method allows you to add or remove images from an existing dataset.
+        The action parameter determines whether to add or remove the specified images.
+        
+        :param dataset_id: The ID of the dataset to update
+        :type dataset_id: int
+        
+        :param action: The action to perform - either "add" or "remove"
+        :type action: str
+        
+        :param image_ids: A list of image IDs to add or remove from the dataset
+        :type image_ids: list of int
+        
+        :return: A dictionary containing the updated dataset details
+        :rtype: dict
+        
+        :raises ValueError: If action is not "add" or "remove"
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> # Add images to dataset
+        >>> image_ids = [660068, 660069]
+        >>> updated_dataset = client.update_dataset_images(8, "add", image_ids)
+        >>> print(f"Dataset now has {len(updated_dataset['image_ids'])} images")
+        
+        >>> # Remove images from dataset
+        >>> updated_dataset = client.update_dataset_images(8, "remove", [660068])
+        >>> print(f"Dataset now has {len(updated_dataset['image_ids'])} images")
+        """
+        if action not in ["add", "remove"]:
+            raise ValueError("Action must be either 'add' or 'remove'")
+        
+        url = f"datasets/{dataset_id}"
+        payload = {
+            "action": action,
+            "image_ids": image_ids
+        }
+        json_data = self.request(url, RequestType.PUT, data=payload)
+        return json_data["data"]
