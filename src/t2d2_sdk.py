@@ -2536,6 +2536,143 @@ class T2D2(object):
         
         url = f"{self.project['id']}/ai-models/{model_id}"
         return self.request(url, RequestType.GET)
+
+    def create_ai_model(self, name, config, labels, shape):
+        """
+        Create a new AI model in the current project.
+        
+        This method creates a new AI model with the specified configuration, labels, and shape.
+        The model will be associated with the current project.
+        
+        :param name: The name of the AI model to create
+        :type name: str
+        
+        :param config: Configuration dictionary containing model paths and settings
+        :type config: dict
+        
+        :param labels: List of labels/classes that the model can detect
+        :type labels: list of str
+        
+        :param shape: The shape parameter for the model
+        :type shape: int
+        
+        :return: A dictionary containing the created AI model details
+        :rtype: dict
+        
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> config = {
+        ...     "weights_path": "/models/roof-discoloration/best_model.pth",
+        ...     "classes": "./models/roof-discoloration/model_classes.json",
+        ...     "config": "/models/roof-discoloration/model_config.json"
+        ... }
+        >>> labels = ["roof_discoloration"]
+        >>> model = client.create_ai_model("Roof discoloration", config, labels, 4)
+        >>> print(f"Created model: {model['name']} with ID: {model['id']}")
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/ai-models"
+        payload = {
+            "name": name,
+            "config": config,
+            "labels": labels,
+            "shape": shape
+        }
+        return self.request(url, RequestType.POST, data=payload)
+
+    def update_ai_model(self, model_id, name=None, config=None, labels=None, shape=None):
+        """
+        Update an existing AI model in the current project.
+        
+        This method updates the properties of an existing AI model. Only the provided
+        parameters will be updated, others will remain unchanged.
+        
+        :param model_id: The ID of the AI model to update
+        :type model_id: int
+        
+        :param name: Updated name for the AI model
+        :type name: str, optional
+        
+        :param config: Updated configuration dictionary
+        :type config: dict, optional
+        
+        :param labels: Updated list of labels/classes
+        :type labels: list of str, optional
+        
+        :param shape: Updated shape parameter
+        :type shape: int, optional
+        
+        :return: A dictionary containing the updated AI model details
+        :rtype: dict
+        
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> # Update just the name
+        >>> updated_model = client.update_ai_model(1, name="Updated Model Name")
+        >>> print(f"Updated model: {updated_model['name']}")
+        
+        >>> # Update multiple properties
+        >>> updated_model = client.update_ai_model(
+        ...     1, 
+        ...     name="New Name", 
+        ...     labels=["new_label1", "new_label2"]
+        ... )
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/ai-models/{model_id}"
+        payload = {}
+        
+        if name is not None:
+            payload["name"] = name
+        if config is not None:
+            payload["config"] = config
+        if labels is not None:
+            payload["labels"] = labels
+        if shape is not None:
+            payload["shape"] = shape
+            
+        return self.request(url, RequestType.PUT, data=payload)
+
+    def delete_ai_model(self, model_id):
+        """
+        Delete an AI model from the current project.
+        
+        This method removes an AI model identified by its ID from the current project.
+        This operation is irreversible.
+        
+        :param model_id: The ID of the AI model to delete
+        :type model_id: int
+        
+        :return: A dictionary containing the API response with status and message
+        :rtype: dict
+        
+        :raises ValueError: If no project is currently set
+        :raises ConnectionError: If there is a problem connecting to the T2D2 API
+        
+        :example:
+        
+        >>> response = client.delete_ai_model(1)
+        >>> print(response["message"])
+        'AI model deleted successfully'
+        
+        :warning: This operation cannot be undone. All AI model data and associated
+                information will be permanently removed from the project.
+        """
+        if not self.project:
+            raise ValueError("Project not set")
+        
+        url = f"{self.project['id']}/ai-models/{model_id}"
+        return self.request(url, RequestType.DELETE)
     
     def run_ai_inferencer(self, image_ids, model_id, confidence_threshold=0.5, 
                          replace_annotations=False, sliding_window=False, 
