@@ -2547,7 +2547,9 @@ class T2D2(object):
         :param name: The name of the AI model to create
         :type name: str
         
-        :param config: Configuration dictionary containing model paths and settings
+        :param config: Configuration dictionary containing model paths and settings.
+                      Should include 'weights_path', 'classes', and 'config' fields.
+                      The API expects config.paths.config to be present.
         :type config: dict
         
         :param labels: List of labels/classes that the model can detect
@@ -2576,10 +2578,20 @@ class T2D2(object):
         if not self.project:
             raise ValueError("Project not set")
         
+        # Ensure config has the required structure for the API
+        formatted_config = {
+            "weights_path": config.get("weights_path", ""),
+            "classes": config.get("classes", ""),
+            "config": config.get("config", ""),
+            "paths": {
+                "config": config.get("config", "")
+            }
+        }
+        
         url = f"{self.project['id']}/ai-models"
         payload = {
             "name": name,
-            "config": config,
+            "config": formatted_config,
             "labels": labels,
             "shape": shape
         }
