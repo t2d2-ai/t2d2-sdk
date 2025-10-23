@@ -456,7 +456,9 @@ The model will be associated with the current project.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – The name of the AI model to create</p></li>
-<li><p><strong>config</strong> (<em>dict</em>) – Configuration dictionary containing model paths and settings</p></li>
+<li><p><strong>config</strong> (<em>dict</em>) – Configuration dictionary containing model paths and settings.
+Should include ‘weights_path’, ‘classes’, and ‘config’ fields.
+The API expects config.paths.config to be present.</p></li>
 <li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em>) – List of labels/classes that the model can detect</p></li>
 <li><p><strong>shape</strong> (<em>int</em>) – The shape parameter for the model</p></li>
 </ul>
