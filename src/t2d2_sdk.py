@@ -2514,7 +2514,12 @@ class T2D2(object):
             raise ValueError("Project not set")
         
         url = f"{self.project['id']}/ai-models"
-        return self.request(url, RequestType.GET)
+        response = self.request(url, RequestType.GET)
+        
+        # Return just the data list if response has the expected structure
+        if isinstance(response, dict) and 'data' in response:
+            return response['data']
+        return response
     
     def get_ai_model_by_id(self, model_id):
         """
@@ -2584,7 +2589,9 @@ class T2D2(object):
             "classes": config.get("classes", ""),
             "config": config.get("config", ""),
             "paths": {
-                "config": config.get("config", "")
+                "config": config.get("config", ""),
+                "classes": config.get("classes", ""),
+                "weights_path": config.get("weights_path", "")
             }
         }
         
@@ -2647,7 +2654,18 @@ class T2D2(object):
         if name is not None:
             payload["name"] = name
         if config is not None:
-            payload["config"] = config
+            # Format config with required paths structure for the API
+            formatted_config = {
+                "weights_path": config.get("weights_path", ""),
+                "classes": config.get("classes", ""),
+                "config": config.get("config", ""),
+                "paths": {
+                    "config": config.get("config", ""),
+                    "classes": config.get("classes", ""),
+                    "weights_path": config.get("weights_path", "")
+                }
+            }
+            payload["config"] = formatted_config
         if labels is not None:
             payload["labels"] = labels
         if shape is not None:
