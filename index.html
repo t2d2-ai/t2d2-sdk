@@ -448,7 +448,7 @@ for that tag is skipped.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_ai_model">
-<span class="sig-name descname"><span class="pre">create_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_ai_model" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">create_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_ai_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new AI model in the current project.</p>
 <p>This method creates a new AI model with the specified configuration, labels, and shape.
 The model will be associated with the current project.</p>
@@ -461,6 +461,11 @@ Should include ‘weights_path’, ‘classes’, and ‘config’ fields.
 The API expects config.paths.config to be present.</p></li>
 <li><p><strong>labels</strong> (<em>list</em><em> of </em><em>str</em>) – List of labels/classes that the model can detect</p></li>
 <li><p><strong>shape</strong> (<em>int</em>) – The shape parameter for the model</p></li>
+<li><p><strong>docker</strong> (<em>dict</em><em>, </em><em>optional</em>) – Docker configuration dictionary containing registry, image, and tag.
+If not provided, defaults to docker.io/t2d2ai/detectron2_inferencer:latest</p></li>
+<li><p><strong>project_ids</strong> (<em>list</em><em>, </em><em>optional</em>) – List of project IDs to associate with the model. If not provided
+and a project is set, the current project ID will be added to the list.
+If not provided and no project is set, an empty list will be used.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -484,7 +489,12 @@ The API expects config.paths.config to be present.</p></li>
 <span class="gp">... </span>    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="s2">&quot;/models/roof-discoloration/model_config.json&quot;</span>
 <span class="gp">... </span><span class="p">}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;roof_discoloration&quot;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_ai_model</span><span class="p">(</span><span class="s2">&quot;Roof discoloration&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">docker_config</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;registry&quot;</span><span class="p">:</span> <span class="s2">&quot;docker.io&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;t2d2ai/detectron2_inferencer&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;tag&quot;</span><span class="p">:</span> <span class="s2">&quot;latest&quot;</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_ai_model</span><span class="p">(</span><span class="s2">&quot;Roof discoloration&quot;</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">docker</span><span class="o">=</span><span class="n">docker_config</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created model: </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> with ID: </span><span class="si">{</span><span class="n">model</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -521,12 +531,12 @@ The dataset will be private by default and owned by the authenticated user.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_ai_model">
 <span class="sig-name descname"><span class="pre">delete_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_ai_model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Delete an AI model from the current project.</p>
-<p>This method removes an AI model identified by its ID from the current project.
+<dd><p>Delete one or more AI models from the current project.</p>
+<p>This method removes AI model(s) identified by their ID(s) from the current project.
 This operation is irreversible.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>model_id</strong> (<em>int</em>) – The ID of the AI model to delete</p>
+<dd class="field-odd"><p><strong>model_id</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em>) – The ID of the AI model to delete, or a list of model IDs to delete</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A dictionary containing the API response with status and message</p>
@@ -543,9 +553,15 @@ This operation is irreversible.</p>
 <dt class="field-odd">Example<span class="colon">:</span></dt>
 <dd class="field-odd"><p></p></dd>
 </dl>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_ai_model</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Delete a single model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_ai_model</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
 <span class="go">&#39;AI model deleted successfully&#39;</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Delete multiple models</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">delete_ai_model</span><span class="p">([</span><span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
