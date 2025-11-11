@@ -2542,7 +2542,7 @@ class T2D2(object):
         url = f"{self.project['id']}/ai-models/{model_id}"
         return self.request(url, RequestType.GET)
 
-    def create_ai_model(self, name, config, labels, shape):
+    def create_ai_model(self, name, config, labels, shape, docker=None, project_ids=None):
         """
         Create a new AI model in the current project.
         
@@ -2563,6 +2563,15 @@ class T2D2(object):
         :param shape: The shape parameter for the model
         :type shape: int
         
+        :param docker: Docker configuration dictionary containing registry, image, and tag.
+                      If not provided, defaults to docker.io/t2d2ai/detectron2_inferencer:latest
+        :type docker: dict, optional
+        
+        :param project_ids: List of project IDs to associate with the model. If not provided
+                           and a project is set, the current project ID will be added to the list.
+                           If not provided and no project is set, an empty list will be used.
+        :type project_ids: list, optional
+        
         :return: A dictionary containing the created AI model details
         :rtype: dict
         
@@ -2577,7 +2586,12 @@ class T2D2(object):
         ...     "config": "/models/roof-discoloration/model_config.json"
         ... }
         >>> labels = ["roof_discoloration"]
-        >>> model = client.create_ai_model("Roof discoloration", config, labels, 4)
+        >>> docker_config = {
+        ...     "registry": "docker.io",
+        ...     "image": "t2d2ai/detectron2_inferencer",
+        ...     "tag": "latest"
+        ... }
+        >>> model = client.create_ai_model("Roof discoloration", config, labels, 4, docker=docker_config)
         >>> print(f"Created model: {model['name']} with ID: {model['id']}")
         """
         if not self.project:
@@ -2595,12 +2609,29 @@ class T2D2(object):
             }
         }
         
+        # Set default docker configuration if not provided
+        if docker is None:
+            docker = {
+                "registry": "docker.io",
+                "image": "t2d2ai/detectron2_inferencer",
+                "tag": "latest"
+            }
+        
+        # Handle project_ids
+        if project_ids is None:
+            if self.project:
+                project_ids = [self.project["id"]]
+            else:
+                project_ids = []
+        
         url = f"{self.project['id']}/ai-models"
         payload = {
             "name": name,
             "config": formatted_config,
             "labels": labels,
-            "shape": shape
+            "shape": shape,
+            "docker": docker,
+            "project_ids": project_ids
         }
         return self.request(url, RequestType.POST, data=payload)
 
@@ -2675,13 +2706,13 @@ class T2D2(object):
 
     def delete_ai_model(self, model_id):
         """
-        Delete an AI model from the current project.
+        Delete one or more AI models from the current project.
         
-        This method removes an AI model identified by its ID from the current project.
+        This method removes AI model(s) identified by their ID(s) from the current project.
         This operation is irreversible.
         
-        :param model_id: The ID of the AI model to delete
-        :type model_id: int
+        :param model_id: The ID of the AI model to delete, or a list of model IDs to delete
+        :type model_id: int or list of int
         
         :return: A dictionary containing the API response with status and message
         :rtype: dict
@@ -2691,9 +2722,14 @@ class T2D2(object):
         
         :example:
         
+        >>> # Delete a single model
         >>> response = client.delete_ai_model(1)
         >>> print(response["message"])
         'AI model deleted successfully'
+        
+        >>> # Delete multiple models
+        >>> response = client.delete_ai_model([21, 22, 23])
+        >>> print(response["message"])
         
         :warning: This operation cannot be undone. All AI model data and associated
                 information will be permanently removed from the project.
@@ -2701,8 +2737,19 @@ class T2D2(object):
         if not self.project:
             raise ValueError("Project not set")
         
-        url = f"{self.project['id']}/ai-models/{model_id}"
-        return self.request(url, RequestType.DELETE)
+        # Handle both single ID and list of IDs
+        if isinstance(model_id, list):
+            # Delete multiple models
+            results = []
+            for mid in model_id:
+                url = f"{self.project['id']}/ai-models/{mid}"
+                result = self.request(url, RequestType.DELETE)
+                results.append(result)
+            return results
+        else:
+            # Delete single model
+            url = f"{self.project['id']}/ai-models/{model_id}"
+            return self.request(url, RequestType.DELETE)
     
     def run_ai_inferencer(self, image_ids, model_id, confidence_threshold=0.5, 
                          replace_annotations=False, sliding_window=False, 
