@@ -529,6 +529,81 @@ The dataset will be private by default and owned by the authenticated user.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_project">
+<span class="sig-name descname"><span class="pre">create_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new project in T2D2.</p>
+<p>This method creates a new project with the specified name and location information.
+You can either provide a complete location dictionary or individual location parameters.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – The name of the project to create</p></li>
+<li><p><strong>location</strong> (<em>dict</em><em> or </em><em>None</em>) – A complete location dictionary with address, latitude, longitude,
+country, and country_code. If provided, individual location parameters are ignored.</p></li>
+<li><p><strong>address</strong> (<em>str</em><em> or </em><em>None</em>) – The address/location of the project</p></li>
+<li><p><strong>latitude</strong> (<em>float</em><em> or </em><em>None</em>) – The latitude coordinate of the project location</p></li>
+<li><p><strong>longitude</strong> (<em>float</em><em> or </em><em>None</em>) – The longitude coordinate of the project location</p></li>
+<li><p><strong>country</strong> (<em>str</em><em> or </em><em>None</em>) – The country where the project is located</p></li>
+<li><p><strong>country_code</strong> (<em>str</em><em> or </em><em>None</em>) – The country code (e.g., “UK”, “US”)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Default location<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Default address<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Default latitude<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Default longitude<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Default country<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Default country_code<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the created project details</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the API request fails or required parameters are missing</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create project with individual location parameters</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_project</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;120 Broadway&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">address</span><span class="o">=</span><span class="s2">&quot;Ahmedabad&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">latitude</span><span class="o">=</span><span class="mf">1234.89</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">longitude</span><span class="o">=</span><span class="mf">456.9</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">country</span><span class="o">=</span><span class="s2">&quot;United Kingdom&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">country_code</span><span class="o">=</span><span class="s2">&quot;UK&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created project: </span><span class="si">{</span><span class="n">project</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> with ID: </span><span class="si">{</span><span class="n">project</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create project with location dictionary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">location</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;address&quot;</span><span class="p">:</span> <span class="s2">&quot;Ahmedabad&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;latitude&quot;</span><span class="p">:</span> <span class="mf">1234.89</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;longitude&quot;</span><span class="p">:</span> <span class="mf">456.9</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;country&quot;</span><span class="p">:</span> <span class="s2">&quot;United Kingdom&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;country_code&quot;</span><span class="p">:</span> <span class="s2">&quot;UK&quot;</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_project</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;120 Broadway&quot;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="n">location</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created project ID: </span><span class="si">{</span><span class="n">project</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_ai_model">
 <span class="sig-name descname"><span class="pre">delete_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_ai_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete one or more AI models from the current project.</p>
@@ -2674,6 +2749,7 @@ then uploads the file from the specified local path with public-read ACL.</p>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.add_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_tags()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.create_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.create_ai_model()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.create_dataset"><code class="docutils literal notranslate"><span class="pre">T2D2.create_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_project"><code class="docutils literal notranslate"><span class="pre">T2D2.create_project()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_ai_model()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotation_classes()</span></code></a></li>
 <li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotations()</span></code></a></li>
