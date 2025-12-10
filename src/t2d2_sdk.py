@@ -419,6 +419,93 @@ class T2D2(object):
         json_data = self.request(url, RequestType.GET)
         return json_data["data"]
     
+    def create_project(self, name, location=None, address=None, latitude=None, 
+                      longitude=None, country=None, country_code=None):
+        """
+        Create a new project in T2D2.
+        
+        This method creates a new project with the specified name and location information.
+        You can either provide a complete location dictionary or individual location parameters.
+        
+        :param name: The name of the project to create
+        :type name: str
+        
+        :param location: A complete location dictionary with address, latitude, longitude, 
+                        country, and country_code. If provided, individual location parameters are ignored.
+        :type location: dict or None
+        :default location: None
+        
+        :param address: The address/location of the project
+        :type address: str or None
+        :default address: None
+        
+        :param latitude: The latitude coordinate of the project location
+        :type latitude: float or None
+        :default latitude: None
+        
+        :param longitude: The longitude coordinate of the project location
+        :type longitude: float or None
+        :default longitude: None
+        
+        :param country: The country where the project is located
+        :type country: str or None
+        :default country: None
+        
+        :param country_code: The country code (e.g., "UK", "US")
+        :type country_code: str or None
+        :default country_code: None
+        
+        :return: A dictionary containing the created project details
+        :rtype: dict
+        
+        :raises ValueError: If the API request fails or required parameters are missing
+        
+        :example:
+            >>> # Create project with individual location parameters
+            >>> project = client.create_project(
+            ...     name="120 Broadway",
+            ...     address="Ahmedabad",
+            ...     latitude=1234.89,
+            ...     longitude=456.9,
+            ...     country="United Kingdom",
+            ...     country_code="UK"
+            ... )
+            >>> print(f"Created project: {project['profile']['name']} with ID: {project['id']}")
+            
+            >>> # Create project with location dictionary
+            >>> location = {
+            ...     "address": "Ahmedabad",
+            ...     "latitude": 1234.89,
+            ...     "longitude": 456.9,
+            ...     "country": "United Kingdom",
+            ...     "country_code": "UK"
+            ... }
+            >>> project = client.create_project(name="120 Broadway", location=location)
+            >>> print(f"Created project ID: {project['id']}")
+        """
+        # Build location dictionary
+        if location is None:
+            location = {}
+            if address is not None:
+                location["address"] = address
+            if latitude is not None:
+                location["latitude"] = latitude
+            if longitude is not None:
+                location["longitude"] = longitude
+            if country is not None:
+                location["country"] = country
+            if country_code is not None:
+                location["country_code"] = country_code
+        
+        # Build payload
+        payload = {
+            "name": name,
+            "location": location
+        }
+        
+        url = "project"
+        json_data = self.request(url, RequestType.POST, data=payload)
+        return json_data["data"]
 
     def set_project(self, project_id):
         """
