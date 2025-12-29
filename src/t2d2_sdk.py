@@ -5,6 +5,7 @@ T2D2 SDK Client Library
 """
 
 import json
+import logging
 import os
 # pylint: disable=wildcard-import, unused-wildcard-import
 import random
@@ -17,6 +18,28 @@ from urllib.parse import urlencode, urlparse
 import boto3
 import requests
 import sentry_sdk
+
+# Set up logger
+logger = logging.getLogger(__name__)
+
+# Configure logging if not already configured
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)  # Use INFO level only - DEBUG messages will be filtered
+from docx import Document
+from docx.shared import Inches, Pt
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from io import BytesIO
+from PIL import Image as PILImage
+from condition_report_service import ImageAnnotationCropper
 
 
 TIMEOUT = 60
@@ -161,6 +184,42 @@ def upload_file(file_path: str, url: str):
 
 
 ####################################################################################################
+# Helper function for adding hyperlinks to docx
+####################################################################################################
+def add_hyperlink(paragraph, url, text):
+    """
+    Add a hyperlink to a paragraph in a Word document.
+    
+    :param paragraph: The paragraph to add the hyperlink to
+    :param url: The URL to link to
+    :param text: The text to display for the hyperlink
+    """
+    part = paragraph.part
+    r_id = part.relate_to(url, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", is_external=True)
+    
+    hyperlink = OxmlElement('w:hyperlink')
+    hyperlink.set(qn('r:id'), r_id)
+    
+    new_run = OxmlElement('w:r')
+    rPr = OxmlElement('w:rPr')
+    
+    # Style the hyperlink
+    color = OxmlElement('w:color')
+    color.set(qn('w:val'), '0000FF')  # Blue color
+    rPr.append(color)
+    
+    underline = OxmlElement('w:u')
+    underline.set(qn('w:val'), 'single')
+    rPr.append(underline)
+    
+    new_run.append(rPr)
+    new_run.text = text
+    hyperlink.append(new_run)
+    
+    paragraph._p.append(hyperlink)
+    return hyperlink
+
+####################################################################################################
 class RequestType(Enum):
     """Request types"""
 
@@ -240,8 +299,10 @@ class T2D2(object):
             base_url += "/"
         self.base_url = base_url
         self.headers = {"Content-Type": "application/json"}
+        logger.info(f"Initializing T2D2 client with base_url: {base_url}")
         self.login(credentials)
         self.project = {}
+        logger.debug("T2D2 client initialized successfully")
 
     def request(
         self,
@@ -252,8 +313,8 @@ class T2D2(object):
         data=None,
     ) -> dict:
         """Send a request and handle response"""
-
         url = self.base_url + url_suffix
+        logger.debug(f"Making {req_type.name} request to: {url}")
         if headers is None:
             headers = {}
         if params is None:
@@ -304,17 +365,19 @@ class T2D2(object):
 
         if res.status_code in (200, 201):
             try:
+                logger.debug(f"Request successful: {req_type.name} {url} - Status: {res.status_code}")
                 return res.json()
             except Exception as e:
-                print("JSON Conversion Error: ", e)
+                logger.error(f"JSON Conversion Error for {url}: {e}")
                 return {"content": res.content}
         else:
+            logger.error(f"Request failed: {req_type.name} {url} - Status: {res.status_code}")
             if self.debug:
-                print(f"URL: {req_type} {res.url}")
-                print(f"HEADERS: {headers}")
-                print(f"PARAMS: {params}")
-                print(f"DATA: {data}")
-                print(res.status_code, res.content)
+                logger.debug(f"URL: {req_type} {res.url}")
+                logger.debug(f"HEADERS: {headers}")
+                logger.debug(f"PARAMS: {params}")
+                logger.debug(f"DATA: {data}")
+                logger.debug(f"Response: {res.status_code} {res.content}")
             raise ValueError(f"Error code received: {res.status_code}")
 
     def login(self, credentials):
@@ -348,19 +411,28 @@ class T2D2(object):
 
         if "access_token" in credentials:
             # Directly use token
+            logger.info("Authenticating with access token")
             self.access_token = credentials["access_token"]
             self.headers["Authorization"] = f"Bearer {self.access_token}"
+            logger.debug("Access token authentication successful")
 
         elif "password" in credentials:
             # Login
+            logger.info(f"Authenticating with username/password for user: {credentials.get('username', 'N/A')}")
             url = "auth/login"
             json_data = self.request(url, RequestType.POST, data=credentials)
             self.access_token = json_data["data"]["firebaseDetail"]["access_token"]
             self.headers["Authorization"] = f"Bearer {self.access_token}"
+            logger.info("Username/password authentication successful")
 
         elif "api_key" in credentials:
+            logger.info("Authenticating with API key")
             self.api_key = credentials["api_key"]
             self.headers["x-api-key"] = self.api_key
+            logger.debug("API key authentication successful")
+        else:
+            logger.error("No valid credentials provided")
+            raise ValueError("No valid credentials provided. Must include 'access_token', 'password'/'username', or 'api_key'")
 
         return
 
@@ -413,10 +485,13 @@ class T2D2(object):
             5
         """
         if project_id is None:
+            logger.info("Fetching all projects")
             url = "project"
         else:
+            logger.info(f"Fetching project: {project_id}")
             url = f"project/{project_id}"
         json_data = self.request(url, RequestType.GET)
+        logger.debug(f"Successfully retrieved project data")
         return json_data["data"]
     
     def create_project(self, name, location=None, address=None, latitude=None, 
@@ -503,8 +578,11 @@ class T2D2(object):
             "location": location
         }
         
+        logger.info(f"Creating new project: {name}")
         url = "project"
         json_data = self.request(url, RequestType.POST, data=payload)
+        project_id = json_data["data"].get("id")
+        logger.info(f"Project created successfully with ID: {project_id}")
         return json_data["data"]
 
     def set_project(self, project_id):
@@ -529,17 +607,21 @@ class T2D2(object):
         :note: After setting a project, S3 storage information is automatically configured
             for use with other methods that require file uploads or downloads.
         """
+        logger.info(f"Setting project: {project_id}")
         json_data = self.request(f"project/{project_id}", RequestType.GET)
         if not json_data["success"]:
+            logger.error(f"Failed to set project {project_id}: {json_data.get('message', 'Unknown error')}")
             raise ValueError(json_data["message"])
 
         project = json_data["data"]
         self.project = project
+        logger.debug(f"Project set: {project.get('profile', {}).get('name', 'N/A')}")
 
         self.s3_base_url = project["config"]["s3_base_url"]
         self.aws_region = project["config"]["aws_region"]
         res = urlparse(self.s3_base_url)
         self.bucket = res.netloc.split(".")[0]
+        logger.debug(f"S3 configuration set: bucket={self.bucket}, region={self.aws_region}")
         return
 
     def get_project_info(self):
@@ -870,15 +952,19 @@ class T2D2(object):
         """
 
         if not self.project:
+            logger.error("Cannot upload images: Project not set")
             raise ValueError("Project not set")
 
+        logger.info(f"Uploading {len(image_paths)} images (type: {image_type})")
+        
         # Upload images to S3
         assets = []
         image_root = "images"
         if image_type == 3:
             image_root = "orthomosaics"
 
-        for file_path in image_paths:
+        for idx, file_path in enumerate(image_paths, 1):
+            logger.debug(f"Uploading image {idx}/{len(image_paths)}: {file_path}")
             base, ext = os.path.splitext(os.path.basename(file_path))
             filename = f"{base}_{random_string(6)}{ext}"
             s3_path = (
@@ -887,6 +973,7 @@ class T2D2(object):
             )
             result = upload_file(file_path, s3_path)
             if result.get("success", False):
+                logger.debug(f"Successfully uploaded to S3: {filename}")
                 assets.append(
                     {
                         "name": base,
@@ -895,8 +982,13 @@ class T2D2(object):
                         "size": {"filesize": os.path.getsize(file_path)},
                     }
                 )
+            else:
+                logger.warning(f"Failed to upload {file_path} to S3: {result.get('message', 'Unknown error')}")
 
+        logger.info(f"Successfully uploaded {len(assets)}/{len(image_paths)} images to S3")
+        
         # Add images to project
+        logger.debug("Registering images with T2D2 API")
         payload = {
             "project_id": self.project["id"],
             "asset_type": 1,
@@ -907,7 +999,9 @@ class T2D2(object):
         if params is not None:
             payload.update(params)
 
-        return self.add_assets(payload)
+        result = self.add_assets(payload)
+        logger.info(f"Successfully registered {len(assets)} images with T2D2 API")
+        return result
 
     def get_images(self, image_ids=None, params=None):
         """
@@ -960,12 +1054,15 @@ class T2D2(object):
             >>> print(f"Images in region: {len(filtered_images)}")
         """
         if not self.project:
+            logger.error("Cannot get images: Project not set")
             raise ValueError("Project not set yet")
 
         # all images in project
         if image_ids is None:
+            logger.info("Fetching all images from project")
             base_url = f"{self.project['id']}/images"
             if params:
+                logger.debug(f"Using filters: {params}")
                 # Convert list values to JSON strings
                 formatted_params = {}
                 for k, v in params.items():
@@ -979,14 +1076,18 @@ class T2D2(object):
                 url = base_url
             json_data = self.request(url, RequestType.GET)
             results = json_data["data"]["image_list"]
+            logger.info(f"Retrieved {len(results)} images")
             return results
 
         # Specified image_ids
+        logger.info(f"Fetching {len(image_ids)} specific images")
         results = []
         for img_id in image_ids:
+            logger.debug(f"Fetching image: {img_id}")
             url = f"{self.project['id']}/images/{img_id}"
             json_data = self.request(url, RequestType.GET)
             results.append(json_data["data"])
+        logger.info(f"Retrieved {len(results)} images")
         return results
 
     def update_images(self, image_ids, payload):
@@ -1744,6 +1845,394 @@ class T2D2(object):
         payload = {"report_ids": report_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
+    def generate_condition_report_document(self, image_ids=None, output_path='condition_report.docx', padding_percent=0.2):
+        """
+        Generate a Word document with condition report for images and their annotations.
+        
+        Creates a Word document with:
+        - First page: Project details and T2D2 information
+        - Subsequent pages: One page per annotation showing:
+          * Cropped annotated image (top)
+          * Original image (middle)
+          * Metadata table (bottom) with file name, link, condition, region, tags
+        
+        :param image_ids: List of specific image IDs to include, or None to include all images
+        :type image_ids: list or None
+        :default image_ids: None
+        
+        :param output_path: Path where the Word document should be saved
+        :type output_path: str
+        :default output_path: 'condition_report.docx'
+        
+        :param padding_percent: Percentage of padding to add around cropped annotations (0.0 to 1.0)
+        :type padding_percent: float
+        :default padding_percent: 0.2
+        
+        :return: Path to the generated document
+        :rtype: str
+        
+        :raises ValueError: If no project is currently set
+        
+        :example:
+            >>> # Generate report for all images
+            >>> doc_path = client.generate_condition_report_document()
+            >>> print(f"Report saved to: {doc_path}")
+            
+            >>> # Generate report for specific images
+            >>> doc_path = client.generate_condition_report_document(
+            ...     image_ids=['img_123', 'img_456'],
+            ...     output_path='custom_report.docx'
+            ... )
+        """
+        if not self.project:
+            logger.error("Cannot generate condition report: Project not set")
+            raise ValueError("Project not set")
+        
+        logger.info(f"Starting condition report generation. Output: {output_path}, Image IDs: {image_ids or 'All'}")
+        
+        # Get project info
+        project_info = self.get_project_info()
+        logger.debug(f"Project: {project_info['name']} (ID: {project_info['id']})")
+        
+        # Get images
+        if image_ids is None:
+            logger.info("Fetching all images for condition report")
+            images = self.get_images()
+        else:
+            logger.info(f"Fetching {len(image_ids)} specific images for condition report")
+            images = self.get_images(image_ids=image_ids)
+        
+        if not images:
+            logger.error("No images found for condition report")
+            raise ValueError("No images found")
+        
+        logger.info(f"Found {len(images)} images to process")
+        
+        # Prepare image data for ImageAnnotationCropper
+        image_data_list = []
+        for img in images:
+            image_id = img.get('id')
+            
+            # Get annotations for this image
+            try:
+                annotations = self.get_annotations(image_id=image_id)
+                logger.debug(f"Image {image_id}: Found {len(annotations)} annotations")
+            except Exception as e:
+                logger.warning(f"Failed to get annotations for image {image_id}: {e}")
+                annotations = []
+            
+            # Filter visible annotations only
+            visible_annotations = [ann for ann in annotations if ann.get('visible', True)]
+            
+            if not visible_annotations:
+                continue
+            
+            # Get image URL - try different possible fields
+            image_url = img.get('url') or img.get('s3_url') or img.get('image_url') or img.get('file_url')
+            if not image_url:
+                # Try to construct from s3_base_url if available
+                if hasattr(self, 's3_base_url') and img.get('filename'):
+                    image_url = f"{self.s3_base_url}/{img['filename']}"
+                else:
+                    logger.warning(f"No URL found for image {image_id}, skipping...")
+                    continue
+            
+            # Get image dimensions
+            width = img.get('width') or img.get('image_width') or 1920
+            height = img.get('height') or img.get('image_height') or 1080
+            
+            # Format image data for ImageAnnotationCropper
+            image_data = {
+                'url': image_url,
+                'info': {
+                    'width': width,
+                    'height': height
+                },
+                'annotations': visible_annotations,
+                'image_id': img.get('id'),
+                'filename': img.get('filename', ''),
+                'region': img.get('region', {}),
+                'tags': img.get('tags', [])
+            }
+            image_data_list.append(image_data)
+        
+        if not image_data_list:
+            logger.error("No images with annotations found for condition report")
+            raise ValueError("No images with annotations found")
+        
+        logger.info(f"Processing {len(image_data_list)} images with annotations")
+        
+        # Initialize ImageAnnotationCropper
+        logger.debug("Initializing ImageAnnotationCropper")
+        cropper = ImageAnnotationCropper(image_data_list)
+        logger.info("Downloading images...")
+        cropper.download_images()
+        
+        # Create Word document
+        logger.info("Creating Word document structure")
+        doc = Document()
+        
+        # Set document margins - optimized for better layout
+        sections = doc.sections
+        for section in sections:
+            section.top_margin = Inches(0.75)
+            section.bottom_margin = Inches(0.75)
+            section.left_margin = Inches(0.75)
+            section.right_margin = Inches(0.75)
+        
+        # First page: Title, Logo, then Project details
+        # Add title first with better spacing
+        title = doc.add_heading('Condition Report', 0)
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        title.paragraph_format.space_before = Pt(12)
+        title.paragraph_format.space_after = Pt(18)
+        
+        # Add T2D2 logo after title
+        logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 't2d2_image', 't2d2.png')
+        if os.path.exists(logo_path):
+            logo_para = doc.add_paragraph()
+            logo_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            logo_para.paragraph_format.space_before = Pt(6)
+            logo_para.paragraph_format.space_after = Pt(18)
+            run = logo_para.add_run()
+            run.add_picture(logo_path, width=Inches(2))
+        
+        # Add project information in a better formatted way
+        # Calculate number of rows needed
+        num_rows = 4  # Project, Project ID, Project Link, Address (always present)
+        if project_info.get('description'):
+            num_rows += 1
+        num_rows += 1  # Created (always present)
+        if project_info.get('created_by'):
+            num_rows += 1
+        
+        project_table = doc.add_table(rows=num_rows, cols=2)
+        project_table.style = 'Light Grid Accent 1'
+        
+        # Set column widths - optimized for better layout
+        project_table.columns[0].width = Inches(1.5)
+        project_table.columns[1].width = Inches(4.5)
+        
+        # Fill project information table
+        row_idx = 0
+        project_table.cell(row_idx, 0).text = 'Project:'
+        project_table.cell(row_idx, 1).text = project_info['name']
+        row_idx += 1
+        
+        project_table.cell(row_idx, 0).text = 'Project ID:'
+        project_table.cell(row_idx, 1).text = str(project_info['id'])
+        row_idx += 1
+        
+        # Add project link
+        project_table.cell(row_idx, 0).text = 'Project Link:'
+        project_link_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}"
+        link_paragraph = project_table.cell(row_idx, 1).paragraphs[0]
+        link_paragraph.clear()
+        add_hyperlink(link_paragraph, project_link_url, project_link_url)
+        row_idx += 1
+        
+        project_table.cell(row_idx, 0).text = 'Address:'
+        project_table.cell(row_idx, 1).text = project_info['address']
+        row_idx += 1
+        
+        if project_info.get('description'):
+            project_table.cell(row_idx, 0).text = 'Description:'
+            project_table.cell(row_idx, 1).text = project_info['description']
+            row_idx += 1
+        
+        project_table.cell(row_idx, 0).text = 'Created:'
+        project_table.cell(row_idx, 1).text = project_info['created_at']
+        row_idx += 1
+        
+        if project_info.get('created_by'):
+            project_table.cell(row_idx, 0).text = 'Created By:'
+            project_table.cell(row_idx, 1).text = project_info['created_by']
+        
+        # Format project table cells with better spacing and alignment
+        for row in project_table.rows:
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    paragraph.style.font.size = Pt(11)
+                    paragraph.paragraph_format.space_before = Pt(6)
+                    paragraph.paragraph_format.space_after = Pt(6)
+                    if cell == row.cells[0]:  # First column (labels)
+                        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                        for run in paragraph.runs:
+                            run.bold = True
+                    else:  # Second column (values)
+                        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        
+        # Add page break after project details
+        doc.add_page_break()
+        
+        # Process each image and annotation
+        figure_counter = 1
+        first_annotation = True
+        
+        for img_idx, (image_data, pil_image) in enumerate(cropper.images):
+            if pil_image is None:
+                continue
+            
+            image_width = image_data['info']['width']
+            image_height = image_data['info']['height']
+            annotations = image_data['annotations']
+            image_id = image_data.get('image_id', '')
+            filename = image_data.get('filename', '')
+            region = image_data.get('region', {})
+            tags = image_data.get('tags', [])
+            
+            # Get portal URL (construct from base_url and project/image IDs)
+            portal_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}/images/{image_id}"
+            
+            # Process each annotation
+            for ann in annotations:
+                # Add page break before each annotation to ensure one condition per page
+                # (skip for first annotation since we already have a page break after project details)
+                if not first_annotation:
+                    doc.add_page_break()
+                first_annotation = False
+                # Crop annotation
+                cropped_img, crop_bbox = cropper.crop_annotation(
+                    pil_image, ann, image_width, image_height, padding_percent
+                )
+                
+                if cropped_img is None or crop_bbox is None:
+                    continue
+                
+                # Draw annotation on cropped image
+                cropped_with_annotation = cropper.draw_annotation_on_image(
+                    cropped_img, ann, image_width, image_height, crop_bbox
+                )
+                
+                # Add minimal spacing at top of page (optimized for one page per condition)
+                doc.add_paragraph()
+                
+                # Add cropped annotated image (top) - optimized size to fit on one page
+                cropped_para = doc.add_paragraph()
+                cropped_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                cropped_para.paragraph_format.space_before = Pt(6)
+                cropped_para.paragraph_format.space_after = Pt(3)
+                
+                # Convert PIL image to bytes for docx
+                cropped_bytes = BytesIO()
+                cropped_with_annotation.save(cropped_bytes, format='PNG')
+                cropped_bytes.seek(0)
+                
+                # Add image to document (optimized width to fit on one page with other content)
+                run = cropped_para.add_run()
+                run.add_picture(cropped_bytes, width=Inches(5.5))
+                
+                # Add figure caption below cropped image with minimal spacing
+                caption_para = doc.add_paragraph()
+                caption_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                caption_para.paragraph_format.space_before = Pt(3)
+                caption_para.paragraph_format.space_after = Pt(6)
+                caption_run = caption_para.add_run(f"Figure {figure_counter}: Annotated Image (Cropped)")
+                caption_run.font.size = Pt(9)
+                caption_run.italic = True
+                figure_counter += 1
+                
+                # Add minimal spacing between images
+                doc.add_paragraph()
+                
+                # Add original image (middle) - optimized size to fit on one page
+                original_para = doc.add_paragraph()
+                original_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                original_para.paragraph_format.space_before = Pt(3)
+                original_para.paragraph_format.space_after = Pt(3)
+                
+                # Draw all annotations on original for context
+                original_with_annotations = pil_image.copy()
+                for visible_ann in annotations:
+                    original_with_annotations = cropper.draw_annotation_on_image(
+                        original_with_annotations, visible_ann, image_width, image_height
+                    )
+                
+                # Convert original image to bytes
+                original_bytes = BytesIO()
+                original_with_annotations.save(original_bytes, format='PNG')
+                original_bytes.seek(0)
+                
+                # Add original image (optimized width to fit on one page)
+                run = original_para.add_run()
+                run.add_picture(original_bytes, width=Inches(3.5))
+                
+                # Add figure caption below original image with minimal spacing
+                caption2_para = doc.add_paragraph()
+                caption2_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                caption2_para.paragraph_format.space_before = Pt(3)
+                caption2_para.paragraph_format.space_after = Pt(6)
+                caption2_run = caption2_para.add_run(f"Figure {figure_counter}: Original Image with All Annotations")
+                caption2_run.font.size = Pt(9)
+                caption2_run.italic = True
+                figure_counter += 1
+                
+                # Add minimal spacing before table
+                doc.add_paragraph()
+                
+                # Create metadata table
+                table = doc.add_table(rows=5, cols=2)
+                table.style = 'Light Grid Accent 1'
+                
+                # Set column widths for better layout
+                table.columns[0].width = Inches(1.8)
+                table.columns[1].width = Inches(4.2)
+                
+                # Get annotation details
+                annotation_class = ann.get('annotation_class', {})
+                class_name = annotation_class.get('annotation_class_long_name', 'N/A')
+                condition = ann.get('condition', {})
+                condition_name = condition.get('rating_name', 'N/A') if condition else 'N/A'
+                region_name = region.get('name', 'N/A') if region else 'N/A'
+                tags_str = ', '.join([tag.get('name', '') for tag in tags if isinstance(tag, dict)]) or 'N/A'
+                if not tags_str or tags_str == '':
+                    tags_str = 'N/A'
+                
+                # Fill table
+                table.cell(0, 0).text = 'File Name'
+                table.cell(0, 1).text = filename or 'N/A'
+                
+                # Add clickable hyperlink for portal URL
+                table.cell(1, 0).text = 'Link to Photo in T2D2 Portal'
+                link_cell = table.cell(1, 1)
+                link_paragraph = link_cell.paragraphs[0]
+                link_paragraph.clear()
+                add_hyperlink(link_paragraph, portal_url, portal_url)
+                
+                table.cell(2, 0).text = 'Condition'
+                table.cell(2, 1).text = condition_name
+                
+                table.cell(3, 0).text = 'Region'
+                table.cell(3, 1).text = region_name
+                
+                table.cell(4, 0).text = 'Tags'
+                table.cell(4, 1).text = tags_str
+                
+                # Format table cells with optimized styling for one page layout
+                for row_idx, row in enumerate(table.rows):
+                    for cell in row.cells:
+                        for paragraph in cell.paragraphs:
+                            paragraph.style.font.size = Pt(9)
+                            # Reduced padding to fit on one page
+                            paragraph.paragraph_format.space_before = Pt(4)
+                            paragraph.paragraph_format.space_after = Pt(4)
+                            # Make first column (labels) bold and align left
+                            if cell == row.cells[0]:
+                                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                                for run in paragraph.runs:
+                                    run.bold = True
+                            else:  # Second column (values)
+                                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                
+                # No page break needed here - next annotation will add its own page break at the start
+        
+        # Save document
+        logger.info(f"Saving condition report document to: {output_path}")
+        doc.save(output_path)
+        logger.info(f"Condition report document saved successfully: {output_path}")
+        
+        return output_path
+
     ################################################################################################
     # CRUD Tags
     ################################################################################################
@@ -1821,7 +2310,7 @@ class T2D2(object):
                 result = self.request(url, RequestType.POST, data=payload)
                 results.append(result)
             except Exception as e:
-                print("*WARNING* Tag already exists: ", e)
+                logger.warning(f"Tag already exists: {tag} - {e}")
 
         return results
 
@@ -2088,22 +2577,29 @@ class T2D2(object):
         """
 
         if not self.project:
+            logger.error("Cannot get annotations: Project not set")
             raise ValueError("Project not set")
 
         if params is None:
             params = {}
 
         if image_id is None:
+            logger.info("Fetching annotations for all images matching params")
             images = self.get_images(params=params)
             image_ids = [img["id"] for img in images]
+            logger.debug(f"Found {len(image_ids)} images to fetch annotations from")
         else:
+            logger.info(f"Fetching annotations for image: {image_id}")
             image_ids = [image_id]
 
         images = self.get_images(image_ids=image_ids, params=params)
         annotations = []
         for img in images:
-            annotations.extend(img["annotations"])
+            img_annotations = img.get("annotations", [])
+            annotations.extend(img_annotations)
+            logger.debug(f"Image {img.get('id')}: Found {len(img_annotations)} annotations")
 
+        logger.info(f"Retrieved {len(annotations)} total annotations")
         return annotations
 
     def delete_annotations(self, image_id, annotation_ids=None):
@@ -2140,12 +2636,17 @@ class T2D2(object):
         """
 
         if not self.project:
+            logger.error("Cannot delete annotations: Project not set")
             raise ValueError("Project not set")
 
         if annotation_ids is None:
             # Get annotation_ids for all annotations in image
+            logger.info(f"Deleting all annotations from image: {image_id}")
             annotations = self.get_annotations(image_id)
             annotation_ids = [ann["id"] for ann in annotations]
+            logger.debug(f"Found {len(annotation_ids)} annotations to delete")
+        else:
+            logger.info(f"Deleting {len(annotation_ids)} specific annotations from image: {image_id}")
 
         payload = {
             "project_id": self.project["id"],
@@ -2153,7 +2654,9 @@ class T2D2(object):
             "annotation_ids": annotation_ids,
         }
 
-        return self.request("annotation", RequestType.DELETE, data=payload)
+        result = self.request("annotation", RequestType.DELETE, data=payload)
+        logger.info(f"Successfully deleted annotations from image: {image_id}")
+        return result
 
     def add_annotations(self, image_id, annotations):
         """
@@ -2191,8 +2694,10 @@ class T2D2(object):
         >>> print(result)
         """
         if not self.project:
+            logger.error("Cannot add annotations: Project not set")
             raise ValueError("Project not set")
 
+        logger.info(f"Adding {len(annotations)} annotations to image: {image_id}")
         url = "annotation"
         payload = {
             "project_id": self.project["id"],
@@ -2201,6 +2706,7 @@ class T2D2(object):
         }
 
         results = self.request(url, RequestType.POST, data=payload)
+        logger.info(f"Successfully added annotations to image: {image_id}")
 
         return results
 
