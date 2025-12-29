@@ -1850,8 +1850,10 @@ class T2D2(object):
         Generate a Word document with condition report for images and their annotations.
         
         Creates a Word document with:
-        - First page: Project details and T2D2 information
-        - Subsequent pages: One page per annotation showing:
+        
+        * First page: Project details and T2D2 information
+        * Subsequent pages: One page per annotation showing:
+        
           * Cropped annotated image (top)
           * Original image (middle)
           * Metadata table (bottom) with file name, link, condition, region, tags
@@ -2498,7 +2500,6 @@ class T2D2(object):
         }
         results = self.request(url, RequestType.POST, data=payload)
 
-        return results
 
     def delete_annotation_classes(self, annotation_class_ids):
         """Delete annotation classes from the current project.

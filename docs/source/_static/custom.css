@@ -1,0 +1,1050 @@
+/* T2D2 SDK Documentation - Clean Professional Style with Poppins Font */
+
+/* Import Poppins Font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* ============================================
+   Global Styles & Typography
+   ============================================ */
+
+body {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #1a1a1a;
+    background: #ffffff;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* RTD Theme Compatibility - Full Page Coverage */
+.wy-nav-content {
+    max-width: 1400px !important;
+    padding: 2rem 4rem !important;
+    background: #ffffff;
+}
+
+.rst-content {
+    line-height: 1.65;
+    color: #1a1a1a;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    max-width: 100%;
+}
+
+.rst-content .section {
+    margin: 1.25em 0;
+}
+
+/* ============================================
+   Clean Headings & Titles
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    color: #0d1117;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #0d1117;
+    border-bottom: 2px solid #e1e4e8;
+    padding-bottom: 0.3em;
+    margin-bottom: 0.75em;
+    margin-top: 0;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 1.85em;
+    color: #0d1117;
+    border-bottom: 1px solid #e1e4e8;
+    padding-bottom: 0.3em;
+    margin-top: 1.25em;
+    font-weight: 600;
+}
+
+h3 {
+    font-size: 1.4em;
+    color: #0d1117;
+    margin-top: 1em;
+    font-weight: 600;
+}
+
+h4 {
+    font-size: 1.2em;
+    color: #24292f;
+    margin-top: 0.75em;
+    font-weight: 600;
+    margin-bottom: 0.4em;
+}
+
+/* ============================================
+   Clean Code Blocks - Minimalist Style
+   ============================================ */
+
+.highlight {
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    padding: 1em 1.25em;
+    margin: 0.75em 0;
+    overflow-x: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.highlight pre {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    font-size: 0.9em;
+    line-height: 1.6;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+    color: #24292f;
+}
+
+code {
+    background: #f6f8fa;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #e83e8c;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+    font-weight: 500;
+    border: 1px solid #e1e4e8;
+}
+
+.highlight code {
+    background: transparent;
+    padding: 0;
+    color: #24292f;
+    border: none;
+}
+
+/* Syntax highlighting colors for code blocks */
+.highlight .k { color: #d73a49; } /* keywords */
+.highlight .s { color: #032f62; } /* strings */
+.highlight .n { color: #005cc5; } /* names */
+.highlight .o { color: #d73a49; } /* operators */
+.highlight .p { color: #24292f; } /* punctuation */
+.highlight .mi { color: #005cc5; } /* numbers */
+
+/* ============================================
+   Clean Class & Method Signatures
+   ============================================ */
+
+.py.class, .py.function, .py.method {
+    margin: 1em 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.sig {
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+    font-size: 0.9em;
+    padding: 0.4em 0;
+    margin-bottom: 0.4em;
+    display: block;
+    word-break: break-word;
+    color: #24292f;
+    line-height: 1.5;
+}
+
+.sig-name {
+    color: #0d1117;
+    font-weight: 600;
+}
+
+.sig-prename {
+    color: #656d76;
+}
+
+.sig-param {
+    color: #24292f;
+}
+
+.sig-return-typehint {
+    color: #24292f;
+}
+
+/* ============================================
+   Compact Field Lists (Parameters)
+   ============================================ */
+
+.field-list {
+    margin: 0.5em 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.field-list dt {
+    font-weight: 600;
+    color: #0d1117;
+    margin-top: 0.4em;
+    padding: 0.2em 0;
+    font-size: 0.9em;
+    float: left;
+    clear: left;
+    width: 120px;
+    min-width: 120px;
+}
+
+.field-list dd {
+    margin-left: 130px;
+    margin-bottom: 0.3em;
+    padding: 0.2em 0;
+    color: #24292f;
+    min-height: 1.2em;
+}
+
+.field-list .colon {
+    color: #656d76;
+    margin: 0 0.2em;
+}
+
+/* Parameters section header */
+.field-list dt.field-odd:first-child {
+    width: 100%;
+    float: none;
+    clear: both;
+    margin-bottom: 0.5em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid #e1e4e8;
+    font-size: 0.95em;
+    font-weight: 700;
+    color: #0d1117;
+}
+
+/* Parameters with ul.simple (multiple parameters) - Table style */
+.field-list dt.field-odd:first-child + dd ul.simple {
+    display: block;
+    width: 100%;
+    margin: 0.4em 0;
+    padding: 0;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #ffffff;
+    list-style: none;
+}
+
+.field-list dt.field-odd:first-child + dd ul.simple li {
+    display: grid;
+    grid-template-columns: 180px 100px 1fr;
+    gap: 1em;
+    margin: 0;
+    padding: 0.65em 0.85em;
+    border-bottom: 1px solid #e8e8e8;
+    align-items: start;
+}
+
+.field-list dt.field-odd:first-child + dd ul.simple li:last-child {
+    border-bottom: none;
+}
+
+.field-list dt.field-odd:first-child + dd ul.simple li p {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* Parameter name (first column) */
+.field-list dt.field-odd:first-child + dd ul.simple li p strong {
+    display: block;
+    font-weight: 600;
+    color: #0d1117;
+    grid-column: 1;
+    word-break: break-word;
+}
+
+/* Type (second column) */
+.field-list dt.field-odd:first-child + dd ul.simple li p em {
+    display: block;
+    color: #656d76;
+    font-style: normal;
+    font-size: 0.85em;
+    font-weight: 400;
+    grid-column: 2;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+/* Description (third column) */
+.field-list dt.field-odd:first-child + dd ul.simple li p {
+    grid-column: 3;
+    color: #24292f;
+    line-height: 1.5;
+}
+
+/* Single parameter format (p tag directly in dd, no ul) - table style */
+/* JavaScript adds 'single-param' class to these elements */
+.field-list dt.field-odd:first-child + dd.single-param {
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    background: #ffffff;
+    margin: 0.4em 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.field-list dt.field-odd:first-child + dd.single-param > p {
+    display: grid;
+    grid-template-columns: 180px 100px 1fr;
+    gap: 1em;
+    margin: 0;
+    padding: 0.65em 0.85em;
+    align-items: start;
+}
+
+.field-list dt.field-odd:first-child + dd.single-param > p strong {
+    grid-column: 1;
+    font-weight: 600;
+    color: #0d1117;
+    word-break: break-word;
+}
+
+.field-list dt.field-odd:first-child + dd.single-param > p em {
+    grid-column: 2;
+    color: #656d76;
+    font-style: normal;
+    font-size: 0.85em;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+.field-list dt.field-odd:first-child + dd.single-param > p {
+    grid-column: 3;
+    color: #24292f;
+    line-height: 1.5;
+}
+
+/* Fallback for browsers that support :has() */
+@supports selector(:has(*)) {
+    .field-list dt.field-odd:first-child + dd.field-odd:not(:has(ul)):not(.single-param),
+    .field-list dt.field-odd:first-child + dd.field-even:not(:has(ul)):not(.single-param) {
+        border: 1px solid #e1e4e8;
+        border-radius: 4px;
+        background: #ffffff;
+        margin: 0.4em 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .field-list dt.field-odd:first-child + dd.field-odd:not(:has(ul)):not(.single-param) > p,
+    .field-list dt.field-odd:first-child + dd.field-even:not(:has(ul)):not(.single-param) > p {
+        display: grid;
+        grid-template-columns: 180px 100px 1fr;
+        gap: 1em;
+        margin: 0;
+        padding: 0.65em 0.85em;
+        align-items: start;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+    }
+}
+
+/* Variables section - table format */
+.field-list.simple dt.field-odd + dd.field-odd ul.simple {
+    display: block;
+    width: 100%;
+    margin: 0.4em 0;
+    padding: 0;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #ffffff;
+    list-style: none;
+}
+
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li {
+    display: grid;
+    grid-template-columns: 180px 100px 1fr;
+    gap: 1em;
+    margin: 0;
+    padding: 0.65em 0.85em;
+    border-bottom: 1px solid #e8e8e8;
+    align-items: start;
+}
+
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li:last-child {
+    border-bottom: none;
+}
+
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li p {
+    display: contents;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+/* Variable name (first column) */
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li p strong {
+    display: block;
+    font-weight: 600;
+    color: #0d1117;
+    grid-column: 1;
+    word-break: break-word;
+}
+
+/* Type (second column) */
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li p em {
+    display: block;
+    color: #656d76;
+    font-style: normal;
+    font-size: 0.85em;
+    font-weight: 400;
+    grid-column: 2;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+/* Description (third column) */
+.field-list.simple dt.field-odd + dd.field-odd ul.simple li p {
+    grid-column: 3;
+    color: #24292f;
+    line-height: 1.5;
+}
+
+/* ============================================
+   Clean Lists
+   ============================================ */
+
+ul, ol {
+    margin: 0.6em 0;
+    padding-left: 1.75em;
+    font-family: 'Poppins', sans-serif;
+}
+
+li {
+    margin: 0.3em 0;
+    line-height: 1.6;
+    color: #24292f;
+}
+
+.simple li {
+    margin: 0.4em 0;
+}
+
+/* ============================================
+   Clean Tables
+   ============================================ */
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid #e1e4e8;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+table th {
+    background: #f6f8fa;
+    color: #0d1117;
+    padding: 0.75em 1em;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 1px solid #e1e4e8;
+    font-size: 0.9em;
+}
+
+table td {
+    padding: 0.75em 1em;
+    border-bottom: 1px solid #f0f0f0;
+    color: #24292f;
+}
+
+table tr:last-child td {
+    border-bottom: none;
+}
+
+table tr:hover td {
+    background: #f6f8fa;
+}
+
+/* ============================================
+   Clean Links
+   ============================================ */
+
+a {
+    color: #0969da;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #0550ae;
+    text-decoration: underline;
+}
+
+a.reference.internal {
+    border-bottom: 1px dotted #0969da;
+}
+
+a.reference.internal:hover {
+    border-bottom: 1px solid #0550ae;
+    color: #0550ae;
+}
+
+/* ============================================
+   Clean Text Elements
+   ============================================ */
+
+dd p {
+    margin: 0.4em 0;
+    line-height: 1.6;
+    font-family: 'Poppins', sans-serif;
+    color: #24292f;
+}
+
+dd p:first-child {
+    margin-top: 0;
+}
+
+dd p:last-child {
+    margin-bottom: 0;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    color: #24292f;
+    margin: 0.6em 0;
+}
+
+/* ============================================
+   Section Spacing
+   ============================================ */
+
+section {
+    margin: 1.25em 0;
+}
+
+.section {
+    margin: 1.25em 0;
+}
+
+/* ============================================
+   Sidebar Styling
+   ============================================ */
+
+.wy-side-nav-search {
+    background: #0d1117 !important;
+}
+
+.wy-side-nav-search input[type="text"] {
+    border-color: rgba(255,255,255,0.2);
+    font-family: 'Poppins', sans-serif;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 0.9em;
+    padding: 0.5em 0.75em;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.wy-side-nav-search input[type="text"]:focus {
+    outline: none;
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.15);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
+}
+
+.wy-nav-side {
+    background: #161b22;
+    font-family: 'Poppins', sans-serif;
+}
+
+.wy-menu-vertical {
+    font-family: 'Poppins', sans-serif;
+}
+
+.wy-menu-vertical a {
+    color: #c9d1d9;
+    font-weight: 400;
+    font-size: 0.9em;
+}
+
+.wy-menu-vertical a:hover {
+    background: #21262d;
+    color: #fff;
+}
+
+.wy-menu-vertical li.current > a {
+    background: #0969da;
+    color: #fff;
+    font-weight: 500;
+}
+
+.wy-menu-vertical li.toctree-l1 > a {
+    font-weight: 500;
+    color: #f0f6fc;
+}
+
+/* ============================================
+   Header Bar
+   ============================================ */
+
+.wy-nav-top {
+    background: #0d1117 !important;
+    font-family: 'Poppins', sans-serif;
+    border-bottom: 1px solid #21262d;
+}
+
+.wy-breadcrumbs {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9em;
+}
+
+.wy-breadcrumbs a {
+    color: #8b949e;
+}
+
+.wy-breadcrumbs li {
+    color: #8b949e;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .wy-nav-content {
+        padding: 2rem 2.5rem !important;
+        max-width: 100% !important;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
+    
+    h2 {
+        font-size: 1.6em;
+    }
+    
+    h3 {
+        font-size: 1.3em;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+    
+    .wy-nav-content {
+        padding: 1.5rem !important;
+        max-width: 100% !important;
+    }
+    
+    h1 {
+        font-size: 1.75em;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    
+    h2 {
+        font-size: 1.5em;
+        margin-top: 1em;
+    }
+    
+    h3 {
+        font-size: 1.25em;
+        margin-top: 0.75em;
+    }
+    
+    h4 {
+        font-size: 1.1em;
+    }
+    
+    .sig {
+        font-size: 0.8em;
+        padding: 0.3em 0;
+    }
+    
+    .highlight {
+        padding: 0.75em 1em;
+        margin: 0.75em 0;
+        font-size: 0.85em;
+    }
+    
+    .py.class, .py.function, .py.method {
+        margin: 1em 0;
+    }
+    
+    .field-list dt {
+        font-size: 0.85em;
+    }
+    
+    .field-list dd {
+        margin-left: 1em;
+        font-size: 0.85em;
+    }
+    
+    .field-list dt.field-odd:first-child + dd ul.simple li {
+        grid-template-columns: 150px 1fr;
+        gap: 0.75em;
+        padding: 0.5em 0.65em;
+    }
+    
+    table {
+        font-size: 0.85em;
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table th,
+    table td {
+        padding: 0.5em 0.75em;
+    }
+    
+    .rst-content {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+    
+    .wy-nav-content {
+        padding: 1rem !important;
+    }
+    
+    h1 {
+        font-size: 1.5em;
+    }
+    
+    h2 {
+        font-size: 1.35em;
+    }
+    
+    h3 {
+        font-size: 1.15em;
+    }
+    
+    .sig {
+        font-size: 0.75em;
+        word-break: break-all;
+    }
+    
+    .highlight {
+        padding: 0.5em 0.75em;
+        font-size: 0.8em;
+    }
+    
+    .field-list dt.field-odd:first-child + dd ul.simple li {
+        grid-template-columns: 120px 1fr;
+        gap: 0.5em;
+        padding: 0.5em;
+    }
+    
+    code {
+        font-size: 0.8em;
+    }
+    
+    ul, ol {
+        padding-left: 1.5em;
+    }
+    
+    .rst-content {
+        font-size: 13px;
+    }
+}
+
+/* ============================================
+   Alignment & Spacing
+   ============================================ */
+
+.rst-content .section,
+.rst-content section,
+.body .section,
+.body section {
+    margin: 1.25em 0;
+    padding: 0;
+}
+
+.rst-content .py.method,
+.rst-content .py.function,
+.rst-content .py.class {
+    margin: 1em 0;
+    clear: both;
+}
+
+/* ============================================
+   Header Links
+   ============================================ */
+
+.headerlink {
+    color: #8b949e;
+    font-size: 0.75em;
+    margin-left: 0.4em;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+h1:hover .headerlink,
+h2:hover .headerlink,
+h3:hover .headerlink,
+h4:hover .headerlink,
+h5:hover .headerlink,
+h6:hover .headerlink,
+dt:hover .headerlink {
+    opacity: 1;
+    color: #0969da;
+}
+
+/* ============================================
+   Blockquotes
+   ============================================ */
+
+blockquote {
+    border-left: 3px solid #e1e4e8;
+    padding-left: 1.5em;
+    margin: 1.25em 0;
+    color: #656d76;
+    font-style: italic;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ============================================
+   Admonitions
+   ============================================ */
+
+.admonition {
+    padding: 1em 1.25em;
+    margin: 1.25em 0;
+    border-radius: 4px;
+    border-left: 3px solid #0969da;
+    background: #ddf4ff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.admonition.note {
+    background: #ddf4ff;
+    border-color: #0969da;
+}
+
+.admonition.warning {
+    background: #fff8c5;
+    border-color: #9a6700;
+}
+
+.admonition.danger {
+    background: #ffebe9;
+    border-color: #cf222e;
+}
+
+/* ============================================
+   Code Examples
+   ============================================ */
+
+.doctest {
+    margin: 1em 0;
+}
+
+.doctest .highlight {
+    margin: 0.5em 0;
+}
+
+/* ============================================
+   Table of Contents
+   ============================================ */
+
+.toctree-wrapper {
+    background: #f6f8fa;
+    padding: 1.25em;
+    border-radius: 4px;
+    margin: 1.5em 0;
+    border: 1px solid #e1e4e8;
+    font-family: 'Poppins', sans-serif;
+}
+
+.toctree-wrapper ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.toctree-wrapper li {
+    margin: 0.4em 0;
+    padding: 0.25em 0;
+}
+
+.toctree-wrapper a {
+    color: #0969da;
+    font-weight: 500;
+}
+
+.toctree-wrapper a:hover {
+    color: #0550ae;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+
+footer {
+    margin-top: 3em;
+    padding: 1.5em 0;
+    border-top: 1px solid #e1e4e8;
+    color: #656d76;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875em;
+}
+
+/* ============================================
+   API Reference Banner
+   ============================================ */
+
+div[style*="linear-gradient"] {
+    background: #0d1117 !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+    border-radius: 4px !important;
+    padding: 1.5em !important;
+    margin: 2em 0 !important;
+    font-family: 'Poppins', sans-serif;
+    border: 1px solid #21262d;
+}
+
+div[style*="linear-gradient"] h2 {
+    color: #ffffff !important;
+    border-bottom: 1px solid rgba(255,255,255,0.2) !important;
+    font-weight: 600;
+    margin-top: 0;
+}
+
+div[style*="linear-gradient"] p {
+    color: #c9d1d9 !important;
+    margin: 0.5em 0 0 0;
+}
+
+/* ============================================
+   Attributes
+   ============================================ */
+
+.py.attribute {
+    margin: 0.75em 0;
+    padding: 0.3em 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.py.attribute dt {
+    font-weight: 600;
+    color: #0d1117;
+}
+
+/* ============================================
+   Local TOC
+   ============================================ */
+
+.local-toc {
+    font-family: 'Poppins', sans-serif;
+}
+
+.local-toc ul {
+    font-family: 'Poppins', sans-serif;
+}
+
+.local-toc a {
+    font-weight: 400;
+    color: #0969da;
+}
+
+/* ============================================
+   Search Box
+   ============================================ */
+
+.wy-side-nav-search input[type="text"] {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+}
+
+/* ============================================
+   Text Elements
+   ============================================ */
+
+strong {
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    color: #0d1117;
+}
+
+em {
+    font-style: italic;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* ============================================
+   Hide Source Code Links
+   ============================================ */
+
+.wy-breadcrumbs-aside,
+a[href*="_sources"],
+a[href*="viewcode"],
+.viewcode-link,
+.viewcode-back {
+    display: none !important;
+}
+
+/* ============================================
+   Smooth Scrolling
+   ============================================ */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ============================================
+   Full Page Coverage - Better Width Usage
+   ============================================ */
+
+.wy-body-for-nav {
+    background: #ffffff;
+}
+
+.wy-grid-for-nav {
+    background: #ffffff;
+}
+
+/* Ensure content uses available space */
+.rst-content {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Better spacing for code sections */
+section h4 + .highlight {
+    margin-top: 0.5em;
+}
+
+/* Clean section headers for code examples */
+section[id*="upload"],
+section[id*="get"],
+section[id*="add"],
+section[id*="run"],
+section[id*="set"] {
+    margin: 1.5em 0;
+}
+
+section[id*="upload"] h4,
+section[id*="get"] h4,
+section[id*="add"] h4,
+section[id*="run"] h4,
+section[id*="set"] h4 {
+    color: #656d76;
+    font-size: 1.1em;
+    font-weight: 500;
+    margin-bottom: 0.5em;
+    border-bottom: none;
+}
