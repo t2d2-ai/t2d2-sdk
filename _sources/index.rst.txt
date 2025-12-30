@@ -4,12 +4,6 @@ Welcome to T2D2 SDK's documentation!
 .. include:: ../../README.md
    :parser: myst_parser.sphinx_
 
-.. raw:: html
-
-   <div style="margin: 2em 0; padding: 1.5em; background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%); border-radius: 8px; color: white;">
-   <h2 style="color: white; margin-top: 0;">API Reference</h2>
-   <p style="margin-bottom: 0;">Complete documentation for all classes, methods, and functions in the T2D2 SDK.</p>
-   </div>
 
 T2D2 SDK Module
 ===============

@@ -1,193 +1,43 @@
-
-
 <!DOCTYPE html>
-<html class="writer-html5" lang="en">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to T2D2 SDK’s documentation! &mdash; T2D2 SDK v1.5 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
-      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=aec32a7d" />
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  
-      <script src="_static/jquery.js?v=5d32c60e"></script>
-      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c1a9d636"></script>
-      <script src="_static/doctools.js?v=888ff710"></script>
-      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
-      <script src="_static/params.js?v=cabca96a"></script>
-    <script src="_static/js/theme.js"></script>
+    <title>Welcome to T2D2 SDK’s documentation! &#8212; T2D2 SDK v1.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=8fc2db88" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c1a9d636"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" /> 
-</head>
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
+      </ul>
+    </div>  
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search"  style="background: #2C3E50" >
-
-          
-          
-          <a href="#" class="icon icon-home">
-            T2D2 SDK
-          </a>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Welcome to T2D2 SDK’s documentation!</a><ul>
-<li><a class="reference internal" href="#t2d2-sdk">T2D2 SDK</a><ul>
-<li><a class="reference internal" href="#description">Description</a></li>
-<li><a class="reference internal" href="#documentation">Documentation</a></li>
-<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#installation">Installation</a></li>
-<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
-<li><a class="reference internal" href="#usage">Usage</a><ul>
-<li><a class="reference internal" href="#set-project">Set Project</a></li>
-<li><a class="reference internal" href="#upload-images">Upload Images</a></li>
-<li><a class="reference internal" href="#get-images">Get Images</a></li>
-<li><a class="reference internal" href="#add-annotation-class">Add Annotation Class</a></li>
-<li><a class="reference internal" href="#add-annotations-to-an-image">Add Annotations to an Image</a></li>
-<li><a class="reference internal" href="#run-ai-inference">Run AI Inference</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#contributing">Contributing</a></li>
-<li><a class="reference internal" href="#license">License</a></li>
-<li><a class="reference internal" href="#support">Support</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#t2d2-sdk-module">T2D2 SDK Module</a><ul>
-<li><a class="reference internal" href="#helper-functions">Helper Functions</a><ul>
-<li><a class="reference internal" href="#t2d2-sdk-client-library">T2D2 SDK Client Library</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#t2d2-class">T2D2 Class</a><ul>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2"><code class="docutils literal notranslate"><span class="pre">T2D2</span></code></a><ul>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.s3_base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.s3_base_url</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.aws_region"><code class="docutils literal notranslate"><span class="pre">T2D2.aws_region</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.bucket"><code class="docutils literal notranslate"><span class="pre">T2D2.bucket</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.access_token"><code class="docutils literal notranslate"><span class="pre">T2D2.access_token</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.api_key"><code class="docutils literal notranslate"><span class="pre">T2D2.api_key</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.debug"><code class="docutils literal notranslate"><span class="pre">T2D2.debug</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.__init__"><code class="docutils literal notranslate"><span class="pre">T2D2.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.base_url</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.headers"><code class="docutils literal notranslate"><span class="pre">T2D2.headers</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.project"><code class="docutils literal notranslate"><span class="pre">T2D2.project</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.request"><code class="docutils literal notranslate"><span class="pre">T2D2.request()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.login"><code class="docutils literal notranslate"><span class="pre">T2D2.login()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.notify_user"><code class="docutils literal notranslate"><span class="pre">T2D2.notify_user()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_project"><code class="docutils literal notranslate"><span class="pre">T2D2.create_project()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.set_project"><code class="docutils literal notranslate"><span class="pre">T2D2.set_project()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project_info"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project_info()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_region"><code class="docutils literal notranslate"><span class="pre">T2D2.add_region()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_region"><code class="docutils literal notranslate"><span class="pre">T2D2.update_region()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_regions"><code class="docutils literal notranslate"><span class="pre">T2D2.get_regions()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_assets()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.add_assets()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.download_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.download_assets()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_images"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_images()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_images"><code class="docutils literal notranslate"><span class="pre">T2D2.get_images()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_images()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_images"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_images()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_drawings()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.get_drawings()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.update_drawings()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_drawings()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_videos()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.get_videos()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.update_videos()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_videos()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_threed()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.get_threed()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.update_threed()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_threed()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_reports()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.get_reports()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.update_reports()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_reports()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.generate_condition_report_document"><code class="docutils literal notranslate"><span class="pre">T2D2.generate_condition_report_document()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_tags()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_tags()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_materials"><code class="docutils literal notranslate"><span class="pre">T2D2.get_materials()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotation_classes()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotation_class"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotation_class()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotation_classes()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotations()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotations()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotations()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_geotags()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_geotags()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_geotags()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_downloads"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_downloads()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_classes()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_images"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_images()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_conditions"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_conditions()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.slack_notification"><code class="docutils literal notranslate"><span class="pre">T2D2.slack_notification()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_models"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_models()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_model_by_id"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_model_by_id()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.create_ai_model()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.update_ai_model()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_ai_model()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.run_ai_inferencer"><code class="docutils literal notranslate"><span class="pre">T2D2.run_ai_inferencer()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_task_list"><code class="docutils literal notranslate"><span class="pre">T2D2.get_task_list()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_task_by_id"><code class="docutils literal notranslate"><span class="pre">T2D2.get_task_by_id()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_datasets()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_dataset"><code class="docutils literal notranslate"><span class="pre">T2D2.create_dataset()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_datasets()</span></code></a></li>
-<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_dataset_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_dataset_images()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-</div>
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2C3E50" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">T2D2 SDK</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content style-external-links">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to T2D2 SDK’s documentation!</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
-</div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
   <section id="welcome-to-t2d2-sdk-s-documentation">
-<h1>Welcome to T2D2 SDK’s documentation!<a class="headerlink" href="#welcome-to-t2d2-sdk-s-documentation" title="Permalink to this heading"></a></h1>
+<h1>Welcome to T2D2 SDK’s documentation!<a class="headerlink" href="#welcome-to-t2d2-sdk-s-documentation" title="Permalink to this heading">¶</a></h1>
 <section id="t2d2-sdk">
-<h2>T2D2 SDK<a class="headerlink" href="#t2d2-sdk" title="Permalink to this heading"></a></h2>
+<h2>T2D2 SDK<a class="headerlink" href="#t2d2-sdk" title="Permalink to this heading">¶</a></h2>
 <p>A Python SDK for seamless integration with the T2D2 platform.</p>
 <p>Easily manage projects, assets, and AI-powered inspections for structural health monitoring.</p>
 <section id="description">
-<h3>Description<a class="headerlink" href="#description" title="Permalink to this heading"></a></h3>
+<h3>Description<a class="headerlink" href="#description" title="Permalink to this heading">¶</a></h3>
 <p><strong>T2D2 SDK</strong> is a Python wrapper for the T2D2 API, enabling seamless integration with T2D2 projects and related assets for structural inspection data management.</p>
 <ul class="simple">
 <li><p>Manage projects, images, annotations, drawings, videos, reports, and more</p></li>
@@ -197,11 +47,11 @@
 </ul>
 </section>
 <section id="documentation">
-<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading"></a></h3>
+<h3>Documentation<a class="headerlink" href="#documentation" title="Permalink to this heading">¶</a></h3>
 <p>Full documentation is available at: <a class="reference external" href="https://t2d2-ai.github.io/t2d2-sdk/">https://t2d2-ai.github.io/t2d2-sdk/</a></p>
 </section>
 <section id="table-of-contents">
-<h3>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading"></a></h3>
+<h3>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><a class="reference internal" href="#features">Features</a></p></li>
 <li><p><a class="reference internal" href="#installation">Installation</a></p></li>
@@ -213,7 +63,7 @@
 </ul>
 </section>
 <section id="features">
-<h3>Features<a class="headerlink" href="#features" title="Permalink to this heading"></a></h3>
+<h3>Features<a class="headerlink" href="#features" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><strong>Authentication</strong>: API key or email/password</p></li>
 <li><p><strong>Project Management</strong>: Set, get, and summarize projects</p></li>
@@ -226,14 +76,14 @@
 </ul>
 </section>
 <section id="installation">
-<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h3>
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">¶</a></h3>
 <p>Install the latest version from PyPI:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>t2d2-sdk
 </pre></div>
 </div>
 </section>
 <section id="quickstart">
-<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading"></a></h3>
+<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this heading">¶</a></h3>
 <ol class="arabic simple">
 <li><p><strong>Sign up for a T2D2 account:</strong> <a class="reference external" href="https://app.t2d2.ai/auth/register">Register here</a></p></li>
 <li><p><strong>Get your API key</strong> from the T2D2 web app</p></li>
@@ -247,9 +97,9 @@
 </div>
 </section>
 <section id="usage">
-<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading"></a></h3>
+<h3>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h3>
 <section id="set-project">
-<h4>Set Project<a class="headerlink" href="#set-project" title="Permalink to this heading"></a></h4>
+<h4>Set Project<a class="headerlink" href="#set-project" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">t2d2</span><span class="o">.</span><span class="n">set_project</span><span class="p">(</span><span class="s1">&#39;&lt;PROJECT_ID&gt;&#39;</span><span class="p">)</span>
 <span class="n">project_info</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">get_project_info</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">project_info</span><span class="p">)</span>
@@ -257,7 +107,7 @@
 </div>
 </section>
 <section id="upload-images">
-<h4>Upload Images<a class="headerlink" href="#upload-images" title="Permalink to this heading"></a></h4>
+<h4>Upload Images<a class="headerlink" href="#upload-images" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">image_paths</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;./images/img1.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;./images/img2.jpg&#39;</span><span class="p">]</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">upload_images</span><span class="p">(</span><span class="n">image_paths</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
@@ -265,7 +115,7 @@
 </div>
 </section>
 <section id="get-images">
-<h4>Get Images<a class="headerlink" href="#get-images" title="Permalink to this heading"></a></h4>
+<h4>Get Images<a class="headerlink" href="#get-images" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">get_images</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">img</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">],</span> <span class="n">img</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
@@ -273,14 +123,14 @@
 </div>
 </section>
 <section id="add-annotation-class">
-<h4>Add Annotation Class<a class="headerlink" href="#add-annotation-class" title="Permalink to this heading"></a></h4>
+<h4>Add Annotation Class<a class="headerlink" href="#add-annotation-class" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">add_annotation_class</span><span class="p">(</span><span class="s1">&#39;Crack&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;#FF0000&#39;</span><span class="p">,</span> <span class="n">materials</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Concrete&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="add-annotations-to-an-image">
-<h4>Add Annotations to an Image<a class="headerlink" href="#add-annotations-to-an-image" title="Permalink to this heading"></a></h4>
+<h4>Add Annotations to an Image<a class="headerlink" href="#add-annotations-to-an-image" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">annotations</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">{</span>
         <span class="s1">&#39;annotation_class_id&#39;</span><span class="p">:</span> <span class="s1">&#39;class_id&#39;</span><span class="p">,</span>
@@ -294,7 +144,7 @@
 </div>
 </section>
 <section id="run-ai-inference">
-<h4>Run AI Inference<a class="headerlink" href="#run-ai-inference" title="Permalink to this heading"></a></h4>
+<h4>Run AI Inference<a class="headerlink" href="#run-ai-inference" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">t2d2</span><span class="o">.</span><span class="n">run_ai_inferencer</span><span class="p">(</span>
     <span class="n">image_ids</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;image_id1&#39;</span><span class="p">,</span> <span class="s1">&#39;image_id2&#39;</span><span class="p">],</span>
     <span class="n">model_id</span><span class="o">=</span><span class="s1">&#39;model_id&#39;</span><span class="p">,</span>
@@ -307,15 +157,15 @@
 </section>
 </section>
 <section id="contributing">
-<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading"></a></h3>
+<h3>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">¶</a></h3>
 <p>Contributions are welcome! Please contact <a class="reference external" href="mailto:bhiriyur&#37;&#52;&#48;t2d2&#46;ai">bhiriyur<span>&#64;</span>t2d2<span>&#46;</span>ai</a> for more information.</p>
 </section>
 <section id="license">
-<h3>License<a class="headerlink" href="#license" title="Permalink to this heading"></a></h3>
+<h3>License<a class="headerlink" href="#license" title="Permalink to this heading">¶</a></h3>
 <p>See the LICENSE file for details.</p>
 </section>
 <section id="support">
-<h3>Support<a class="headerlink" href="#support" title="Permalink to this heading"></a></h3>
+<h3>Support<a class="headerlink" href="#support" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Documentation: <a class="reference external" href="https://t2d2-ai.github.io/t2d2-sdk/">https://t2d2-ai.github.io/t2d2-sdk/</a></p></li>
 <li><p>Email: <a class="reference external" href="mailto:bhiriyur&#37;&#52;&#48;t2d2&#46;ai">bhiriyur<span>&#64;</span>t2d2<span>&#46;</span>ai</a></p></li>
@@ -323,17 +173,14 @@
 </ul>
 </section>
 </section>
-<div style="margin: 2em 0; padding: 1.5em; background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%); border-radius: 8px; color: white;">
-<h2 style="color: white; margin-top: 0;">API Reference</h2>
-<p style="margin-bottom: 0;">Complete documentation for all classes, methods, and functions in the T2D2 SDK.</p>
-</div></section>
+</section>
 <section id="t2d2-sdk-module">
-<h1>T2D2 SDK Module<a class="headerlink" href="#t2d2-sdk-module" title="Permalink to this heading"></a></h1>
+<h1>T2D2 SDK Module<a class="headerlink" href="#t2d2-sdk-module" title="Permalink to this heading">¶</a></h1>
 <section id="helper-functions">
-<h2>Helper Functions<a class="headerlink" href="#helper-functions" title="Permalink to this heading"></a></h2>
+<h2>Helper Functions<a class="headerlink" href="#helper-functions" title="Permalink to this heading">¶</a></h2>
 <p>These utility functions are available at the module level for common operations.</p>
 <section id="t2d2-sdk-client-library">
-<h3>T2D2 SDK Client Library<a class="headerlink" href="#t2d2-sdk-client-library" title="Permalink to this heading"></a></h3>
+<h3>T2D2 SDK Client Library<a class="headerlink" href="#t2d2-sdk-client-library" title="Permalink to this heading">¶</a></h3>
 </section>
 <dl class="py function">
 <dt class="sig sig-object py">
@@ -486,11 +333,11 @@ then uploads the file from the specified local path with public-read ACL.</p>
 </section>
 </section>
 <section id="t2d2-class">
-<h1>T2D2 Class<a class="headerlink" href="#t2d2-class" title="Permalink to this heading"></a></h1>
+<h1>T2D2 Class<a class="headerlink" href="#t2d2-class" title="Permalink to this heading">¶</a></h1>
 <p>The main <code class="docutils literal notranslate"><span class="pre">T2D2</span></code> class provides a comprehensive interface to interact with the T2D2 API.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">T2D2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api-v3.t2d2.ai/api/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">T2D2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api-v3.t2d2.ai/api/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A class to interact with the T2D2 API for structural inspection data management.</p>
 <p>This class provides a comprehensive interface to the T2D2 API, enabling authentication,
@@ -513,37 +360,37 @@ drawings, videos, reports, and more.</p>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.s3_base_url">
-<span class="sig-name descname"><span class="pre">s3_base_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.s3_base_url" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">s3_base_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.s3_base_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.aws_region">
-<span class="sig-name descname"><span class="pre">aws_region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.aws_region" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">aws_region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.aws_region" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.bucket">
-<span class="sig-name descname"><span class="pre">bucket</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.bucket" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">bucket</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.bucket" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.access_token">
-<span class="sig-name descname"><span class="pre">access_token</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.access_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">access_token</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.access_token" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.api_key">
-<span class="sig-name descname"><span class="pre">api_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.api_key" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">api_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.api_key" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.debug">
-<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.debug" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.debug" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api-v3.t2d2.ai/api/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.__init__" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'https://api-v3.t2d2.ai/api/'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the T2D2 client and authenticate with the API.</p>
 <p>Creates a new T2D2 client instance, configures it with the provided base URL,
 and authenticates using the supplied credentials. This method ensures the base URL
@@ -577,28 +424,28 @@ authentication fails</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.base_url">
-<span class="sig-name descname"><span class="pre">base_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.base_url" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">base_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.base_url" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.headers">
-<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.headers" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.headers" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.project">
-<span class="sig-name descname"><span class="pre">project</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.project" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">project</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#t2d2_sdk.T2D2.project" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RequestType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">RequestType.GET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#t2d2_sdk.T2D2.request" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">req_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RequestType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">RequestType.GET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#t2d2_sdk.T2D2.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a request and handle response</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.login">
-<span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.login" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">login</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.login" title="Permalink to this definition">¶</a></dt>
 <dd><p>Authenticate with the T2D2 API using provided credentials.</p>
 <p>This method supports three authentication methods:
 1. Direct access token authentication
@@ -632,7 +479,7 @@ or if the authentication request fails</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.notify_user">
-<span class="sig-name descname"><span class="pre">notify_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.notify_user" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">notify_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.notify_user" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a notification to the user</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -655,7 +502,7 @@ or if the authentication request fails</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_project">
-<span class="sig-name descname"><span class="pre">get_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a project by ID or get a list of all projects.</p>
 <p>If project_id is provided, returns data for the specific project.
 If project_id is None, returns a list of all available projects.</p>
@@ -694,7 +541,7 @@ If project_id is None, returns a list of all available projects.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_project">
-<span class="sig-name descname"><span class="pre">create_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_project" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">longitude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country_code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new project in T2D2.</p>
 <p>This method creates a new project with the specified name and location information.
 You can either provide a complete location dictionary or individual location parameters.</p>
@@ -769,7 +616,7 @@ country, and country_code. If provided, individual location parameters are ignor
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.set_project">
-<span class="sig-name descname"><span class="pre">set_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.set_project" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.set_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the current active project for the T2D2 client.</p>
 <p>This method retrieves the project data by ID, sets it as the active project,
 and configures related S3 storage settings for the client instance.</p>
@@ -799,7 +646,7 @@ for use with other methods that require file uploads or downloads.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_project_info">
-<span class="sig-name descname"><span class="pre">get_project_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project_info" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_project_info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_project_info" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a summary of the current active project’s information.</p>
 <p>This method returns a dictionary containing the essential information
 about the currently selected project, including its ID, name, address,
@@ -836,7 +683,7 @@ description, creation details, and statistics.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_region">
-<span class="sig-name descname"><span class="pre">add_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_region" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new region to the current project.</p>
 <p>Regions in T2D2 represent geographical or logical divisions within a project,
 allowing for better organization of assets and data.</p>
@@ -867,7 +714,7 @@ allowing for better organization of assets and data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_region">
-<span class="sig-name descname"><span class="pre">update_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_region" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update an existing region in the current project.</p>
 <p>This method finds a region by name and updates its properties with the provided values.</p>
 <dl class="field-list">
@@ -899,7 +746,7 @@ allowing for better organization of assets and data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_regions">
-<span class="sig-name descname"><span class="pre">get_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_regions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve all regions from the current project.</p>
 <p>This method returns a list of all regions defined in the project.</p>
 <dl class="field-list">
@@ -926,7 +773,7 @@ allowing for better organization of assets and data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_assets">
-<span class="sig-name descname"><span class="pre">get_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_assets" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve a list of assets based on specified IDs and asset type.</p>
 <p>This method fetches detailed information about specific assets in the project.</p>
 <dl class="field-list">
@@ -967,7 +814,7 @@ allowing for better organization of assets and data.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_assets">
-<span class="sig-name descname"><span class="pre">add_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_assets" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add assets to the current project.</p>
 <p>This generic method adds assets of various types to the project using
 a structured payload that defines the assets’ properties.</p>
@@ -1012,7 +859,7 @@ upload_images() or upload_reports() for specific asset types.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.download_assets">
-<span class="sig-name descname"><span class="pre">download_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.download_assets" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">download_assets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asset_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">asset_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.download_assets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Download assets from the project to the local filesystem.</p>
 <p>This method retrieves assets by their IDs, downloads them from storage,
 and saves them to the specified directory.</p>
@@ -1063,7 +910,7 @@ or if downloading fails</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_images">
-<span class="sig-name descname"><span class="pre">upload_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload images to the current project.</p>
 <p>This method uploads images from local paths to the project’s S3 storage
 and registers them with the T2D2 API.</p>
@@ -1112,7 +959,7 @@ and registers them with the T2D2 API.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_images">
-<span class="sig-name descname"><span class="pre">get_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve images from the current project.</p>
 <p>This method fetches image data either for specific image IDs or for all images in the project
 if no IDs are specified.</p>
@@ -1177,7 +1024,7 @@ if no IDs are specified.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_images">
-<span class="sig-name descname"><span class="pre">update_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update properties of existing images in the current project.</p>
 <p>This method allows you to modify image metadata such as region, tags, and notes.</p>
 <dl class="field-list">
@@ -1220,7 +1067,7 @@ if no IDs are specified.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_images">
-<span class="sig-name descname"><span class="pre">delete_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete images from the current project.</p>
 <p>This method removes images from the project based on their IDs. This operation
 is irreversible and will also delete all associated annotations and data.</p>
@@ -1255,7 +1102,7 @@ will be permanently removed from the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_drawings">
-<span class="sig-name descname"><span class="pre">upload_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_drawings" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_drawings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload drawings to the current project.</p>
 <p>This method uploads drawing files from local paths to the project’s S3 storage
 and registers them with the T2D2 API.</p>
@@ -1299,7 +1146,7 @@ and registers them with the T2D2 API.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_drawings">
-<span class="sig-name descname"><span class="pre">get_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_drawings" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_drawings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve drawings from the current project.</p>
 <p>This method fetches drawing data either for specific drawing IDs or for all drawings in the project
 if no IDs are specified.</p>
@@ -1352,7 +1199,7 @@ if no IDs are specified.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_drawings">
-<span class="sig-name descname"><span class="pre">update_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_drawings" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_drawings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update properties of existing drawings in the current project.</p>
 <p>This method allows you to modify drawing metadata such as region, tags, and name.</p>
 <dl class="field-list">
@@ -1393,7 +1240,7 @@ if no IDs are specified.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_drawings">
-<span class="sig-name descname"><span class="pre">delete_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_drawings" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_drawings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_drawings" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete drawings from the current project.</p>
 <p>This method removes drawings from the project based on their IDs. This operation
 is irreversible and will also delete all associated data.</p>
@@ -1428,7 +1275,7 @@ information will be permanently removed from the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_videos">
-<span class="sig-name descname"><span class="pre">upload_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_videos" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_videos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload videos to the current project.</p>
 <p>This method uploads a list of videos to the current project. Each video is first
 uploaded to S3 storage and then registered as an asset in the project.</p>
@@ -1457,7 +1304,7 @@ uploaded to S3 storage and then registered as an asset in the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_videos">
-<span class="sig-name descname"><span class="pre">get_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_videos" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_videos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve videos from the current project.</p>
 <p>This method queries the T2D2 API to fetch details for videos in the current project.
 If video_ids is provided, it returns details for those specific videos.
@@ -1498,7 +1345,7 @@ If video_ids is None, all videos in the project are returned.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_videos">
-<span class="sig-name descname"><span class="pre">update_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_videos" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_videos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update multiple videos in the current project.</p>
 <p>This method updates the details of videos identified by their IDs in the current project.
 The updates are specified in the payload dictionary and are applied to each video.</p>
@@ -1534,7 +1381,7 @@ The updates are specified in the payload dictionary and are applied to each vide
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_videos">
-<span class="sig-name descname"><span class="pre">delete_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_videos" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_videos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">video_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_videos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete videos from the current project.</p>
 <p>This method removes videos identified by their IDs from the current project.
 This operation is irreversible.</p>
@@ -1566,7 +1413,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_threed">
-<span class="sig-name descname"><span class="pre">upload_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threed_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_threed" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threed_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_threed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload 3D model files to the current project.</p>
 <p>This method takes a list of file paths pointing to 3D model files and uploads them
 to the T2D2 project. Each file is uploaded to a storage location and then registered
@@ -1600,7 +1447,7 @@ within the project with a unique identifier.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_threed">
-<span class="sig-name descname"><span class="pre">get_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_threed" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_threed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve 3D models from the current project.</p>
 <p>This method queries the project for details on 3D models. If model_ids is provided,
 it returns details for those specific models. If model_ids is None, all 3D models
@@ -1641,7 +1488,7 @@ in the project are returned.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_threed">
-<span class="sig-name descname"><span class="pre">update_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_threed" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_threed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update 3D models in the current project.</p>
 <p>This method updates the details of 3D models identified by their IDs in the current project.
 The updates are specified in the payload dictionary and are applied to each model.</p>
@@ -1677,7 +1524,7 @@ The updates are specified in the payload dictionary and are applied to each mode
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_threed">
-<span class="sig-name descname"><span class="pre">delete_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_threed" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_threed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_threed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete 3D models from the current project.</p>
 <p>This method removes 3D models identified by their IDs from the current project.
 This operation is irreversible.</p>
@@ -1709,7 +1556,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_reports">
-<span class="sig-name descname"><span class="pre">upload_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_reports" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_reports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload report files to the current project.</p>
 <p>This method takes a list of file paths pointing to report files (PDF or docx)
 and uploads them to the T2D2 project. Each file is uploaded to a storage location
@@ -1743,7 +1590,7 @@ and then registered within the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_reports">
-<span class="sig-name descname"><span class="pre">get_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_reports" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_reports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve reports from the current project.</p>
 <p>This method queries the project for details on reports identified by their
 unique IDs. It returns information about each report, including metadata.</p>
@@ -1779,7 +1626,7 @@ unique IDs. It returns information about each report, including metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_reports">
-<span class="sig-name descname"><span class="pre">update_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_reports" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_reports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update reports in the current project.</p>
 <p>This method updates the details of reports identified by their IDs in the current project.
 The updates are specified in the payload dictionary and are applied to each report.</p>
@@ -1815,7 +1662,7 @@ The updates are specified in the payload dictionary and are applied to each repo
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_reports">
-<span class="sig-name descname"><span class="pre">delete_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_reports" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_reports</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">report_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_reports" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete reports from the current project.</p>
 <p>This method removes reports identified by their IDs from the current project.
 This operation is irreversible.</p>
@@ -1847,7 +1694,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.generate_condition_report_document">
-<span class="sig-name descname"><span class="pre">generate_condition_report_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'condition_report.docx'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.generate_condition_report_document" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">generate_condition_report_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'condition_report.docx'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.generate_condition_report_document" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a Word document with condition report for images and their annotations.</p>
 <p>Creates a Word document with:</p>
 <ul class="simple">
@@ -1905,7 +1752,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_tags">
-<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_tags" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve tags from the current project.</p>
 <p>This method queries the project for all tags or specific tags based on the
 provided parameters. It returns information about each tag, including its
@@ -1942,7 +1789,7 @@ name and associated metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_tags">
-<span class="sig-name descname"><span class="pre">add_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_tags" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_tags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new tags to the current project.</p>
 <p>This method creates new tags within the project. Each tag is defined by
 a name. If a tag already exists, a warning is printed and the operation
@@ -1979,7 +1826,7 @@ for that tag is skipped.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_materials">
-<span class="sig-name descname"><span class="pre">get_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_materials" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_materials</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_materials" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve materials from the current project.</p>
 <p>This method queries the project’s database for a list of all materials that
 have been defined within the project.</p>
@@ -2008,7 +1855,7 @@ have been defined within the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_annotation_classes">
-<span class="sig-name descname"><span class="pre">get_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotation_classes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotation_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve annotation classes from the current project.</p>
 <p>This method queries the project’s database for annotation classes defined within
 the project. It returns information about each class including ID, name, and attributes.</p>
@@ -2040,7 +1887,7 @@ the project. It returns information about each class including ID, name, and att
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_annotation_class">
-<span class="sig-name descname"><span class="pre">add_annotation_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">materials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotation_class" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_annotation_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">materials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotation_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a new annotation class to the current project.</p>
 <p>This method creates a new annotation class with the specified name, color,
 and associated materials.</p>
@@ -2080,7 +1927,7 @@ and associated materials.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_annotation_classes">
-<span class="sig-name descname"><span class="pre">delete_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation_class_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotation_classes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_annotation_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotation_class_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotation_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete annotation classes from the current project.</p>
 <p>This method removes annotation classes identified by their IDs from the project.
 This operation is irreversible.</p>
@@ -2116,7 +1963,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_annotations">
-<span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotations" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_annotations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve annotations from the current project.</p>
 <p>This method queries the project for annotations. If image_id is provided,
 it retrieves annotations for that specific image. If image_id is None,
@@ -2158,7 +2005,7 @@ it retrieves annotations for all images matching the provided params.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_annotations">
-<span class="sig-name descname"><span class="pre">delete_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotations" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotation_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_annotations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete annotations from an image in the current project.</p>
 <p>This method removes annotations from a specific image. If annotation_ids is provided,
 it deletes those specific annotations. If annotation_ids is None, it deletes all
@@ -2201,7 +2048,7 @@ annotations in the image.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_annotations">
-<span class="sig-name descname"><span class="pre">add_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotations" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_annotations" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new annotations to an image in the current project.</p>
 <p>This method creates new annotations for a specific image. Each annotation
 is defined by its properties such as class, geometry, and attributes.</p>
@@ -2247,7 +2094,7 @@ is defined by its properties such as class, geometry, and attributes.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_geotags">
-<span class="sig-name descname"><span class="pre">get_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_geotags" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_geotags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve geotags associated with a drawing in the current project.</p>
 <p>This method queries the project’s database for geotags associated with the specified
 drawing. Additional filter parameters can be provided through the params argument.</p>
@@ -2283,7 +2130,7 @@ drawing. Additional filter parameters can be provided through the params argumen
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.add_geotags">
-<span class="sig-name descname"><span class="pre">add_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_geotags" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.add_geotags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new geotags to a drawing in the current project.</p>
 <p>This method creates new geotags associated with the specified drawing.
 Each geotag is defined by its coordinates and can include additional
@@ -2323,7 +2170,7 @@ metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_geotags">
-<span class="sig-name descname"><span class="pre">delete_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotag_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_geotags" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_geotags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drawing_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geotag_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_geotags" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete specified geotags from a drawing in the current project.</p>
 <p>This method removes geotags identified by their IDs from a specified drawing.
 This operation is irreversible.</p>
@@ -2359,7 +2206,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.upload_downloads">
-<span class="sig-name descname"><span class="pre">upload_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_downloads" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">upload_downloads</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_paths</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.upload_downloads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload files to the downloads section of the current project.</p>
 <p>This method uploads files to the downloads section of the current project.
 Each file is uploaded to a pre-specified storage location and is associated
@@ -2394,7 +2241,7 @@ with the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_classes">
-<span class="sig-name descname"><span class="pre">get_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_classes" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve annotation classes with associated conditions.</p>
 <p>This method retrieves all annotation classes from the current project and
 maps them to their corresponding conditions. It returns a list of condition
@@ -2424,7 +2271,7 @@ objects enriched with the name of the annotation class they belong to.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.summarize_images">
-<span class="sig-name descname"><span class="pre">summarize_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">summarize_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summarize images in the current project by region, date, and tags.</p>
 <p>This method analyzes all images in the project and groups them by region,
 capture date, and assigned tags. It returns counts for each group category.</p>
@@ -2461,7 +2308,7 @@ Each containing counts of images per category</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.summarize_conditions">
-<span class="sig-name descname"><span class="pre">summarize_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_conditions" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">summarize_conditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.summarize_conditions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Summarize annotations and their conditions by region, label, and rating.</p>
 <p>This method analyzes all annotations in the project, grouped by region, and summarizes
 them based on annotation class label and condition rating. For each combination,
@@ -2506,7 +2353,7 @@ for label-rating combinations with count, length, area, and annotation_ids</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.slack_notification">
-<span class="sig-name descname"><span class="pre">slack_notification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.slack_notification" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">slack_notification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.slack_notification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send a notification to Slack.</p>
 <p>This method sends a notification to a Slack channel using the T2D2 API.
 The notification content and destination are specified in the payload.</p>
@@ -2539,7 +2386,7 @@ The notification content and destination are specified in the payload.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_ai_models">
-<span class="sig-name descname"><span class="pre">get_ai_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_models" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_ai_models</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_models" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve all AI models available in the current project.</p>
 <p>This method fetches all AI models associated with the current project from the T2D2 API.
 It returns a list of dictionaries containing details about each AI model.</p>
@@ -2567,7 +2414,7 @@ It returns a list of dictionaries containing details about each AI model.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_ai_model_by_id">
-<span class="sig-name descname"><span class="pre">get_ai_model_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_model_by_id" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_ai_model_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_ai_model_by_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve details of a specific AI model by its ID.</p>
 <p>This method fetches detailed information about a specific AI model from the T2D2 API.
 It returns a dictionary containing all the information available for the specified AI model.</p>
@@ -2586,7 +2433,7 @@ It returns a dictionary containing all the information available for the specifi
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_ai_model">
-<span class="sig-name descname"><span class="pre">create_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_ai_model" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">docker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_ai_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new AI model in the current project.</p>
 <p>This method creates a new AI model with the specified configuration, labels, and shape.
 The model will be associated with the current project.</p>
@@ -2640,7 +2487,7 @@ If not provided and no project is set, an empty list will be used.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_ai_model">
-<span class="sig-name descname"><span class="pre">update_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_ai_model" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_ai_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update an existing AI model in the current project.</p>
 <p>This method updates the properties of an existing AI model. Only the provided
 parameters will be updated, others will remain unchanged.</p>
@@ -2686,7 +2533,7 @@ parameters will be updated, others will remain unchanged.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_ai_model">
-<span class="sig-name descname"><span class="pre">delete_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_ai_model" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_ai_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_ai_model" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete one or more AI models from the current project.</p>
 <p>This method removes AI model(s) identified by their ID(s) from the current project.
 This operation is irreversible.</p>
@@ -2730,7 +2577,7 @@ information will be permanently removed from the project.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.run_ai_inferencer">
-<span class="sig-name descname"><span class="pre">run_ai_inferencer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliding_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whole_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.run_ai_inferencer" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run_ai_inferencer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sliding_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whole_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.run_ai_inferencer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run AI inference on specified images using a selected model.</p>
 <p>This method initiates an AI inference process on a set of images using the specified
 model. It constructs the payload with model details and user parameters, then sends
@@ -2787,7 +2634,7 @@ the request to start the inference process.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_task_list">
-<span class="sig-name descname"><span class="pre">get_task_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_task_list" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_task_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_task_list" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the list of tasks for the current project.</p>
 <p>This method fetches the list of tasks associated with the current project from the T2D2 API.
 It returns a list of dictionaries containing details about each task.</p>
@@ -2815,7 +2662,7 @@ It returns a list of dictionaries containing details about each task.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_task_by_id">
-<span class="sig-name descname"><span class="pre">get_task_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_task_by_id" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_task_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_task_by_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the details of a specific task by its ID.</p>
 <p>This method fetches detailed information about a specific task from the T2D2 API.
 It returns a dictionary containing all the information available for the specified task.</p>
@@ -2846,7 +2693,7 @@ It returns a dictionary containing all the information available for the specifi
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.get_datasets">
-<span class="sig-name descname"><span class="pre">get_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_datasets" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.get_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve datasets from the T2D2 API.</p>
 <p>This method fetches all datasets available to the authenticated user.
 It supports filtering and pagination through the params parameter.</p>
@@ -2896,7 +2743,7 @@ It supports filtering and pagination through the params parameter.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.create_dataset">
-<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_dataset" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.create_dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a new dataset.</p>
 <p>This method creates a new dataset with the specified name.
 The dataset will be private by default and owned by the authenticated user.</p>
@@ -2924,7 +2771,7 @@ The dataset will be private by default and owned by the authenticated user.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.delete_datasets">
-<span class="sig-name descname"><span class="pre">delete_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_datasets" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">delete_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.delete_datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete datasets by their IDs.</p>
 <p>This method removes datasets identified by their IDs from the T2D2 system.
 This operation is irreversible and will also delete all associated data.</p>
@@ -2960,7 +2807,7 @@ information will be permanently removed.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.update_dataset_images">
-<span class="sig-name descname"><span class="pre">update_dataset_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_dataset_images" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">update_dataset_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.update_dataset_images" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add or remove images from a dataset.</p>
 <p>This method allows you to add or remove images from an existing dataset.
 The action parameter determines whether to add or remove the specified images.</p>
@@ -3006,7 +2853,7 @@ The action parameter determines whether to add or remove the specified images.</
 </div>
 </section>
 <section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
@@ -3015,31 +2862,156 @@ The action parameter determines whether to add or remove the specified images.</
 </section>
 
 
-           </div>
+            <div class="clearer"></div>
           </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2024, Badri Hiriyur.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
         </div>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="#">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Welcome to T2D2 SDK’s documentation!</a><ul>
+<li><a class="reference internal" href="#t2d2-sdk">T2D2 SDK</a><ul>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#set-project">Set Project</a></li>
+<li><a class="reference internal" href="#upload-images">Upload Images</a></li>
+<li><a class="reference internal" href="#get-images">Get Images</a></li>
+<li><a class="reference internal" href="#add-annotation-class">Add Annotation Class</a></li>
+<li><a class="reference internal" href="#add-annotations-to-an-image">Add Annotations to an Image</a></li>
+<li><a class="reference internal" href="#run-ai-inference">Run AI Inference</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#contributing">Contributing</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#support">Support</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#t2d2-sdk-module">T2D2 SDK Module</a><ul>
+<li><a class="reference internal" href="#helper-functions">Helper Functions</a><ul>
+<li><a class="reference internal" href="#t2d2-sdk-client-library">T2D2 SDK Client Library</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#t2d2-class">T2D2 Class</a><ul>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2"><code class="docutils literal notranslate"><span class="pre">T2D2</span></code></a><ul>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.s3_base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.s3_base_url</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.aws_region"><code class="docutils literal notranslate"><span class="pre">T2D2.aws_region</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.bucket"><code class="docutils literal notranslate"><span class="pre">T2D2.bucket</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.access_token"><code class="docutils literal notranslate"><span class="pre">T2D2.access_token</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.api_key"><code class="docutils literal notranslate"><span class="pre">T2D2.api_key</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.debug"><code class="docutils literal notranslate"><span class="pre">T2D2.debug</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.__init__"><code class="docutils literal notranslate"><span class="pre">T2D2.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.base_url"><code class="docutils literal notranslate"><span class="pre">T2D2.base_url</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.headers"><code class="docutils literal notranslate"><span class="pre">T2D2.headers</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.project"><code class="docutils literal notranslate"><span class="pre">T2D2.project</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.request"><code class="docutils literal notranslate"><span class="pre">T2D2.request()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.login"><code class="docutils literal notranslate"><span class="pre">T2D2.login()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.notify_user"><code class="docutils literal notranslate"><span class="pre">T2D2.notify_user()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_project"><code class="docutils literal notranslate"><span class="pre">T2D2.create_project()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.set_project"><code class="docutils literal notranslate"><span class="pre">T2D2.set_project()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_project_info"><code class="docutils literal notranslate"><span class="pre">T2D2.get_project_info()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_region"><code class="docutils literal notranslate"><span class="pre">T2D2.add_region()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_region"><code class="docutils literal notranslate"><span class="pre">T2D2.update_region()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_regions"><code class="docutils literal notranslate"><span class="pre">T2D2.get_regions()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.add_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.download_assets"><code class="docutils literal notranslate"><span class="pre">T2D2.download_assets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_images"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_images"><code class="docutils literal notranslate"><span class="pre">T2D2.get_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_images"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.get_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.update_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_drawings"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_drawings()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.get_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.update_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_videos"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_videos()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.get_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.update_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_threed"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_threed()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.get_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.update_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_reports"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_reports()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.generate_condition_report_document"><code class="docutils literal notranslate"><span class="pre">T2D2.generate_condition_report_document()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_tags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_tags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_tags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_materials"><code class="docutils literal notranslate"><span class="pre">T2D2.get_materials()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotation_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotation_class"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotation_class()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotation_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotation_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.get_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_annotations"><code class="docutils literal notranslate"><span class="pre">T2D2.add_annotations()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.get_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.add_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.add_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_geotags"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_geotags()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.upload_downloads"><code class="docutils literal notranslate"><span class="pre">T2D2.upload_downloads()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_classes"><code class="docutils literal notranslate"><span class="pre">T2D2.get_classes()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_images"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_images()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.summarize_conditions"><code class="docutils literal notranslate"><span class="pre">T2D2.summarize_conditions()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.slack_notification"><code class="docutils literal notranslate"><span class="pre">T2D2.slack_notification()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_models"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_models()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_ai_model_by_id"><code class="docutils literal notranslate"><span class="pre">T2D2.get_ai_model_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.create_ai_model()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.update_ai_model()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_ai_model"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_ai_model()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.run_ai_inferencer"><code class="docutils literal notranslate"><span class="pre">T2D2.run_ai_inferencer()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_task_list"><code class="docutils literal notranslate"><span class="pre">T2D2.get_task_list()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_task_by_id"><code class="docutils literal notranslate"><span class="pre">T2D2.get_task_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.get_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.get_datasets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.create_dataset"><code class="docutils literal notranslate"><span class="pre">T2D2.create_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.delete_datasets"><code class="docutils literal notranslate"><span class="pre">T2D2.delete_datasets()</span></code></a></li>
+<li><a class="reference internal" href="#t2d2_sdk.T2D2.update_dataset_images"><code class="docutils literal notranslate"><span class="pre">T2D2.update_dataset_images()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
 
-</body>
+  </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">T2D2 SDK v1.5 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Welcome to T2D2 SDK’s documentation!</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2024, Badri Hiriyur.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.1.2.
+    </div>
+  </body>
 </html>
