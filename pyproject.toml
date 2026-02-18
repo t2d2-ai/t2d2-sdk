@@ -15,7 +15,9 @@ requires-python = ">=3.8"
 dependencies = [
   "boto3",
   "requests",
-  "sentry_sdk"
+  "sentry_sdk",
+  "python-docx",
+  "Pillow",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
