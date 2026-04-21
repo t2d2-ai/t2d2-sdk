@@ -966,7 +966,9 @@ if no IDs are specified.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_ids</strong> (<em>list</em><em> or </em><em>None</em>) – A list of specific image IDs to retrieve, or None to get all images</p></li>
+<li><p><strong>image_ids</strong> (<em>list</em><em> or </em><em>None</em>) – A list of specific image IDs to retrieve, or None to get all images.
+Duplicate IDs are ignored (first occurrence wins). Multiple distinct IDs
+are fetched concurrently (up to 32 parallel requests).</p></li>
 <li><p><strong>params</strong> (<em>dict</em><em> or </em><em>None</em>) – Additional parameters to filter the image results, which may include:
 - region_id: Filter images by region
 - tag_ids: Filter images by associated tags
@@ -1971,7 +1973,7 @@ it retrieves annotations for all images matching the provided params.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_id</strong> (<em>str</em><em>, </em><em>optional</em>) – The ID of the image for which to retrieve annotations, defaults to None</p></li>
+<li><p><strong>image_id</strong> (<em>str</em><em>, </em><em>int</em><em>, </em><em>list</em><em>, </em><em>tuple</em><em>, </em><em>optional</em>) – One image ID, or a list/tuple of image IDs, or None for all images matching params</p></li>
 <li><p><strong>params</strong> (<em>dict</em><em>, </em><em>optional</em>) – Additional query parameters to filter images, defaults to None</p></li>
 </ul>
 </dd>
