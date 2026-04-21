@@ -7,6 +7,7 @@ T2D2 SDK Client Library
 import json
 import logging
 import os
+from concurrent.futures import ThreadPoolExecutor
 # pylint: disable=wildcard-import, unused-wildcard-import
 import random
 import string
@@ -1010,7 +1011,9 @@ class T2D2(object):
         This method fetches image data either for specific image IDs or for all images in the project
         if no IDs are specified.
         
-        :param image_ids: A list of specific image IDs to retrieve, or None to get all images
+        :param image_ids: A list of specific image IDs to retrieve, or None to get all images.
+                          Duplicate IDs are ignored (first occurrence wins). Multiple distinct IDs
+                          are fetched concurrently (up to 32 parallel requests).
         :type image_ids: list or None
         :default image_ids: None
         
@@ -1079,16 +1082,27 @@ class T2D2(object):
             logger.info(f"Retrieved {len(results)} images")
             return results
 
-        # Specified image_ids
-        logger.info(f"Fetching {len(image_ids)} specific images")
-        results = []
-        for img_id in image_ids:
-            logger.debug(f"Fetching image: {img_id}")
-            url = f"{self.project['id']}/images/{img_id}"
-            json_data = self.request(url, RequestType.GET)
-            results.append(json_data["data"])
+        # Specified image_ids: dedupe (preserves order) to avoid redundant requests and duplicate rows
+        unique_ids = list(dict.fromkeys(image_ids))
+        if not unique_ids:
+            return []
+
+        logger.info(f"Fetching {len(unique_ids)} specific images")
+        if len(unique_ids) == 1:
+            results = [self._fetch_project_image_by_id(unique_ids[0])]
+        else:
+            max_workers = min(32, len(unique_ids))
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                results = list(executor.map(self._fetch_project_image_by_id, unique_ids))
         logger.info(f"Retrieved {len(results)} images")
         return results
+
+    def _fetch_project_image_by_id(self, img_id):
+        """GET /projects/{id}/images/{img_id}; used for sequential and parallel batch fetches."""
+        logger.debug(f"Fetching image: {img_id}")
+        url = f"{self.project['id']}/images/{img_id}"
+        json_data = self.request(url, RequestType.GET)
+        return json_data["data"]
 
     def update_images(self, image_ids, payload):
         """
@@ -2553,8 +2567,8 @@ class T2D2(object):
         it retrieves annotations for that specific image. If image_id is None,
         it retrieves annotations for all images matching the provided params.
         
-        :param image_id: The ID of the image for which to retrieve annotations, defaults to None
-        :type image_id: str, optional
+        :param image_id: One image ID, or a list/tuple of image IDs, or None for all images matching params
+        :type image_id: str, int, list, tuple, optional
         :param params: Additional query parameters to filter images, defaults to None
         :type params: dict, optional
         
@@ -2590,8 +2604,12 @@ class T2D2(object):
             image_ids = [img["id"] for img in images]
             logger.debug(f"Found {len(image_ids)} images to fetch annotations from")
         else:
-            logger.info(f"Fetching annotations for image: {image_id}")
-            image_ids = [image_id]
+            # Accept a single id or a list/tuple of ids (do not treat str as a sequence of ids)
+            if isinstance(image_id, (list, tuple)):
+                image_ids = list(image_id)
+            else:
+                image_ids = [image_id]
+            logger.info(f"Fetching annotations for image(s): {image_ids}")
 
         images = self.get_images(image_ids=image_ids, params=params)
         annotations = []
