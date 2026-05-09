@@ -379,6 +379,9 @@ class T2D2(object):
                 logger.debug(f"PARAMS: {params}")
                 logger.debug(f"DATA: {data}")
                 logger.debug(f"Response: {res.status_code} {res.content}")
+            detail = (res.text or "")[:800]
+            if detail.strip():
+                raise ValueError(f"Error code received: {res.status_code}. Response: {detail}")
             raise ValueError(f"Error code received: {res.status_code}")
 
     def login(self, credentials):
@@ -1088,14 +1091,44 @@ class T2D2(object):
             return []
 
         logger.info(f"Fetching {len(unique_ids)} specific images")
-        if len(unique_ids) == 1:
-            results = [self._fetch_project_image_by_id(unique_ids[0])]
-        else:
-            max_workers = min(32, len(unique_ids))
-            with ThreadPoolExecutor(max_workers=max_workers) as executor:
-                results = list(executor.map(self._fetch_project_image_by_id, unique_ids))
+        results = self._fetch_project_images_by_ids(unique_ids)
         logger.info(f"Retrieved {len(results)} images")
         return results
+
+    def _fetch_project_images_by_ids(self, unique_ids):
+        """
+        Resolve images by ID. Prefer POST {project}/assets (get_assets), which matches api-v3
+        behavior used by download_assets. Fall back to GET {project}/images/{id} if the batch
+        call fails or returns an incomplete list.
+        """
+        try:
+            assets = self.get_assets(asset_type=1, asset_ids=list(unique_ids))
+            if isinstance(assets, dict):
+                assets = assets.get("asset_list") or assets.get("assets") or []
+            if not isinstance(assets, list):
+                raise ValueError("Unexpected assets response shape")
+            if len(assets) == len(unique_ids):
+                by_id = {str(a["id"]): a for a in assets if a.get("id") is not None}
+                try:
+                    return [by_id[str(oid)] for oid in unique_ids]
+                except KeyError:
+                    logger.warning(
+                        "Could not map /assets batch results to requested ids; falling back to GET /images/{id}"
+                    )
+            else:
+                logger.warning(
+                    "POST assets returned %s records for %s image id(s); falling back to GET /images/{id}",
+                    len(assets),
+                    len(unique_ids),
+                )
+        except ValueError as e:
+            logger.warning("Batch image lookup via /assets failed (%s); falling back to GET /images/{id}", e)
+
+        if len(unique_ids) == 1:
+            return [self._fetch_project_image_by_id(unique_ids[0])]
+        max_workers = min(32, len(unique_ids))
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            return list(executor.map(self._fetch_project_image_by_id, unique_ids))
 
     def _fetch_project_image_by_id(self, img_id):
         """GET /projects/{id}/images/{img_id}; used for sequential and parallel batch fetches."""
