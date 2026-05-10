@@ -1007,6 +1007,16 @@ class T2D2(object):
         logger.info(f"Successfully registered {len(assets)} images with T2D2 API")
         return result
 
+    @staticmethod
+    def _format_image_query_params(params):
+        """Build query string for image endpoints (lists in params are JSON-encoded)."""
+        if not params:
+            return None
+        formatted_params = {}
+        for k, v in params.items():
+            formatted_params[k] = json.dumps(v) if isinstance(v, list) else v
+        return urlencode(formatted_params)
+
     def get_images(self, image_ids=None, params=None):
         """
         Retrieve images from the current project.
@@ -1020,7 +1030,10 @@ class T2D2(object):
         :type image_ids: list or None
         :default image_ids: None
         
-        :param params: Additional parameters to filter the image results, which may include:
+        :param params: When listing all images (image_ids is None), filters for GET .../images.
+                    When fetching specific image_ids, the same dict is sent as the query string on
+                    each GET .../images/{id} (e.g. hide_empty_images, image_id), matching the web app.
+                    Common keys include:
                     - region_id: Filter images by region
                     - tag_ids: Filter images by associated tags
                     - date_range: Filter images by capture date
@@ -1069,15 +1082,8 @@ class T2D2(object):
             base_url = f"{self.project['id']}/images"
             if params:
                 logger.debug(f"Using filters: {params}")
-                # Convert list values to JSON strings
-                formatted_params = {}
-                for k, v in params.items():
-                    if isinstance(v, list):
-                        formatted_params[k] = json.dumps(v)
-                    else:
-                        formatted_params[k] = v
-                query_string = "&".join([f"{k}={v}" for k, v in formatted_params.items()])
-                url = f"{base_url}?{query_string}"
+                query_string = self._format_image_query_params(params)
+                url = f"{base_url}?{query_string}" if query_string else base_url
             else:
                 url = base_url
             json_data = self.request(url, RequestType.GET)
@@ -1091,51 +1097,29 @@ class T2D2(object):
             return []
 
         logger.info(f"Fetching {len(unique_ids)} specific images")
-        results = self._fetch_project_images_by_ids(unique_ids)
+        results = self._fetch_project_images_by_ids(unique_ids, params)
         logger.info(f"Retrieved {len(results)} images")
         return results
 
-    def _fetch_project_images_by_ids(self, unique_ids):
+    def _fetch_project_images_by_ids(self, unique_ids, params=None):
         """
-        Resolve images by ID. Prefer POST {project}/assets (get_assets), which matches api-v3
-        behavior used by download_assets. Fall back to GET {project}/images/{id} if the batch
-        call fails or returns an incomplete list.
+        Fetch full image documents via GET {project}/images/{id} (same payload as the web app),
+        including embedded annotations when the API returns them. Multiple IDs are fetched concurrently.
         """
-        try:
-            assets = self.get_assets(asset_type=1, asset_ids=list(unique_ids))
-            if isinstance(assets, dict):
-                assets = assets.get("asset_list") or assets.get("assets") or []
-            if not isinstance(assets, list):
-                raise ValueError("Unexpected assets response shape")
-            if len(assets) == len(unique_ids):
-                by_id = {str(a["id"]): a for a in assets if a.get("id") is not None}
-                try:
-                    return [by_id[str(oid)] for oid in unique_ids]
-                except KeyError:
-                    logger.warning(
-                        "Could not map /assets batch results to requested ids; falling back to GET /images/{id}"
-                    )
-            else:
-                logger.warning(
-                    "POST assets returned %s records for %s image id(s); falling back to GET /images/{id}",
-                    len(assets),
-                    len(unique_ids),
-                )
-        except ValueError as e:
-            logger.warning("Batch image lookup via /assets failed (%s); falling back to GET /images/{id}", e)
+        def fetch_one(img_id):
+            logger.debug(f"Fetching image: {img_id}")
+            url = f"{self.project['id']}/images/{img_id}"
+            query_string = self._format_image_query_params(params)
+            if query_string:
+                url = f"{url}?{query_string}"
+            json_data = self.request(url, RequestType.GET)
+            return json_data["data"]
 
         if len(unique_ids) == 1:
-            return [self._fetch_project_image_by_id(unique_ids[0])]
+            return [fetch_one(unique_ids[0])]
         max_workers = min(32, len(unique_ids))
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
-            return list(executor.map(self._fetch_project_image_by_id, unique_ids))
-
-    def _fetch_project_image_by_id(self, img_id):
-        """GET /projects/{id}/images/{img_id}; used for sequential and parallel batch fetches."""
-        logger.debug(f"Fetching image: {img_id}")
-        url = f"{self.project['id']}/images/{img_id}"
-        json_data = self.request(url, RequestType.GET)
-        return json_data["data"]
+            return list(executor.map(fetch_one, unique_ids))
 
     def update_images(self, image_ids, payload):
         """
