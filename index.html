@@ -969,7 +969,10 @@ if no IDs are specified.</p>
 <li><p><strong>image_ids</strong> (<em>list</em><em> or </em><em>None</em>) – A list of specific image IDs to retrieve, or None to get all images.
 Duplicate IDs are ignored (first occurrence wins). Multiple distinct IDs
 are fetched concurrently (up to 32 parallel requests).</p></li>
-<li><p><strong>params</strong> (<em>dict</em><em> or </em><em>None</em>) – Additional parameters to filter the image results, which may include:
+<li><p><strong>params</strong> (<em>dict</em><em> or </em><em>None</em>) – When listing all images (image_ids is None), filters for GET …/images.
+When fetching specific image_ids, the same dict is sent as the query string on
+each GET …/images/{id} (e.g. hide_empty_images, image_id), matching the web app.
+Common keys include:
 - region_id: Filter images by region
 - tag_ids: Filter images by associated tags
 - date_range: Filter images by capture date
