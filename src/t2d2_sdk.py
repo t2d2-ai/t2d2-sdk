@@ -4,9 +4,13 @@ T2D2 SDK Client Library
 ========================
 """
 
+import inspect
 import json
 import logging
 import os
+import re
+from html import unescape
+from html.parser import HTMLParser
 from concurrent.futures import ThreadPoolExecutor
 # pylint: disable=wildcard-import, unused-wildcard-import
 import random
@@ -34,13 +38,16 @@ if not logger.handlers:
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)  # Use INFO level only - DEBUG messages will be filtered
 from docx import Document
-from docx.shared import Inches, Pt
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Inches, Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
-from io import BytesIO
 from PIL import Image as PILImage
-from condition_report_service import ImageAnnotationCropper
+from condition_report_service import (
+    ImageAnnotationCropper,
+    pil_image_to_jpeg_bytes,
+    resize_pil_to_fit_box,
+)
 
 
 TIMEOUT = 60
@@ -95,6 +102,83 @@ def random_color() -> str:
     """
     r = lambda: random.randint(0, 255)
     return "#%02X%02X%02X" % (r(), r(), r())
+
+
+class _HTMLToPlainTextParser(HTMLParser):
+    """Convert project description HTML from the API into plain text for Word cells."""
+
+    def __init__(self):
+        super().__init__()
+        self._parts = []
+        self._href = None
+
+    def handle_starttag(self, tag, attrs):
+        tag = tag.lower()
+        if tag in ("br", "p", "motion", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "tr"):
+            self._parts.append("\n")
+        if tag == "a":
+            attr_map = {k.lower(): v for k, v in attrs}
+            self._href = attr_map.get("href")
+
+    def handle_endtag(self, tag):
+        tag = tag.lower()
+        if tag in ("p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "li", "ul", "ol"):
+            self._parts.append("\n")
+        if tag == "a" and self._href:
+            href = self._href.strip()
+            self._href = None
+            if href and not href.lower().startswith("mailto:"):
+                if not href.lower().startswith(("http://", "https://")):
+                    href = f"https://{href}"
+                self._parts.append(f" ({href})")
+
+    def handle_data(self, data):
+        if data:
+            self._parts.append(data)
+
+
+def html_to_plain_text(html_content) -> str:
+    """
+    Strip HTML tags from API fields (e.g. project description) for use in Word tables.
+    Block elements become line breaks; link URLs are appended in parentheses.
+    """
+    if html_content is None:
+        return ""
+    text = str(html_content).strip()
+    if not text:
+        return ""
+    if "<" not in text or ">" not in text:
+        return unescape(text)
+
+    parser = _HTMLToPlainTextParser()
+    try:
+        parser.feed(text)
+        parser.close()
+    except Exception:
+        text = re.sub(r"<[^>]+>", " ", text)
+        return unescape(re.sub(r"\s+", " ", text).strip())
+
+    plain = unescape("".join(parser._parts))
+    plain = re.sub(r"[ \t]+\n", "\n", plain)
+    plain = re.sub(r"\n[ \t]+", "\n", plain)
+    plain = re.sub(r"\n{3,}", "\n\n", plain)
+    plain = re.sub(r"[ \t]{2,}", " ", plain)
+    lines = [ln.strip() for ln in plain.splitlines()]
+    return "\n".join(ln for ln in lines if ln).strip()
+
+
+def safe_condition_report_filename_stem(project_name: str) -> str:
+    """
+    Build a filesystem-safe segment from the project name for report filenames.
+    """
+    name = (project_name or "").strip() or "project"
+    name = re.sub(r'[\\/:*?"<>|]+', "", name)
+    name = re.sub(r"\s+", "_", name)
+    name = name.strip(" ._")
+    name = re.sub(r"_+", "_", name)
+    if not name:
+        name = "project"
+    return name[:150]
 
 
 def ts2date(ts):
@@ -203,7 +287,11 @@ def add_hyperlink(paragraph, url, text):
     
     new_run = OxmlElement('w:r')
     rPr = OxmlElement('w:rPr')
-    
+    rPr.append(_docx_font_rfonts_element(_CR_BODY_FONT))
+    sz = OxmlElement('w:sz')
+    sz.set(qn('w:val'), '20')
+    rPr.append(sz)
+
     # Style the hyperlink
     color = OxmlElement('w:color')
     color.set(qn('w:val'), '0000FF')  # Blue color
@@ -219,6 +307,369 @@ def add_hyperlink(paragraph, url, text):
     
     paragraph._p.append(hyperlink)
     return hyperlink
+
+
+# Condition report document styling
+_CR_PRIMARY = "1A365D"
+_CR_ACCENT = "2B6CB0"
+_CR_TABLE_HEAD = "E2E8F0"
+_CR_TABLE_LABEL = "F7FAFC"
+_CR_BORDER = "A0AEC0"
+_CR_BODY_FONT = "Montserrat"
+
+
+def _docx_font_rfonts_element(font_name: str):
+    r_fonts = OxmlElement("w:rFonts")
+    for attr in ("ascii", "hAnsi", "eastAsia", "cs"):
+        r_fonts.set(qn(f"w:{attr}"), font_name)
+    return r_fonts
+
+
+def _docx_apply_run_font(run, font_name: str = None) -> None:
+    """Set font on a run (including rFonts so Word uses Montserrat consistently)."""
+    name = font_name or _CR_BODY_FONT
+    run.font.name = name
+    r_pr = run._element.get_or_add_rPr()
+    existing = r_pr.find(qn("w:rFonts"))
+    if existing is not None:
+        r_pr.remove(existing)
+    r_pr.insert(0, _docx_font_rfonts_element(name))
+
+
+def _docx_configure_report_fonts(doc) -> None:
+    """Apply Montserrat to built-in styles used in the condition report."""
+    for style_name in ("Normal", "Heading 1", "Heading 2", "Title", "Subtitle", "List Paragraph"):
+        try:
+            doc.styles[style_name].font.name = _CR_BODY_FONT
+        except KeyError:
+            pass
+    doc.styles["Normal"].font.size = Pt(10)
+
+
+def _docx_set_cell_shading(cell, fill_hex: str) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:color"), "auto")
+    shd.set(qn("w:fill"), fill_hex)
+    tc_pr.append(shd)
+
+
+def _docx_set_cell_margins(cell, top=60, bottom=60, left=100, right=100) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    tc_mar = OxmlElement("w:tcMar")
+    for side, val in (("top", top), ("left", left), ("bottom", bottom), ("right", right)):
+        el = OxmlElement(f"w:{side}")
+        el.set(qn("w:w"), str(val))
+        el.set(qn("w:type"), "dxa")
+        tc_mar.append(el)
+    tc_pr.append(tc_mar)
+
+
+def _docx_set_table_borders(table, color_hex: str = _CR_BORDER, size: int = 4) -> None:
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr
+    if tbl_pr is None:
+        tbl_pr = OxmlElement("w:tblPr")
+        tbl.insert(0, tbl_pr)
+    borders = OxmlElement("w:tblBorders")
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        el = OxmlElement(f"w:{edge}")
+        el.set(qn("w:val"), "single")
+        el.set(qn("w:sz"), str(size))
+        el.set(qn("w:space"), "0")
+        el.set(qn("w:color"), color_hex)
+        borders.append(el)
+    tbl_pr.append(borders)
+
+
+def _docx_add_field(paragraph, field_code: str) -> None:
+    run = paragraph.add_run()
+    fld_begin = OxmlElement("w:fldChar")
+    fld_begin.set(qn("w:fldCharType"), "begin")
+    instr = OxmlElement("w:instrText")
+    instr.set(qn("xml:space"), "preserve")
+    instr.text = field_code
+    fld_sep = OxmlElement("w:fldChar")
+    fld_sep.set(qn("w:fldCharType"), "separate")
+    fld_end = OxmlElement("w:fldChar")
+    fld_end.set(qn("w:fldCharType"), "end")
+    run._r.append(fld_begin)
+    run._r.append(instr)
+    run._r.append(fld_sep)
+    run._r.append(fld_end)
+
+
+def _report_title_case(text: str) -> str:
+    """Capitalize report text (title case); preserve T2D2 and N/A."""
+    if text is None:
+        return "N/A"
+    text = str(text).strip()
+    if not text:
+        return "N/A"
+    if text.upper() in ("N/A", "NA"):
+        return "N/A"
+    words = text.split()
+    out = []
+    for word in words:
+        if word.upper() == "T2D2":
+            out.append("T2D2")
+        else:
+            out.append(word.capitalize())
+    return " ".join(out)
+
+
+def _docx_picture_size_inches(pil_image, max_width_in: float, max_height_in: float):
+    w_px, h_px = pil_image.size
+    if w_px <= 0 or h_px <= 0:
+        return max_width_in, max_height_in
+    aspect = w_px / float(h_px)
+    width_in = max_width_in
+    height_in = width_in / aspect
+    if height_in > max_height_in:
+        height_in = max_height_in
+        width_in = height_in * aspect
+    return width_in, height_in
+
+
+def _docx_add_centered_figure(
+    doc,
+    jpeg_bytes,
+    pil_image,
+    max_width_in: float,
+    max_height_in: float,
+    space_before_pt: int = 6,
+    space_after_pt: int = 4,
+    keep_with_next: bool = False,
+):
+    width_in, height_in = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    para = doc.add_paragraph()
+    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    para.paragraph_format.space_before = Pt(space_before_pt)
+    para.paragraph_format.space_after = Pt(space_after_pt)
+    para.paragraph_format.keep_together = True
+    para.paragraph_format.keep_with_next = keep_with_next
+    run = para.add_run()
+    run.add_picture(jpeg_bytes, width=Inches(width_in), height=Inches(height_in))
+    return para, width_in, height_in
+
+
+def _docx_add_figure_caption(doc, text: str, space_after_pt: int = 6, keep_with_next: bool = False) -> None:
+    para = doc.add_paragraph()
+    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    para.paragraph_format.space_before = Pt(2)
+    para.paragraph_format.space_after = Pt(space_after_pt)
+    para.paragraph_format.keep_with_next = keep_with_next
+    run = para.add_run(_report_title_case(text))
+    _docx_apply_run_font(run)
+    run.font.size = Pt(9)
+    run.font.italic = True
+    run.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
+
+
+def _docx_format_report_table(table, label_width_in: float = 1.75) -> None:
+    _docx_set_table_borders(table)
+    table.columns[0].width = Inches(label_width_in)
+    for row_idx, row in enumerate(table.rows):
+        for col_idx, cell in enumerate(row.cells):
+            _docx_set_cell_margins(cell)
+            if col_idx == 0:
+                _docx_set_cell_shading(cell, _CR_TABLE_LABEL)
+            elif row_idx == 0:
+                _docx_set_cell_shading(cell, _CR_TABLE_HEAD)
+            for paragraph in cell.paragraphs:
+                paragraph.paragraph_format.space_before = Pt(2)
+                paragraph.paragraph_format.space_after = Pt(2)
+                for run in paragraph.runs:
+                    _docx_apply_run_font(run)
+                    run.font.size = Pt(9)
+                    if col_idx == 0:
+                        run.font.bold = True
+                        run.font.color.rgb = RGBColor(0x2D, 0x37, 0x48)
+
+
+def _docx_set_cell_plain_text(cell, text: str) -> None:
+    """Write plain or multiline text into a table cell with Montserrat."""
+    cell.text = ""
+    lines = text.split("\n") if text else [""]
+    for idx, line in enumerate(lines):
+        para = cell.paragraphs[0] if idx == 0 else cell.add_paragraph()
+        if line:
+            _docx_apply_run_font(para.add_run(line))
+
+
+def _docx_fill_label_value_table(table, rows: list) -> None:
+    for row_idx, (label, value) in enumerate(rows):
+        table.cell(row_idx, 0).text = _report_title_case(label)
+        if not isinstance(value, str):
+            value = str(value) if value is not None else "N/A"
+        if "<" in value and ">" in value:
+            value = html_to_plain_text(value)
+        if label in ("File Name",):
+            table.cell(row_idx, 1).text = value
+        elif label == "Description" or "\n" in value:
+            _docx_set_cell_plain_text(table.cell(row_idx, 1), value)
+        else:
+            table.cell(row_idx, 1).text = _report_title_case(value)
+
+
+def _docx_clear_header_footer(hf) -> None:
+    """Remove all footer/header content (paragraphs, tables, images) before rebuilding."""
+    hf.is_linked_to_previous = False
+    element = hf._element
+    for child in list(element):
+        element.remove(child)
+
+
+def _docx_set_page_border(
+    section,
+    color: str = "000000",
+    size: int = 6,
+    space: int = 18,
+) -> None:
+    """Add a thin rectangular border inset on every page (Word pgBorders)."""
+    sect_pr = section._sectPr
+    existing = sect_pr.find(qn("w:pgBorders"))
+    if existing is not None:
+        sect_pr.remove(existing)
+    pg_borders = OxmlElement("w:pgBorders")
+    pg_borders.set(qn("w:offsetFrom"), "text")
+    for side in ("top", "left", "bottom", "right"):
+        edge = OxmlElement(f"w:{side}")
+        edge.set(qn("w:val"), "single")
+        edge.set(qn("w:sz"), str(size))
+        edge.set(qn("w:space"), str(space))
+        edge.set(qn("w:color"), color)
+        pg_borders.append(edge)
+    sect_pr.append(pg_borders)
+
+
+def _docx_add_sized_table(container, rows: int, cols: int, width_in: float):
+    """
+    Add a table with a target width. python-docx differs by container:
+    - Document body: ``add_table(rows, cols[, style])`` — 3rd arg is style, not width
+    - Header/footer: ``add_table(rows, cols, width)`` — width is required
+    """
+    w = Inches(width_in)
+    params = inspect.signature(container.add_table).parameters
+    if "width" in params:
+        table = container.add_table(rows, cols, w)
+    else:
+        table = container.add_table(rows, cols)
+    table.autofit = False
+    table.width = w
+    return table
+
+
+def _docx_setup_condition_report_section(
+    section,
+    project_name: str,
+    generated_on: str,
+    content_width_in: float = 6.5,
+    cover_page: bool = False,
+) -> None:
+    section.top_margin = Inches(0.45)
+    section.bottom_margin = Inches(0.45)
+    section.left_margin = Inches(0.65)
+    section.right_margin = Inches(0.65)
+    section.header_distance = Inches(0.2)
+    section.footer_distance = Inches(0.25)
+    section.different_first_page_header_footer = cover_page
+    _docx_set_page_border(section)
+
+    _docx_clear_header_footer(section.header)
+    if cover_page:
+        _docx_clear_header_footer(section.first_page_header)
+
+    def _style_footer(footer) -> None:
+        _docx_clear_header_footer(footer)
+        p = footer.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        p.paragraph_format.tab_stops.add_tab_stop(
+            Inches(content_width_in), WD_TAB_ALIGNMENT.RIGHT
+        )
+        lr = p.add_run(f"Report by T2D2 | Generated on {generated_on}")
+        _docx_apply_run_font(lr)
+        lr.font.size = Pt(9)
+        lr.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
+        p.add_run("\t")
+        pr = p.add_run("Page ")
+        _docx_apply_run_font(pr)
+        pr.font.size = Pt(9)
+        pr.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
+        _docx_add_field(p, "PAGE")
+        pr2 = p.add_run(" of ")
+        _docx_apply_run_font(pr2)
+        pr2.font.size = Pt(9)
+        pr2.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
+        _docx_add_field(p, "NUMPAGES")
+
+    _style_footer(section.footer)
+    if cover_page:
+        _style_footer(section.first_page_footer)
+
+
+def _docx_add_condition_report_cover(
+    doc,
+    project_info: dict,
+    project_link_url: str,
+    logo_path=None,
+) -> None:
+    project_name = project_info.get("name") or "Project"
+    accent = _docx_add_sized_table(doc, 1, 1, 6.5)
+    ac = accent.rows[0].cells[0]
+    _docx_set_cell_shading(ac, _CR_ACCENT)
+    _docx_set_cell_margins(ac, top=100, bottom=100, left=120, right=120)
+    ap = ac.paragraphs[0]
+    ap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    ar = ap.add_run("Condition Report")
+    _docx_apply_run_font(ar)
+    ar.font.size = Pt(10)
+    ar.font.bold = True
+    ar.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    doc.add_paragraph().paragraph_format.space_after = Pt(12)
+
+    if logo_path and os.path.exists(logo_path):
+        logo_para = doc.add_paragraph()
+        logo_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        logo_para.paragraph_format.space_after = Pt(14)
+        logo_para.add_run().add_picture(logo_path, width=Inches(1.75))
+
+    title = doc.add_heading(project_name, level=0)
+    title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    for run in title.runs:
+        _docx_apply_run_font(run)
+        run.font.color.rgb = RGBColor(0x1A, 0x36, 0x5D)
+    subtitle = doc.add_paragraph()
+    subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    subtitle.paragraph_format.space_after = Pt(18)
+    sr = subtitle.add_run("Inspection Findings and Annotated Imagery")
+    _docx_apply_run_font(sr)
+    sr.font.size = Pt(12)
+    sr.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
+
+    rows = [
+        ("Project ID", str(project_info.get("id", "N/A"))),
+        ("Project Link", project_link_url),
+        ("Address", project_info.get("address") or "N/A"),
+    ]
+    description = project_info.get("description")
+    if description:
+        rows.append(("Description", html_to_plain_text(description)))
+    rows.append(("Created", project_info.get("created_at") or "N/A"))
+    if project_info.get("created_by"):
+        rows.append(("Created By", project_info["created_by"]))
+
+    table = doc.add_table(rows=len(rows), cols=2)
+    table.autofit = False
+    _docx_fill_label_value_table(table, rows)
+    link_row = next(i for i, (lbl, _) in enumerate(rows) if lbl == "Project Link")
+    link_cell = table.cell(link_row, 1)
+    link_cell.paragraphs[0].clear()
+    add_hyperlink(link_cell.paragraphs[0], project_link_url, "Click Here")
+    _docx_format_report_table(table, label_width_in=1.65)
+    doc.add_paragraph().paragraph_format.space_after = Pt(6)
+
 
 ####################################################################################################
 class RequestType(Enum):
@@ -1876,7 +2327,19 @@ class T2D2(object):
         payload = {"report_ids": report_ids}
         return self.request(url, RequestType.DELETE, data=payload)
 
-    def generate_condition_report_document(self, image_ids=None, output_path='condition_report.docx', padding_percent=0.2):
+    def generate_condition_report_document(
+        self,
+        image_ids=None,
+        output_path=None,
+        padding_percent=0.2,
+        crop_min_width_fraction=0.20,
+        crop_min_height_fraction=0.20,
+        include_orthomosaics=False,
+        report_max_long_edge=4096,
+        report_max_megapixels=45.0,
+        report_jpeg_quality=92,
+        report_embed_dpi=220,
+    ):
         """
         Generate a Word document with condition report for images and their annotations.
         
@@ -1889,17 +2352,57 @@ class T2D2(object):
           * Original image (middle)
           * Metadata table (bottom) with file name, link, condition, region, tags
         
-        :param image_ids: List of specific image IDs to include, or None to include all images
+        :param image_ids: List of specific image IDs to include, or None to include all images.
+            IDs are resolved with ``GET …/images/{id}``, so orthomosaic images (type ``3``) work
+            the same as regular images when you pass their id (e.g. ``image_ids=[694791]``).
         :type image_ids: list or None
         :default image_ids: None
         
-        :param output_path: Path where the Word document should be saved
-        :type output_path: str
-        :default output_path: 'condition_report.docx'
+        :param output_path: Path where the Word document should be saved. If ``None``, uses
+            ``{project_name}_condition_report.docx`` in the current working directory (project name
+            is sanitized for the filesystem).
+        :type output_path: str or None
+        :default output_path: None
         
         :param padding_percent: Percentage of padding to add around cropped annotations (0.0 to 1.0)
         :type padding_percent: float
         :default padding_percent: 0.2
+        
+        :param crop_min_width_fraction: Minimum crop width as a fraction of the full image width (avoids extreme zoom on tiny marks)
+        :type crop_min_width_fraction: float
+        :default crop_min_width_fraction: 0.20
+        
+        :param crop_min_height_fraction: Minimum crop height as a fraction of the full image height
+        :type crop_min_height_fraction: float
+        :default crop_min_height_fraction: 0.20
+        
+        :param include_orthomosaics: When ``image_ids`` is None, also include orthomosaic images
+            (API image type ``3``) that are not already in the default image list. Ignored when
+            ``image_ids`` is provided.
+        :type include_orthomosaics: bool
+        :default include_orthomosaics: False
+        
+        :param report_max_long_edge: After download, scale images so the longest side is at most
+            this many pixels (reduces memory and .docx size). Orthomosaics are often far larger than
+            needed for on-page figures. Pass ``None`` to disable this limit.
+        :type report_max_long_edge: int or None
+        :default report_max_long_edge: 4096
+        
+        :param report_max_megapixels: After download, cap total pixels (width * height) in millions.
+            Pass ``None`` to disable. If both this and ``report_max_long_edge`` are ``None``, no
+            resolution downscaling is applied (not recommended for very large orthos).
+        :type report_max_megapixels: float or None
+        :default report_max_megapixels: 45.0
+        
+        :param report_jpeg_quality: JPEG quality (1–100) for figures embedded in the Word file.
+        :type report_jpeg_quality: int
+        :default report_jpeg_quality: 92
+        
+        :param report_embed_dpi: Target pixels-per-inch for images **as embedded in the .docx**
+            (after layout). Pixel dimensions are capped to ``display_size × report_embed_dpi`` so
+            files stay small while matching on-page width/height. Typical print range: 200–240.
+        :type report_embed_dpi: int
+        :default report_embed_dpi: 220
         
         :return: Path to the generated document
         :rtype: str
@@ -1921,16 +2424,36 @@ class T2D2(object):
             logger.error("Cannot generate condition report: Project not set")
             raise ValueError("Project not set")
         
-        logger.info(f"Starting condition report generation. Output: {output_path}, Image IDs: {image_ids or 'All'}")
-        
-        # Get project info
         project_info = self.get_project_info()
+        if output_path is None:
+            stem = safe_condition_report_filename_stem(project_info.get("name"))
+            output_path = f"{stem}_condition_report.docx"
         logger.debug(f"Project: {project_info['name']} (ID: {project_info['id']})")
         
-        # Get images
+        logger.info(
+            f"Starting condition report generation. Output: {output_path}, "
+            f"Image IDs: {image_ids or 'All'}, include_orthomosaics: {include_orthomosaics}"
+        )
+        
+        # Get images (orthomosaics are often listed under image_types=[3]; merge when listing all)
         if image_ids is None:
             logger.info("Fetching all images for condition report")
-            images = self.get_images()
+            images = list(self.get_images())
+            if include_orthomosaics:
+                seen = {img.get('id') for img in images if img.get('id') is not None}
+                try:
+                    ortho_images = self.get_images(params={"image_types": [3]})
+                    added = 0
+                    for img in ortho_images:
+                        oid = img.get('id')
+                        if oid is not None and oid not in seen:
+                            images.append(img)
+                            seen.add(oid)
+                            added += 1
+                    if added:
+                        logger.info(f"Merged {added} orthomosaic image(s) into condition report source list")
+                except Exception as e:
+                    logger.warning(f"Could not fetch orthomosaics for condition report: {e}")
         else:
             logger.info(f"Fetching {len(image_ids)} specific images for condition report")
             images = self.get_images(image_ids=image_ids)
@@ -2000,104 +2523,43 @@ class T2D2(object):
         cropper = ImageAnnotationCropper(image_data_list)
         logger.info("Downloading images...")
         cropper.download_images()
+        cropper.downscale_images_for_report(
+            max_long_edge=report_max_long_edge,
+            max_megapixels=report_max_megapixels,
+        )
         
         # Create Word document
         logger.info("Creating Word document structure")
         doc = Document()
-        
-        # Set document margins - optimized for better layout
-        sections = doc.sections
-        for section in sections:
-            section.top_margin = Inches(0.75)
-            section.bottom_margin = Inches(0.75)
-            section.left_margin = Inches(0.75)
-            section.right_margin = Inches(0.75)
-        
-        # First page: Title, Logo, then Project details
-        # Add title first with better spacing
-        title = doc.add_heading('Condition Report', 0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        title.paragraph_format.space_before = Pt(12)
-        title.paragraph_format.space_after = Pt(18)
-        
-        # Add T2D2 logo after title
-        logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 't2d2_image', 't2d2.png')
-        if os.path.exists(logo_path):
-            logo_para = doc.add_paragraph()
-            logo_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            logo_para.paragraph_format.space_before = Pt(6)
-            logo_para.paragraph_format.space_after = Pt(18)
-            run = logo_para.add_run()
-            run.add_picture(logo_path, width=Inches(2))
-        
-        # Add project information in a better formatted way
-        # Calculate number of rows needed
-        num_rows = 4  # Project, Project ID, Project Link, Address (always present)
-        if project_info.get('description'):
-            num_rows += 1
-        num_rows += 1  # Created (always present)
-        if project_info.get('created_by'):
-            num_rows += 1
-        
-        project_table = doc.add_table(rows=num_rows, cols=2)
-        project_table.style = 'Light Grid Accent 1'
-        
-        # Set column widths - optimized for better layout
-        project_table.columns[0].width = Inches(1.5)
-        project_table.columns[1].width = Inches(4.5)
-        
-        # Fill project information table
-        row_idx = 0
-        project_table.cell(row_idx, 0).text = 'Project:'
-        project_table.cell(row_idx, 1).text = project_info['name']
-        row_idx += 1
-        
-        project_table.cell(row_idx, 0).text = 'Project ID:'
-        project_table.cell(row_idx, 1).text = str(project_info['id'])
-        row_idx += 1
-        
-        # Add project link
-        project_table.cell(row_idx, 0).text = 'Project Link:'
+        _docx_configure_report_fonts(doc)
+        project_name = project_info.get("name") or "Project"
+        generated_on = datetime.now().strftime("%d %b %Y")
         project_link_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}"
-        link_paragraph = project_table.cell(row_idx, 1).paragraphs[0]
-        link_paragraph.clear()
-        add_hyperlink(link_paragraph, project_link_url, project_link_url)
-        row_idx += 1
-        
-        project_table.cell(row_idx, 0).text = 'Address:'
-        project_table.cell(row_idx, 1).text = project_info['address']
-        row_idx += 1
-        
-        if project_info.get('description'):
-            project_table.cell(row_idx, 0).text = 'Description:'
-            project_table.cell(row_idx, 1).text = project_info['description']
-            row_idx += 1
-        
-        project_table.cell(row_idx, 0).text = 'Created:'
-        project_table.cell(row_idx, 1).text = project_info['created_at']
-        row_idx += 1
-        
-        if project_info.get('created_by'):
-            project_table.cell(row_idx, 0).text = 'Created By:'
-            project_table.cell(row_idx, 1).text = project_info['created_by']
-        
-        # Format project table cells with better spacing and alignment
-        for row in project_table.rows:
-            for cell in row.cells:
-                for paragraph in cell.paragraphs:
-                    paragraph.style.font.size = Pt(11)
-                    paragraph.paragraph_format.space_before = Pt(6)
-                    paragraph.paragraph_format.space_after = Pt(6)
-                    if cell == row.cells[0]:  # First column (labels)
-                        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                        for run in paragraph.runs:
-                            run.bold = True
-                    else:  # Second column (values)
-                        paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-        
-        # Add page break after project details
+        logo_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)), "t2d2_image", "t2d2.png"
+        )
+        _CONTENT_W_IN = 6.5
+        # Cropped detail smaller; full image larger — sized to fill the page above the table
+        _CROP_MAX_W_IN = 4.5
+        _CROP_MAX_H_IN = 2.35
+        _FULL_MAX_W_IN = 6.5
+        _FULL_MAX_H_IN = 4.65
+        _edpi = float(report_embed_dpi)
+        _crop_embed_px_w = max(1, int(round(_CROP_MAX_W_IN * _edpi)))
+        _crop_embed_px_h = max(1, int(round(_CROP_MAX_H_IN * _edpi)))
+        _full_embed_px_w = max(1, int(round(_FULL_MAX_W_IN * _edpi)))
+        _full_embed_px_h = max(1, int(round(_FULL_MAX_H_IN * _edpi)))
+
+        _docx_setup_condition_report_section(
+            doc.sections[0],
+            project_name,
+            generated_on,
+            content_width_in=_CONTENT_W_IN,
+            cover_page=True,
+        )
+        _docx_add_condition_report_cover(doc, project_info, project_link_url, logo_path)
         doc.add_page_break()
-        
+
         # Process each image and annotation
         figure_counter = 1
         first_annotation = True
@@ -2124,145 +2586,134 @@ class T2D2(object):
                 if not first_annotation:
                     doc.add_page_break()
                 first_annotation = False
+
+                ann_class_name = _report_title_case(
+                    ann.get("annotation_class", {}).get("annotation_class_long_name")
+                    or ann.get("annotation_class", {}).get("annotation_class_name")
+                    or "Finding"
+                )
+
                 # Crop annotation
                 cropped_img, crop_bbox = cropper.crop_annotation(
-                    pil_image, ann, image_width, image_height, padding_percent
+                    pil_image,
+                    ann,
+                    image_width,
+                    image_height,
+                    padding_percent,
+                    crop_min_width_fraction,
+                    crop_min_height_fraction,
                 )
                 
                 if cropped_img is None or crop_bbox is None:
                     continue
                 
-                # Draw annotation on cropped image
                 cropped_with_annotation = cropper.draw_annotation_on_image(
                     cropped_img, ann, image_width, image_height, crop_bbox
                 )
-                
-                # Add minimal spacing at top of page (optimized for one page per condition)
-                doc.add_paragraph()
-                
-                # Add cropped annotated image (top) - optimized size to fit on one page
-                cropped_para = doc.add_paragraph()
-                cropped_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                cropped_para.paragraph_format.space_before = Pt(6)
-                cropped_para.paragraph_format.space_after = Pt(3)
-                
-                # Convert PIL image to bytes for docx
-                cropped_bytes = BytesIO()
-                cropped_with_annotation.save(cropped_bytes, format='PNG')
-                cropped_bytes.seek(0)
-                
-                # Add image to document (optimized width to fit on one page with other content)
-                run = cropped_para.add_run()
-                run.add_picture(cropped_bytes, width=Inches(5.5))
-                
-                # Add figure caption below cropped image with minimal spacing
-                caption_para = doc.add_paragraph()
-                caption_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                caption_para.paragraph_format.space_before = Pt(3)
-                caption_para.paragraph_format.space_after = Pt(6)
-                caption_run = caption_para.add_run(f"Figure {figure_counter}: Annotated Image (Cropped)")
-                caption_run.font.size = Pt(9)
-                caption_run.italic = True
+                cropped_for_doc = resize_pil_to_fit_box(
+                    cropped_with_annotation, _crop_embed_px_w, _crop_embed_px_h
+                )
+                cropped_bytes = pil_image_to_jpeg_bytes(
+                    cropped_for_doc, quality=report_jpeg_quality
+                )
+                _docx_add_centered_figure(
+                    doc,
+                    cropped_bytes,
+                    cropped_for_doc,
+                    _CROP_MAX_W_IN,
+                    _CROP_MAX_H_IN,
+                    space_before_pt=0,
+                    space_after_pt=1,
+                    keep_with_next=True,
+                )
+                _docx_add_figure_caption(
+                    doc,
+                    f"Figure {figure_counter}: Annotated Detail (Cropped)",
+                    space_after_pt=2,
+                    keep_with_next=True,
+                )
                 figure_counter += 1
-                
-                # Add minimal spacing between images
-                doc.add_paragraph()
-                
-                # Add original image (middle) - optimized size to fit on one page
-                original_para = doc.add_paragraph()
-                original_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                original_para.paragraph_format.space_before = Pt(3)
-                original_para.paragraph_format.space_after = Pt(3)
-                
-                # Draw all annotations on original for context
+
                 original_with_annotations = pil_image.copy()
                 for visible_ann in annotations:
                     original_with_annotations = cropper.draw_annotation_on_image(
                         original_with_annotations, visible_ann, image_width, image_height
                     )
-                
-                # Convert original image to bytes
-                original_bytes = BytesIO()
-                original_with_annotations.save(original_bytes, format='PNG')
-                original_bytes.seek(0)
-                
-                # Add original image (optimized width to fit on one page)
-                run = original_para.add_run()
-                run.add_picture(original_bytes, width=Inches(3.5))
-                
-                # Add figure caption below original image with minimal spacing
-                caption2_para = doc.add_paragraph()
-                caption2_para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-                caption2_para.paragraph_format.space_before = Pt(3)
-                caption2_para.paragraph_format.space_after = Pt(6)
-                caption2_run = caption2_para.add_run(f"Figure {figure_counter}: Original Image with All Annotations")
-                caption2_run.font.size = Pt(9)
-                caption2_run.italic = True
+                original_with_annotations = cropper.highlight_crop_callout_on_image(
+                    original_with_annotations, crop_bbox
+                )
+                original_for_doc = resize_pil_to_fit_box(
+                    original_with_annotations, _full_embed_px_w, _full_embed_px_h
+                )
+                original_bytes = pil_image_to_jpeg_bytes(
+                    original_for_doc, quality=report_jpeg_quality
+                )
+                _docx_add_centered_figure(
+                    doc,
+                    original_bytes,
+                    original_for_doc,
+                    _FULL_MAX_W_IN,
+                    _FULL_MAX_H_IN,
+                    space_before_pt=0,
+                    space_after_pt=1,
+                    keep_with_next=True,
+                )
+                _docx_add_figure_caption(
+                    doc,
+                    f"Figure {figure_counter}: Full Image With Annotations "
+                    f"(Orange Frame and Arrow Indicate the Detail Above)",
+                    space_after_pt=2,
+                    keep_with_next=True,
+                )
                 figure_counter += 1
-                
-                # Add minimal spacing before table
-                doc.add_paragraph()
-                
-                # Create metadata table
-                table = doc.add_table(rows=5, cols=2)
-                table.style = 'Light Grid Accent 1'
-                
-                # Set column widths for better layout
-                table.columns[0].width = Inches(1.8)
-                table.columns[1].width = Inches(4.2)
-                
-                # Get annotation details
-                annotation_class = ann.get('annotation_class', {})
-                class_name = annotation_class.get('annotation_class_long_name', 'N/A')
-                condition = ann.get('condition', {})
-                condition_name = condition.get('rating_name', 'N/A') if condition else 'N/A'
-                region_name = region.get('name', 'N/A') if region else 'N/A'
-                tags_str = ', '.join([tag.get('name', '') for tag in tags if isinstance(tag, dict)]) or 'N/A'
-                if not tags_str or tags_str == '':
-                    tags_str = 'N/A'
-                
-                # Fill table
-                table.cell(0, 0).text = 'File Name'
-                table.cell(0, 1).text = filename or 'N/A'
-                
-                # Add clickable hyperlink for portal URL
-                table.cell(1, 0).text = 'Link to Photo in T2D2 Portal'
-                link_cell = table.cell(1, 1)
-                link_paragraph = link_cell.paragraphs[0]
-                link_paragraph.clear()
-                add_hyperlink(link_paragraph, portal_url, portal_url)
-                
-                table.cell(2, 0).text = 'Condition'
-                table.cell(2, 1).text = condition_name
-                
-                table.cell(3, 0).text = 'Region'
-                table.cell(3, 1).text = region_name
-                
-                table.cell(4, 0).text = 'Tags'
-                table.cell(4, 1).text = tags_str
-                
-                # Format table cells with optimized styling for one page layout
-                for row_idx, row in enumerate(table.rows):
+
+                condition = ann.get("condition", {})
+                condition_name = _report_title_case(
+                    condition.get("rating_name", "N/A") if condition else "N/A"
+                )
+                region_name = _report_title_case(region.get("name", "N/A") if region else "N/A")
+                tags_str = _report_title_case(
+                    ", ".join([tag.get("name", "") for tag in tags if isinstance(tag, dict)])
+                    or "N/A"
+                )
+
+                meta_rows = [
+                    ("File Name", filename or "N/A"),
+                    ("Annotation", ann_class_name),
+                    ("Condition", condition_name),
+                    ("Region", region_name),
+                    ("Tags", tags_str),
+                ]
+                table = doc.add_table(rows=len(meta_rows) + 1, cols=2)
+                table.autofit = False
+                _docx_fill_label_value_table(table, meta_rows)
+                link_cell = table.cell(len(meta_rows), 1)
+                table.cell(len(meta_rows), 0).text = "Image"
+                link_cell.paragraphs[0].clear()
+                add_hyperlink(
+                    link_cell.paragraphs[0],
+                    portal_url,
+                    "Click Here to See the Image",
+                )
+                _docx_format_report_table(table, label_width_in=1.55)
+                for row in table.rows:
                     for cell in row.cells:
                         for paragraph in cell.paragraphs:
-                            paragraph.style.font.size = Pt(9)
-                            # Reduced padding to fit on one page
-                            paragraph.paragraph_format.space_before = Pt(4)
-                            paragraph.paragraph_format.space_after = Pt(4)
-                            # Make first column (labels) bold and align left
-                            if cell == row.cells[0]:
-                                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                                for run in paragraph.runs:
-                                    run.bold = True
-                            else:  # Second column (values)
-                                paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                
-                # No page break needed here - next annotation will add its own page break at the start
+                            paragraph.paragraph_format.space_before = Pt(1)
+                            paragraph.paragraph_format.space_after = Pt(1)
         
         # Save document
         logger.info(f"Saving condition report document to: {output_path}")
         doc.save(output_path)
-        logger.info(f"Condition report document saved successfully: {output_path}")
+        try:
+            sz = os.path.getsize(output_path)
+            logger.info(
+                "Condition report document saved successfully: %s (%.2f MB)",
+                output_path,
+                sz / (1024 * 1024),
+            )
+        except OSError:
+            logger.info("Condition report document saved successfully: %s", output_path)
         
         return output_path
 

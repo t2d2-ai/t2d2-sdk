@@ -1,3 +1,4 @@
+import math
 import requests
 from PIL import Image, ImageDraw, ImageFont
 import io
@@ -7,6 +8,72 @@ from typing import List, Dict, Tuple, Union
 import os
 import numpy as np
 from datetime import datetime
+
+
+def pil_image_to_jpeg_bytes(img: Image.Image, quality: int = 93) -> io.BytesIO:
+    """
+    Encode a PIL image as high-quality JPEG for embedding in documents (smaller than PNG
+    at typical report display sizes). Uses 4:4:4 chroma when supported for sharper edges.
+    """
+    work = img
+    if work.mode in ("RGBA", "LA"):
+        background = Image.new("RGB", work.size, (255, 255, 255))
+        alpha = work.split()[-1]
+        background.paste(work, mask=alpha)
+        work = background
+    elif work.mode == "P":
+        work = work.convert("RGBA")
+        background = Image.new("RGB", work.size, (255, 255, 255))
+        background.paste(work, mask=work.split()[-1])
+        work = background
+    elif work.mode != "RGB":
+        work = work.convert("RGB")
+    buf = io.BytesIO()
+    try:
+        work.save(
+            buf,
+            format="JPEG",
+            quality=quality,
+            optimize=True,
+            subsampling=0,
+            progressive=True,
+        )
+    except TypeError:
+        buf = io.BytesIO()
+        try:
+            work.save(
+                buf,
+                format="JPEG",
+                quality=quality,
+                optimize=True,
+                progressive=True,
+            )
+        except TypeError:
+            buf = io.BytesIO()
+            work.save(buf, format="JPEG", quality=quality, optimize=True)
+    buf.seek(0)
+    return buf
+
+
+def resize_pil_to_fit_box(img: Image.Image, max_width: int, max_height: int) -> Image.Image:
+    """
+    Downscale so the image fits within max_width x max_height while preserving aspect ratio.
+    Used so embedded JPEGs match on-page display size (keeps .docx small).
+    """
+    if max_width <= 0 or max_height <= 0:
+        return img
+    w, h = img.size
+    if w <= max_width and h <= max_height:
+        return img
+    scale = min(max_width / float(w), max_height / float(h))
+    nw = max(1, int(round(w * scale)))
+    nh = max(1, int(round(h * scale)))
+    try:
+        resample = Image.Resampling.LANCZOS
+    except AttributeError:
+        resample = Image.LANCZOS  # type: ignore[attr-defined]
+    return img.resize((nw, nh), resample)
+
 
 class ImageAnnotationCropper:
     def __init__(self, image_data_list: Union[dict, List[dict]]):
@@ -35,9 +102,17 @@ class ImageAnnotationCropper:
                 print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Downloading image {idx+1}/{len(self.image_data_list)}...")
                 response = requests.get(image_data['url'])
                 response.raise_for_status()
-                pil_image = Image.open(io.BytesIO(response.content))
+                # Large orthomosaics can exceed Pillow's decompression guard; decode then downscale in-process.
+                _prev_max_pixels = getattr(Image, "MAX_IMAGE_PIXELS", None)
+                try:
+                    Image.MAX_IMAGE_PIXELS = None
+                    pil_image = Image.open(io.BytesIO(response.content))
+                    pil_image.load()
+                finally:
+                    Image.MAX_IMAGE_PIXELS = _prev_max_pixels
                 self.images.append((image_data, pil_image))
-                print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✓ [{idx+1}/{len(self.image_data_list)}] Downloaded: {image_data['info']['width']}x{image_data['info']['height']} ({len(response.content)} bytes)")
+                aw, ah = pil_image.size
+                print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✓ [{idx+1}/{len(self.image_data_list)}] Downloaded: {aw}x{ah} ({len(response.content)} bytes)")
             except Exception as e:
                 print(f"[ERROR] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✗ [{idx+1}/{len(self.image_data_list)}] Error downloading image: {e}")
                 # Store None for failed downloads
@@ -46,7 +121,60 @@ class ImageAnnotationCropper:
         successful = sum(1 for _, img in self.images if img is not None)
         print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✓ Download complete: {successful}/{len(self.image_data_list)} images successfully downloaded\n")
         return self.images
-    
+
+    def downscale_images_for_report(
+        self,
+        max_long_edge: Union[int, None] = 4096,
+        max_megapixels: Union[float, None] = 45.0,
+    ) -> None:
+        """
+        Resize decoded images in-place so condition-report work stays within memory and
+        matches normalized annotation coordinates to the pixels we actually draw on.
+
+        :param max_long_edge: If set, scale so max(width, height) is at most this many pixels.
+        :param max_megapixels: If set, scale so width * height is at most this many megapixels.
+        Pass ``None`` for either limit to disable that constraint (both ``None`` skips scaling).
+        """
+        if max_long_edge is None and max_megapixels is None:
+            for idx, (image_data, pil_image) in enumerate(self.images):
+                if pil_image is None:
+                    continue
+                w, h = pil_image.size
+                image_data["info"]["width"] = w
+                image_data["info"]["height"] = h
+            return
+
+        try:
+            resample = Image.Resampling.LANCZOS
+        except AttributeError:
+            resample = Image.LANCZOS  # type: ignore[attr-defined]
+
+        for idx, (image_data, pil_image) in enumerate(self.images):
+            if pil_image is None:
+                continue
+            w, h = pil_image.size
+            scale = 1.0
+            if max_long_edge is not None and max(w, h) > max_long_edge:
+                scale = min(scale, max_long_edge / float(max(w, h)))
+            if max_megapixels is not None:
+                mp = (w * h) / 1_000_000.0
+                if mp > max_megapixels:
+                    scale = min(scale, math.sqrt(max_megapixels / mp))
+            if scale >= 0.999:
+                image_data["info"]["width"] = w
+                image_data["info"]["height"] = h
+                continue
+            new_w = max(1, int(round(w * scale)))
+            new_h = max(1, int(round(h * scale)))
+            resized = pil_image.resize((new_w, new_h), resample)
+            image_data["info"]["width"] = new_w
+            image_data["info"]["height"] = new_h
+            self.images[idx] = (image_data, resized)
+            print(
+                f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] "
+                f"Downscaled for report: {w}x{h} -> {new_w}x{new_h} (scale {scale:.4f})"
+            )
+
     def flatten_points(self, points: Union[List[float], List[List[float]]]) -> List[float]:
         """
         Flatten nested point lists into a single flat list
@@ -161,11 +289,162 @@ class ImageAnnotationCropper:
         print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Expanded bbox: {expanded_bbox} (final size: {expanded_bbox[2]-expanded_bbox[0]}x{expanded_bbox[3]-expanded_bbox[1]})")
         return expanded_bbox
     
+    def enforce_minimum_crop_extent(
+        self,
+        bbox: Tuple[int, int, int, int],
+        image_width: int,
+        image_height: int,
+        min_width_fraction: float = 0.20,
+        min_height_fraction: float = 0.20,
+    ) -> Tuple[int, int, int, int]:
+        """
+        Expand the crop window (centered on the annotation) so each axis is at least a
+        fraction of the full image. Prevents tiny defects from being shown at extreme zoom
+        when embedded large in a document.
+        """
+        x_min, y_min, x_max, y_max = bbox
+        bw = x_max - x_min
+        bh = y_max - y_min
+        min_w = max(1, int(image_width * min_width_fraction))
+        min_h = max(1, int(image_height * min_height_fraction))
+        target_w = min(image_width, max(bw, min_w))
+        target_h = min(image_height, max(bh, min_h))
+        cx = (x_min + x_max) // 2
+        cy = (y_min + y_max) // 2
+        nx_min = cx - target_w // 2
+        ny_min = cy - target_h // 2
+        nx_max = nx_min + target_w
+        ny_max = ny_min + target_h
+        if nx_min < 0:
+            nx_max -= nx_min
+            nx_min = 0
+        if nx_max > image_width:
+            nx_min -= nx_max - image_width
+            nx_max = image_width
+        nx_min = max(0, nx_min)
+        if ny_min < 0:
+            ny_max -= ny_min
+            ny_min = 0
+        if ny_max > image_height:
+            ny_min -= ny_max - image_height
+            ny_max = image_height
+        ny_min = max(0, ny_min)
+        return (int(nx_min), int(ny_min), int(nx_max), int(ny_max))
+
+    def _flatten_rgba_to_rgb(self, rgba: Image.Image, bg=(255, 255, 255)) -> Image.Image:
+        rgb = Image.new('RGB', rgba.size, bg)
+        if rgba.mode == 'RGBA':
+            rgb.paste(rgba, mask=rgba.split()[3])
+        else:
+            rgb.paste(rgba)
+        return rgb
+
+    def _draw_bold_rectangle_outline(
+        self,
+        draw: ImageDraw.ImageDraw,
+        box: Tuple[int, int, int, int],
+        color: Tuple[int, int, int, int],
+        thickness: int = 10,
+        outer_color: Tuple[int, int, int, int] = (90, 12, 0, 255),
+    ) -> None:
+        """Draw a thick border by stacking outline rectangles (PIL width is limited per stroke)."""
+        x0, y0, x1, y1 = box
+        for i in range(thickness):
+            stroke = outer_color if i < thickness - 3 else color
+            draw.rectangle(
+                [x0 - i, y0 - i, x1 + i, y1 + i],
+                outline=stroke,
+                width=1,
+            )
+
+    def _draw_arrow_line(
+        self,
+        draw: ImageDraw.ImageDraw,
+        start: Tuple[float, float],
+        end: Tuple[float, float],
+        fill: Tuple[int, int, int, int],
+        line_width: int = 4,
+        head_len: float = 22.0,
+    ) -> None:
+        draw.line([start, end], fill=fill, width=line_width)
+        ang = math.atan2(end[1] - start[1], end[0] - start[0])
+        p1 = (end[0] - head_len * math.cos(ang - 0.45), end[1] - head_len * math.sin(ang - 0.45))
+        p2 = (end[0] - head_len * math.cos(ang + 0.45), end[1] - head_len * math.sin(ang + 0.45))
+        draw.polygon(
+            [(int(round(end[0])), int(round(end[1]))), (int(round(p1[0])), int(round(p1[1]))), (int(round(p2[0])), int(round(p2[1])))],
+            fill=fill,
+        )
+
+    def highlight_crop_callout_on_image(
+        self,
+        image: Image.Image,
+        crop_bbox: Tuple[int, int, int, int],
+    ) -> Image.Image:
+        """
+        Draw a translucent tint, a bold frame, and an arrow from the nearest image edge
+        toward the crop region so readers can match the detail view to the full photo.
+        """
+        x0, y0, x1, y1 = crop_bbox
+        W, H = image.size
+        cx = (x0 + x1) / 2.0
+        cy = (y0 + y1) / 2.0
+        margin = max(24, min(W, H) // 40)
+        # Dark orange/red callout — visible on concrete and varied backgrounds
+        accent = (185, 35, 0, 255)
+        tint = (200, 55, 0, 130)
+
+        base = image.copy()
+        if base.mode != 'RGBA':
+            base = base.convert('RGBA')
+        overlay = Image.new('RGBA', base.size, (0, 0, 0, 0))
+        od = ImageDraw.Draw(overlay)
+        od.rectangle([x0, y0, x1, y1], fill=tint)
+        base = Image.alpha_composite(base, overlay)
+        draw = ImageDraw.Draw(base)
+        frame_pad = 2
+        frame_box = (
+            max(0, x0 - frame_pad),
+            max(0, y0 - frame_pad),
+            min(W - 1, x1 + frame_pad),
+            min(H - 1, y1 + frame_pad),
+        )
+        self._draw_bold_rectangle_outline(
+            draw, frame_box, accent, thickness=12, outer_color=(90, 12, 0, 255)
+        )
+
+        dist_top = cy
+        dist_bottom = H - cy
+        dist_left = cx
+        dist_right = W - cx
+        dists = [dist_top, dist_bottom, dist_left, dist_right]
+        idx = min(range(4), key=lambda i: dists[i])
+        if idx == 0:
+            start = (max(margin, min(W - margin, cx)), margin)
+        elif idx == 1:
+            start = (max(margin, min(W - margin, cx)), H - margin)
+        elif idx == 2:
+            start = (margin, max(margin, min(H - margin, cy)))
+        else:
+            start = (W - margin, max(margin, min(H - margin, cy)))
+
+        vx, vy = cx - start[0], cy - start[1]
+        L = math.hypot(vx, vy)
+        if L > 15:
+            shorten = min(28.0, L * 0.08)
+            unit_x, unit_y = vx / L, vy / L
+            end = (cx - shorten * unit_x, cy - shorten * unit_y)
+            self._draw_arrow_line(draw, start, end, accent, line_width=5, head_len=22.0)
+
+        return self._flatten_rgba_to_rgb(base)
+
     def crop_annotation(self, image: Image.Image, annotation: dict, 
                        image_width: int, image_height: int,
-                       padding_percent: float = 0.2) -> Tuple[Image.Image, Tuple[int, int, int, int]]:
+                       padding_percent: float = 0.2,
+                       min_crop_width_fraction: float = 0.20,
+                       min_crop_height_fraction: float = 0.20) -> Tuple[Image.Image, Tuple[int, int, int, int]]:
         """
-        Crop the image around an annotation with padding
+        Crop the image around an annotation with padding, then ensure a minimum crop
+        extent so the detail is not shown at extreme zoom in reports.
         Returns None if cropping fails
         """
         try:
@@ -178,6 +457,13 @@ class ImageAnnotationCropper:
                 return None, None
             
             expanded_bbox = self.expand_bbox(bbox, image_width, image_height, padding_percent)
+            expanded_bbox = self.enforce_minimum_crop_extent(
+                expanded_bbox,
+                image_width,
+                image_height,
+                min_crop_width_fraction,
+                min_crop_height_fraction,
+            )
             
             # Validate bbox
             if expanded_bbox[2] <= expanded_bbox[0] or expanded_bbox[3] <= expanded_bbox[1]:
