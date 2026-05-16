@@ -232,6 +232,19 @@
 
 <dl class="py function">
 <dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">html_to_plain_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html_content</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span></dt>
+<dd><p>Strip HTML tags from API fields (e.g. project description) for use in Word tables.
+Block elements become line breaks; link URLs are appended in parentheses.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">safe_condition_report_filename_stem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span></dt>
+<dd><p>Build a filesystem-safe segment from the project name for report filenames.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py">
 <span class="sig-prename descclassname"><span class="pre">t2d2_sdk.</span></span><span class="sig-name descname"><span class="pre">ts2date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ts</span></span></em><span class="sig-paren">)</span></dt>
 <dd><p>Convert a Unix timestamp to a human-readable date string.</p>
 <dl class="field-list">
@@ -1699,7 +1712,7 @@ This operation is irreversible.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="t2d2_sdk.T2D2.generate_condition_report_document">
-<span class="sig-name descname"><span class="pre">generate_condition_report_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'condition_report.docx'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.generate_condition_report_document" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">generate_condition_report_document</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_percent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_min_width_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crop_min_height_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_orthomosaics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_max_long_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_max_megapixels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_jpeg_quality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">92</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_embed_dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">220</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#t2d2_sdk.T2D2.generate_condition_report_document" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a Word document with condition report for images and their annotations.</p>
 <p>Creates a Word document with:</p>
 <ul class="simple">
@@ -1715,31 +1728,71 @@ This operation is irreversible.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_ids</strong> (<em>list</em><em> or </em><em>None</em>) – List of specific image IDs to include, or None to include all images</p></li>
-<li><p><strong>output_path</strong> (<em>str</em>) – Path where the Word document should be saved</p></li>
+<li><p><strong>image_ids</strong> (<em>list</em><em> or </em><em>None</em>) – List of specific image IDs to include, or None to include all images.
+IDs are resolved with <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">…/images/{id}</span></code>, so orthomosaic images (type <code class="docutils literal notranslate"><span class="pre">3</span></code>) work
+the same as regular images when you pass their id (e.g. <code class="docutils literal notranslate"><span class="pre">image_ids=[694791]</span></code>).</p></li>
+<li><p><strong>output_path</strong> (<em>str</em><em> or </em><em>None</em>) – Path where the Word document should be saved. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, uses
+<code class="docutils literal notranslate"><span class="pre">{project_name}_condition_report.docx</span></code> in the current working directory (project name
+is sanitized for the filesystem).</p></li>
 <li><p><strong>padding_percent</strong> (<em>float</em>) – Percentage of padding to add around cropped annotations (0.0 to 1.0)</p></li>
+<li><p><strong>crop_min_width_fraction</strong> (<em>float</em>) – Minimum crop width as a fraction of the full image width (avoids extreme zoom on tiny marks)</p></li>
+<li><p><strong>crop_min_height_fraction</strong> (<em>float</em>) – Minimum crop height as a fraction of the full image height</p></li>
+<li><p><strong>include_orthomosaics</strong> (<em>bool</em>) – When <code class="docutils literal notranslate"><span class="pre">image_ids</span></code> is None, also include orthomosaic images
+(API image type <code class="docutils literal notranslate"><span class="pre">3</span></code>) that are not already in the default image list. Ignored when
+<code class="docutils literal notranslate"><span class="pre">image_ids</span></code> is provided.</p></li>
+<li><p><strong>report_max_long_edge</strong> (<em>int</em><em> or </em><em>None</em>) – After download, scale images so the longest side is at most
+this many pixels (reduces memory and .docx size). Orthomosaics are often far larger than
+needed for on-page figures. Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable this limit.</p></li>
+<li><p><strong>report_max_megapixels</strong> (<em>float</em><em> or </em><em>None</em>) – After download, cap total pixels (width * height) in millions.
+Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable. If both this and <code class="docutils literal notranslate"><span class="pre">report_max_long_edge</span></code> are <code class="docutils literal notranslate"><span class="pre">None</span></code>, no
+resolution downscaling is applied (not recommended for very large orthos).</p></li>
+<li><p><strong>report_jpeg_quality</strong> (<em>int</em>) – JPEG quality (1–100) for figures embedded in the Word file.</p></li>
+<li><p><strong>report_embed_dpi</strong> (<em>int</em>) – Target pixels-per-inch for images <strong>as embedded in the .docx</strong>
+(after layout). Pixel dimensions are capped to <code class="docutils literal notranslate"><span class="pre">display_size</span> <span class="pre">×</span> <span class="pre">report_embed_dpi</span></code> so
+files stay small while matching on-page width/height. Typical print range: 200–240.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Default image_ids<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 <dt class="field-odd">Default output_path<span class="colon">:</span></dt>
-<dd class="field-odd"><p>‘condition_report.docx’</p>
+<dd class="field-odd"><p>None</p>
 </dd>
 <dt class="field-even">Default padding_percent<span class="colon">:</span></dt>
 <dd class="field-even"><p>0.2</p>
 </dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path to the generated document</p>
+<dt class="field-odd">Default crop_min_width_fraction<span class="colon">:</span></dt>
+<dd class="field-odd"><p>0.20</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>str</p>
+<dt class="field-even">Default crop_min_height_fraction<span class="colon">:</span></dt>
+<dd class="field-even"><p>0.20</p>
 </dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ValueError</strong> – If no project is currently set</p>
+<dt class="field-odd">Default include_orthomosaics<span class="colon">:</span></dt>
+<dd class="field-odd"><p>False</p>
 </dd>
-<dt class="field-even">Example<span class="colon">:</span></dt>
-<dd class="field-even"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate report for all images</span>
+<dt class="field-even">Default report_max_long_edge<span class="colon">:</span></dt>
+<dd class="field-even"><p>4096</p>
+</dd>
+<dt class="field-odd">Default report_max_megapixels<span class="colon">:</span></dt>
+<dd class="field-odd"><p>45.0</p>
+</dd>
+<dt class="field-even">Default report_jpeg_quality<span class="colon">:</span></dt>
+<dd class="field-even"><p>92</p>
+</dd>
+<dt class="field-odd">Default report_embed_dpi<span class="colon">:</span></dt>
+<dd class="field-odd"><p>220</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Path to the generated document</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If no project is currently set</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Generate report for all images</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">doc_path</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">generate_condition_report_document</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Report saved to: </span><span class="si">{</span><span class="n">doc_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
