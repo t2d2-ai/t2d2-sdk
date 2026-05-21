@@ -1,3 +1,4 @@
+import logging
 import math
 import requests
 from PIL import Image, ImageDraw, ImageFont
@@ -8,6 +9,19 @@ from typing import List, Dict, Tuple, Union
 import os
 import numpy as np
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+if not logger.handlers:
+    _log_handler = logging.StreamHandler()
+    _log_handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+    logger.addHandler(_log_handler)
+    logger.setLevel(logging.INFO)
 
 
 def pil_image_to_jpeg_bytes(img: Image.Image, quality: int = 93) -> io.BytesIO:
@@ -83,23 +97,23 @@ class ImageAnnotationCropper:
         Args:
             image_data_list: Single image data dict or list of image data dicts
         """
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Initializing ImageAnnotationCropper...")
+        logger.info(f"Initializing ImageAnnotationCropper...")
 
         if isinstance(image_data_list, dict):
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Converting single dict to list format")
+            logger.info(f"Converting single dict to list format")
             image_data_list = [image_data_list]
         
         self.image_data_list = image_data_list
         self.images = []  # Will store (image_data, PIL_Image) tuples
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Initialized with {len(self.image_data_list)} image(s)")
+        logger.info(f"Initialized with {len(self.image_data_list)} image(s)")
         
     def download_images(self):
         """Download all images from URLs"""
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting download of {len(self.image_data_list)} images...")
+        logger.info(f"Starting download of {len(self.image_data_list)} images...")
         
         for idx, image_data in enumerate(self.image_data_list):
             try:
-                print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Downloading image {idx+1}/{len(self.image_data_list)}...")
+                logger.info(f"Downloading image {idx+1}/{len(self.image_data_list)}...")
                 response = requests.get(image_data['url'])
                 response.raise_for_status()
                 # Large orthomosaics can exceed Pillow's decompression guard; decode then downscale in-process.
@@ -112,14 +126,14 @@ class ImageAnnotationCropper:
                     Image.MAX_IMAGE_PIXELS = _prev_max_pixels
                 self.images.append((image_data, pil_image))
                 aw, ah = pil_image.size
-                print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✓ [{idx+1}/{len(self.image_data_list)}] Downloaded: {aw}x{ah} ({len(response.content)} bytes)")
+                logger.info(f"✓ [{idx+1}/{len(self.image_data_list)}] Downloaded: {aw}x{ah} ({len(response.content)} bytes)")
             except Exception as e:
-                print(f"[ERROR] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✗ [{idx+1}/{len(self.image_data_list)}] Error downloading image: {e}")
+                logger.error(f"✗ [{idx+1}/{len(self.image_data_list)}] Error downloading image: {e}")
                 # Store None for failed downloads
                 self.images.append((image_data, None))
         
         successful = sum(1 for _, img in self.images if img is not None)
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ✓ Download complete: {successful}/{len(self.image_data_list)} images successfully downloaded\n")
+        logger.info(f"✓ Download complete: {successful}/{len(self.image_data_list)} images successfully downloaded\n")
         return self.images
 
     def downscale_images_for_report(
@@ -170,10 +184,7 @@ class ImageAnnotationCropper:
             image_data["info"]["width"] = new_w
             image_data["info"]["height"] = new_h
             self.images[idx] = (image_data, resized)
-            print(
-                f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] "
-                f"Downscaled for report: {w}x{h} -> {new_w}x{new_h} (scale {scale:.4f})"
-            )
+            logger.info(f"Downscaled for report: {w}x{h} -> {new_w}x{new_h} (scale {scale:.4f})")
 
     def flatten_points(self, points: Union[List[float], List[List[float]]]) -> List[float]:
         """
@@ -198,7 +209,7 @@ class ImageAnnotationCropper:
         flat_points = self.flatten_points(normalized_points)
         
         if len(flat_points) % 2 != 0:
-            print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Odd number of coordinate values: {len(flat_points)}, truncating last value")
+            logger.warning(f"Odd number of coordinate values: {len(flat_points)}, truncating last value")
             flat_points = flat_points[:-1]
         
         pixel_coords = []
@@ -223,7 +234,7 @@ class ImageAnnotationCropper:
         pixel_coords = self.denormalize_coordinates(points, image_width, image_height)
         
         if len(pixel_coords) < 2:
-            print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Insufficient coordinates for bounding box: {len(pixel_coords)}")
+            logger.warning(f"Insufficient coordinates for bounding box: {len(pixel_coords)}")
             return None
         
         # Extract x and y coordinates separately
@@ -232,7 +243,7 @@ class ImageAnnotationCropper:
         
         # Validate coordinates
         if not x_coords or not y_coords:
-            print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Empty coordinate lists for bounding box")
+            logger.warning(f"Empty coordinate lists for bounding box")
             return None
         
         # Calculate bounding box (works for any shape type)
@@ -246,7 +257,7 @@ class ImageAnnotationCropper:
         y_max = max(0, min(y_max, image_height - 1))
         
         bbox = (x_min, y_min, x_max, y_max)
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Bounding box computed: {bbox} (size: {bbox[2]-bbox[0]}x{bbox[3]-bbox[1]})")
+        logger.info(f"Bounding box computed: {bbox} (size: {bbox[2]-bbox[0]}x{bbox[3]-bbox[1]})")
         return bbox
     
     def expand_bbox(self, bbox: Tuple[int, int, int, int], 
@@ -263,14 +274,14 @@ class ImageAnnotationCropper:
         
         # Ensure minimum size
         if width < min_size:
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Width {width} < min_size {min_size}, expanding to minimum")
+            logger.info(f"Width {width} < min_size {min_size}, expanding to minimum")
             center_x = (x_min + x_max) // 2
             x_min = center_x - min_size // 2
             x_max = center_x + min_size // 2
             width = min_size
             
         if height < min_size:
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Height {height} < min_size {min_size}, expanding to minimum")
+            logger.info(f"Height {height} < min_size {min_size}, expanding to minimum")
             center_y = (y_min + y_max) // 2
             y_min = center_y - min_size // 2
             y_max = center_y + min_size // 2
@@ -286,7 +297,7 @@ class ImageAnnotationCropper:
         y_max = min(image_height, y_max + padding_y)
         
         expanded_bbox = (x_min, y_min, x_max, y_max)
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Expanded bbox: {expanded_bbox} (final size: {expanded_bbox[2]-expanded_bbox[0]}x{expanded_bbox[3]-expanded_bbox[1]})")
+        logger.info(f"Expanded bbox: {expanded_bbox} (final size: {expanded_bbox[2]-expanded_bbox[0]}x{expanded_bbox[3]-expanded_bbox[1]})")
         return expanded_bbox
     
     def enforce_minimum_crop_extent(
@@ -448,12 +459,12 @@ class ImageAnnotationCropper:
         Returns None if cropping fails
         """
         try:
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Cropping annotation {annotation['id']}")
+            logger.info(f"Cropping annotation {annotation['id']}")
             points = annotation['points']
             bbox = self.get_bounding_box(points, image_width, image_height)
             
             if bbox is None:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Invalid bounding box for annotation {annotation['id']}")
+                logger.warning(f"Invalid bounding box for annotation {annotation['id']}")
                 return None, None
             
             expanded_bbox = self.expand_bbox(bbox, image_width, image_height, padding_percent)
@@ -467,21 +478,21 @@ class ImageAnnotationCropper:
             
             # Validate bbox
             if expanded_bbox[2] <= expanded_bbox[0] or expanded_bbox[3] <= expanded_bbox[1]:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Invalid bbox dimensions for annotation {annotation['id']}")
+                logger.warning(f"Invalid bbox dimensions for annotation {annotation['id']}")
                 return None, None
             
             cropped = image.crop(expanded_bbox)
             
             # Verify cropped image is valid
             if cropped.size[0] == 0 or cropped.size[1] == 0:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Zero-size crop for annotation {annotation['id']}")
+                logger.warning(f"Zero-size crop for annotation {annotation['id']}")
                 return None, None
             
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Successfully cropped annotation {annotation['id']}, size: {cropped.size[0]}x{cropped.size[1]}")
+            logger.info(f"Successfully cropped annotation {annotation['id']}, size: {cropped.size[0]}x{cropped.size[1]}")
             return cropped, expanded_bbox
             
         except Exception as e:
-            print(f"[ERROR] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Failed to crop annotation {annotation['id']}: {e}")
+            logger.error(f"Failed to crop annotation {annotation['id']}: {e}")
             return None, None
     
     def draw_annotation_on_image(self, image: Image.Image, annotation: dict,
@@ -491,7 +502,7 @@ class ImageAnnotationCropper:
         Draw annotation overlay on image
         """
         try:
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Drawing annotation {annotation['id']} on image (shape type: {annotation['shape']})")
+            logger.info(f"Drawing annotation {annotation['id']} on image (shape type: {annotation['shape']})")
             img_copy = image.copy()
             draw = ImageDraw.Draw(img_copy, 'RGBA')
             
@@ -525,14 +536,14 @@ class ImageAnnotationCropper:
                         width=3
                     )
                 else:
-                    print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Rectangle annotation {annotation['id']} has insufficient points: {len(pixel_coords)}")
+                    logger.warning(f"Rectangle annotation {annotation['id']} has insufficient points: {len(pixel_coords)}")
             elif shape == 4:  # Polygon
                 coords_list = [(pixel_coords[i], pixel_coords[i+1]) 
                               for i in range(0, len(pixel_coords), 2)]
                 if len(coords_list) >= 3:
                     draw.polygon(coords_list, outline=outline_color, fill=fill_color, width=3)
                 else:
-                    print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Polygon annotation {annotation['id']} has insufficient points: {len(coords_list)}")
+                    logger.warning(f"Polygon annotation {annotation['id']} has insufficient points: {len(coords_list)}")
             elif shape == 8:  # Point
                 if len(pixel_coords) >= 2:
                     radius = 15
@@ -544,17 +555,17 @@ class ImageAnnotationCropper:
                         width=3
                     )
                 else:
-                    print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Point annotation {annotation['id']} has insufficient points: {len(pixel_coords)}")
+                    logger.warning(f"Point annotation {annotation['id']} has insufficient points: {len(pixel_coords)}")
             elif shape == 5:  # Line/Polyline
                 coords_list = [(pixel_coords[i], pixel_coords[i+1]) 
                               for i in range(0, len(pixel_coords), 2)]
                 if len(coords_list) >= 2:
                     draw.line(coords_list, fill=outline_color, width=3)
                 else:
-                    print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Line annotation {annotation['id']} has insufficient points: {len(coords_list)}")
+                    logger.warning(f"Line annotation {annotation['id']} has insufficient points: {len(coords_list)}")
             else:
                 # Fallback for unknown shape types: draw bounding box
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Unknown shape type {shape} for annotation {annotation['id']}, drawing bounding box")
+                logger.warning(f"Unknown shape type {shape} for annotation {annotation['id']}, drawing bounding box")
                 coords_list = [(pixel_coords[i], pixel_coords[i+1]) 
                               for i in range(0, len(pixel_coords), 2)]
                 if len(coords_list) >= 2:
@@ -569,11 +580,11 @@ class ImageAnnotationCropper:
                             width=3
                         )
             
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Successfully drew annotation {annotation['id']}")
+            logger.info(f"Successfully drew annotation {annotation['id']}")
             return img_copy
             
         except Exception as e:
-            print(f"[ERROR] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Failed to draw annotation {annotation['id']}: {e}")
+            logger.error(f"Failed to draw annotation {annotation['id']}: {e}")
             return image
     
     def create_visualization(self, output_path: str = 'annotation_crops.png', 
@@ -581,17 +592,17 @@ class ImageAnnotationCropper:
         """
         Create a visualization showing all images with their cropped annotations
         """
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting visualization creation...")
+        logger.info(f"Starting visualization creation...")
         if not self.images:
             self.download_images()
         
         # Process each image
         for img_idx, (image_data, pil_image) in enumerate(self.images):
             if pil_image is None:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Skipping image {img_idx + 1} (download failed)")
+                logger.warning(f"Skipping image {img_idx + 1} (download failed)")
                 continue
             
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Processing image {img_idx + 1} for visualization...")
+            logger.info(f"Processing image {img_idx + 1} for visualization...")
             image_width = image_data['info']['width']
             image_height = image_data['info']['height']
             annotations = image_data['annotations']
@@ -600,7 +611,7 @@ class ImageAnnotationCropper:
             visible_annotations = [ann for ann in annotations if ann.get('visible', True)]
             
             if len(visible_annotations) == 0:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] No visible annotations found in image {img_idx + 1}!")
+                logger.warning(f"No visible annotations found in image {img_idx + 1}!")
                 continue
             
             # Create output path for this image
@@ -613,10 +624,10 @@ class ImageAnnotationCropper:
             # Create output directory if it doesn't exist
             output_dir = os.path.dirname(img_output_path) if os.path.dirname(img_output_path) else '.'
             os.makedirs(output_dir, exist_ok=True)
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Output directory ready: {output_dir}")
+            logger.info(f"Output directory ready: {output_dir}")
             
             # Pre-process crops to filter out failed ones
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Processing {len(visible_annotations)} visible annotations...")
+            logger.info(f"Processing {len(visible_annotations)} visible annotations...")
             successful_crops = []
             for ann in visible_annotations:
                 cropped_img, crop_bbox = self.crop_annotation(
@@ -626,15 +637,15 @@ class ImageAnnotationCropper:
                     successful_crops.append((ann, cropped_img, crop_bbox))
             
             if len(successful_crops) == 0:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] No valid crops could be created for image {img_idx + 1}!")
+                logger.warning(f"No valid crops could be created for image {img_idx + 1}!")
                 continue
             
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Image {img_idx + 1}: Successfully cropped {len(successful_crops)}/{len(visible_annotations)} annotations")
+            logger.info(f"Image {img_idx + 1}: Successfully cropped {len(successful_crops)}/{len(visible_annotations)} annotations")
             
             # Create figure with subplots
             cols = 3
             rows = 1 + ((len(successful_crops) + cols - 1) // cols)
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Creating visualization figure: {rows} rows x {cols} cols")
+            logger.info(f"Creating visualization figure: {rows} rows x {cols} cols")
             
             fig = plt.figure(figsize=(18, 5 * rows))
             
@@ -693,12 +704,12 @@ class ImageAnnotationCropper:
                 ax.axis('off')
             
             plt.tight_layout()
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saving visualization to {img_output_path}...")
+            logger.info(f"Saving visualization to {img_output_path}...")
             plt.savefig(img_output_path, dpi=150, bbox_inches='tight')
             plt.close(fig)
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Visualization saved to {img_output_path}\n")
+            logger.info(f"Visualization saved to {img_output_path}\n")
         
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Visualization creation complete")
+        logger.info(f"Visualization creation complete")
         return True
     
     def save_individual_crops(self, output_dir: str = 'crops', 
@@ -706,9 +717,9 @@ class ImageAnnotationCropper:
         """
         Save each cropped annotation as individual image files for all images
         """
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting to save individual crops to directory: {output_dir}")
+        logger.info(f"Starting to save individual crops to directory: {output_dir}")
         os.makedirs(output_dir, exist_ok=True)
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Output directory created/verified: {output_dir}")
+        logger.info(f"Output directory created/verified: {output_dir}")
         
         if not self.images:
             self.download_images()
@@ -718,7 +729,7 @@ class ImageAnnotationCropper:
         
         for img_idx, (image_data, pil_image) in enumerate(self.images):
             if pil_image is None:
-                print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Skipping image {img_idx + 1} (download failed)")
+                logger.warning(f"Skipping image {img_idx + 1} (download failed)")
                 continue
             
             image_width = image_data['info']['width']
@@ -728,7 +739,7 @@ class ImageAnnotationCropper:
             visible_annotations = [ann for ann in annotations if ann.get('visible', True)]
             total_annotations += len(visible_annotations)
             
-            print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Processing Image {img_idx + 1}: {len(visible_annotations)} visible annotations")
+            logger.info(f"Processing Image {img_idx + 1}: {len(visible_annotations)} visible annotations")
             
             for idx, ann in enumerate(visible_annotations):
                 class_name = ann['annotation_class']['annotation_class_name']
@@ -740,7 +751,7 @@ class ImageAnnotationCropper:
                 )
                 
                 if cropped_img is None or bbox is None:
-                    print(f"[WARNING] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Skipping annotation {ann_id} (crop failed)")
+                    logger.warning(f"Skipping annotation {ann_id} (crop failed)")
                     continue
                 
                 cropped_with_annotation = self.draw_annotation_on_image(
@@ -751,16 +762,16 @@ class ImageAnnotationCropper:
                 filename = f"{output_dir}/img{img_idx + 1}_crop_{ann_id}_{class_name}.jpg"
                 cropped_with_annotation.save(filename, quality=95)
                 total_saved += 1
-                print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Saved: {filename}")
+                logger.info(f"Saved: {filename}")
         
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Total crops saved: {total_saved}/{total_annotations} across {len(self.images)} images")
+        logger.info(f"Total crops saved: {total_saved}/{total_annotations} across {len(self.images)} images")
         return total_saved
     
     def get_summary(self):
         """
         Get summary statistics for all images
         """
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Generating summary statistics...")
+        logger.info(f"Generating summary statistics...")
         if not self.images:
             self.download_images()
         
@@ -782,5 +793,5 @@ class ImageAnnotationCropper:
             }
             summary['images'].append(img_info)
         
-        print(f"[INFO] [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Summary generated: {summary['total_images']} images, {summary['successful_downloads']} successful downloads, {summary['failed_downloads']} failed downloads")
+        logger.info(f"Summary generated: {summary['total_images']} images, {summary['successful_downloads']} successful downloads, {summary['failed_downloads']} failed downloads")
         return summary

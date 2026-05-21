@@ -39,6 +39,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)  # Use INFO level only - DEBUG messages will be filtered
 from docx import Document
 from docx.shared import Inches, Pt, RGBColor
+from docx.enum.table import WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
@@ -419,6 +420,113 @@ def _report_title_case(text: str) -> str:
     return " ".join(out)
 
 
+def _image_is_orthomosaic(image: dict) -> bool:
+    """Return True when the image record is an orthomosaic (type 3 or ortho URL/path)."""
+    image_type = image.get("image_type", image.get("type"))
+    try:
+        if int(image_type) == 3:
+            return True
+    except (TypeError, ValueError):
+        pass
+    url = (
+        image.get("url")
+        or image.get("image_url")
+        or image.get("s3_url")
+        or image.get("file_url")
+        or ""
+    )
+    filename = image.get("filename") or ""
+    combined = f"{url} {filename}".lower()
+    return "orthomosaic" in combined or "/orthomosaics/" in combined
+
+
+def _get_project_measurement_unit(project: dict):
+    """Best-effort measurement unit from the active project payload."""
+    if not project:
+        return None
+    candidates = [
+        project.get("unit"),
+        project.get("measurement_unit"),
+        (project.get("settings") or {}).get("unit"),
+        (project.get("settings") or {}).get("measurement_unit"),
+        (project.get("profile") or {}).get("unit"),
+        (project.get("profile") or {}).get("measurement_unit"),
+        (project.get("config") or {}).get("unit"),
+    ]
+    measurement = project.get("measurement")
+    if isinstance(measurement, dict):
+        candidates.append(measurement.get("unit"))
+    for value in candidates:
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return None
+
+
+def _format_condition_report_image_size(
+    width,
+    height,
+    project: dict,
+    image_meta: dict = None,
+) -> str:
+    """Pixel dimensions; physical size when image scale is available; project unit label."""
+    try:
+        w = int(width)
+        h = int(height)
+    except (TypeError, ValueError):
+        return "N/A"
+    unit = _get_project_measurement_unit(project)
+    scale = (image_meta or {}).get("scale") if image_meta else None
+    if isinstance(scale, dict):
+        scale_value = scale.get("value")
+        if scale_value is None:
+            scale_value = scale.get("pixel_size") or scale.get("size")
+        if scale_value is not None:
+            try:
+                sv = float(scale_value)
+                scale_unit = scale.get("unit") or unit or ""
+                pw = w * sv
+                ph = h * sv
+                if scale_unit:
+                    return f"{w} × {h} px ({pw:.2f} × {ph:.2f} {scale_unit})"
+                return f"{w} × {h} px ({pw:.2f} × {ph:.2f})"
+            except (TypeError, ValueError):
+                pass
+    if unit:
+        return f"{w} × {h} px ({unit})"
+    return f"{w} × {h} px"
+
+
+def _resolve_condition_report_page_layout(
+    is_orthomosaic: bool,
+    padding_percent: float,
+    crop_min_width_fraction: float,
+    crop_min_height_fraction: float,
+) -> dict:
+    """
+    On-page figure sizes and crop behaviour. Cropped detail is shown larger than the
+    full-image overview. Orthomosaics use a tighter crop (closer aspect to the mark).
+    """
+    if is_orthomosaic:
+        return {
+            "crop_max_w_in": 6.5,
+            "crop_max_h_in": 4.0,
+            "full_max_w_in": 4.5,
+            "full_max_h_in": 2.25,
+            "padding_percent": 0.12,
+            "crop_min_width_fraction": 0.06,
+            "crop_min_height_fraction": 0.06,
+        }
+    return {
+        "crop_max_w_in": 6.0,
+        "crop_max_h_in": 3.5,
+        "full_max_w_in": 4.25,
+        "full_max_h_in": 2.0,
+        "padding_percent": padding_percent,
+        "crop_min_width_fraction": crop_min_width_fraction,
+        "crop_min_height_fraction": crop_min_height_fraction,
+    }
+
+
 def _docx_picture_size_inches(pil_image, max_width_in: float, max_height_in: float):
     w_px, h_px = pil_image.size
     if w_px <= 0 or h_px <= 0:
@@ -467,9 +575,24 @@ def _docx_add_figure_caption(doc, text: str, space_after_pt: int = 6, keep_with_
     run.font.color.rgb = RGBColor(0x4A, 0x55, 0x68)
 
 
-def _docx_format_report_table(table, label_width_in: float = 1.75) -> None:
+def _docx_format_report_table(
+    table,
+    label_width_in: float = 1.75,
+    *,
+    center: bool = False,
+    table_width_in: float | None = None,
+) -> None:
     _docx_set_table_borders(table)
-    table.columns[0].width = Inches(label_width_in)
+    table.autofit = False
+    if table_width_in is not None:
+        table.width = Inches(table_width_in)
+        table.columns[0].width = Inches(label_width_in)
+        if len(table.columns) > 1:
+            table.columns[1].width = Inches(max(1.0, table_width_in - label_width_in))
+    else:
+        table.columns[0].width = Inches(label_width_in)
+    if center:
+        table.alignment = WD_TABLE_ALIGNMENT.CENTER
     for row_idx, row in enumerate(table.rows):
         for col_idx, cell in enumerate(row.cells):
             _docx_set_cell_margins(cell)
@@ -1117,6 +1240,7 @@ class T2D2(object):
             "created_by": self.project.get("created_by", ""),
             "created_at": ts2date(self.project["created_at"]),
             "statistics": self.project.get("statistics", {}),
+            "measurement_unit": _get_project_measurement_unit(self.project),
         }
 
     ################################################################################################
@@ -2335,10 +2459,11 @@ class T2D2(object):
         crop_min_width_fraction=0.20,
         crop_min_height_fraction=0.20,
         include_orthomosaics=False,
-        report_max_long_edge=4096,
-        report_max_megapixels=45.0,
-        report_jpeg_quality=92,
-        report_embed_dpi=220,
+        report_max_long_edge=None,
+        report_max_megapixels=None,
+        report_jpeg_quality=None,
+        report_embed_dpi=None,
+        orthomosaic_report=None,
     ):
         """
         Generate a Word document with condition report for images and their annotations.
@@ -2383,26 +2508,34 @@ class T2D2(object):
         :default include_orthomosaics: False
         
         :param report_max_long_edge: After download, scale images so the longest side is at most
-            this many pixels (reduces memory and .docx size). Orthomosaics are often far larger than
-            needed for on-page figures. Pass ``None`` to disable this limit.
+            this many pixels (reduces memory and .docx size). Pass ``None`` to disable. When
+            omitted, uses **3200** for regular photos (target ~10–20 MB) and **8192** for
+            orthomosaic-only reports (target ~20–30 MB).
         :type report_max_long_edge: int or None
-        :default report_max_long_edge: 4096
+        :default report_max_long_edge: None (profile default)
         
         :param report_max_megapixels: After download, cap total pixels (width * height) in millions.
-            Pass ``None`` to disable. If both this and ``report_max_long_edge`` are ``None``, no
-            resolution downscaling is applied (not recommended for very large orthos).
+            Pass ``None`` to disable. When omitted, uses **28** for photos and **120** for
+            orthomosaic-only reports.
         :type report_max_megapixels: float or None
-        :default report_max_megapixels: 45.0
+        :default report_max_megapixels: None (profile default)
         
         :param report_jpeg_quality: JPEG quality (1–100) for figures embedded in the Word file.
+            When omitted, uses **25** for photos and **85** for orthomosaic-only reports.
         :type report_jpeg_quality: int
-        :default report_jpeg_quality: 92
+        :default report_jpeg_quality: None (profile default)
         
         :param report_embed_dpi: Target pixels-per-inch for images **as embedded in the .docx**
-            (after layout). Pixel dimensions are capped to ``display_size × report_embed_dpi`` so
-            files stay small while matching on-page width/height. Typical print range: 200–240.
+            (after layout). Pixel dimensions are capped to ``display_size × report_embed_dpi``.
+            When omitted, uses **150** for photos and **280** for orthomosaic-only reports.
         :type report_embed_dpi: int
-        :default report_embed_dpi: 220
+        :default report_embed_dpi: None (profile default)
+        
+        :param orthomosaic_report: Force embed profile selection. ``True`` always uses the
+            orthomosaic profile; ``False`` always uses the standard photo profile; ``None``
+            (default) auto-detects from image type and URL.
+        :type orthomosaic_report: bool or None
+        :default orthomosaic_report: None
         
         :return: Path to the generated document
         :rtype: str
@@ -2508,13 +2641,71 @@ class T2D2(object):
                 'image_id': img.get('id'),
                 'filename': img.get('filename', ''),
                 'region': img.get('region', {}),
-                'tags': img.get('tags', [])
+                'tags': img.get('tags', []),
+                'image_type': img.get('image_type') or img.get('type'),
+                'scale': img.get('scale'),
             }
+            if _image_is_orthomosaic(
+                {
+                    "image_type": image_data["image_type"],
+                    "url": image_url,
+                    "filename": image_data["filename"],
+                }
+            ):
+                image_data["image_type"] = image_data["image_type"] or 3
             image_data_list.append(image_data)
         
         if not image_data_list:
             logger.error("No images with annotations found for condition report")
             raise ValueError("No images with annotations found")
+        
+        detected_orthomosaic = all(
+            _image_is_orthomosaic(
+                {
+                    "image_type": d.get("image_type"),
+                    "url": d.get("url"),
+                    "filename": d.get("filename"),
+                }
+            )
+            for d in image_data_list
+        )
+        if orthomosaic_report is True:
+            all_orthomosaic_report = True
+        elif orthomosaic_report is False:
+            all_orthomosaic_report = False
+        else:
+            all_orthomosaic_report = detected_orthomosaic
+        _report_profile = (
+            {
+                "report_max_long_edge": 8192,
+                "report_max_megapixels": 120.0,
+                "report_jpeg_quality": 85,
+                "report_embed_dpi": 280,
+            }
+            if all_orthomosaic_report
+            else {
+                "report_max_long_edge": 3200,
+                "report_max_megapixels": 28.0,
+                "report_jpeg_quality": 25,
+                "report_embed_dpi": 150,
+            }
+        )
+        if report_max_long_edge is None:
+            report_max_long_edge = _report_profile["report_max_long_edge"]
+        if report_max_megapixels is None:
+            report_max_megapixels = _report_profile["report_max_megapixels"]
+        if report_jpeg_quality is None:
+            report_jpeg_quality = _report_profile["report_jpeg_quality"]
+        if report_embed_dpi is None:
+            report_embed_dpi = _report_profile["report_embed_dpi"]
+        logger.info(
+            "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s)",
+            "orthomosaic" if all_orthomosaic_report else "standard",
+            report_jpeg_quality,
+            report_embed_dpi,
+            report_max_long_edge,
+            report_max_megapixels,
+        )
         
         logger.info(f"Processing {len(image_data_list)} images with annotations")
         
@@ -2539,16 +2730,7 @@ class T2D2(object):
             os.path.dirname(os.path.dirname(__file__)), "t2d2_image", "t2d2.png"
         )
         _CONTENT_W_IN = 6.5
-        # Cropped detail smaller; full image larger — sized to fill the page above the table
-        _CROP_MAX_W_IN = 4.5
-        _CROP_MAX_H_IN = 2.35
-        _FULL_MAX_W_IN = 6.5
-        _FULL_MAX_H_IN = 4.65
         _edpi = float(report_embed_dpi)
-        _crop_embed_px_w = max(1, int(round(_CROP_MAX_W_IN * _edpi)))
-        _crop_embed_px_h = max(1, int(round(_CROP_MAX_H_IN * _edpi)))
-        _full_embed_px_w = max(1, int(round(_FULL_MAX_W_IN * _edpi)))
-        _full_embed_px_h = max(1, int(round(_FULL_MAX_H_IN * _edpi)))
 
         _docx_setup_condition_report_section(
             doc.sections[0],
@@ -2568,13 +2750,40 @@ class T2D2(object):
             if pil_image is None:
                 continue
             
-            image_width = image_data['info']['width']
-            image_height = image_data['info']['height']
+            image_width = pil_image.size[0]
+            image_height = pil_image.size[1]
             annotations = image_data['annotations']
             image_id = image_data.get('image_id', '')
             filename = image_data.get('filename', '')
             region = image_data.get('region', {})
             tags = image_data.get('tags', [])
+            is_ortho_image = all_orthomosaic_report or _image_is_orthomosaic(
+                {
+                    "image_type": image_data.get("image_type"),
+                    "url": image_data.get("url"),
+                    "filename": image_data.get("filename"),
+                }
+            )
+            page_layout = _resolve_condition_report_page_layout(
+                is_ortho_image,
+                padding_percent,
+                crop_min_width_fraction,
+                crop_min_height_fraction,
+            )
+            crop_max_w_in = page_layout["crop_max_w_in"]
+            crop_max_h_in = page_layout["crop_max_h_in"]
+            full_max_w_in = page_layout["full_max_w_in"]
+            full_max_h_in = page_layout["full_max_h_in"]
+            crop_embed_px_w = max(1, int(round(crop_max_w_in * _edpi)))
+            crop_embed_px_h = max(1, int(round(crop_max_h_in * _edpi)))
+            full_embed_px_w = max(1, int(round(full_max_w_in * _edpi)))
+            full_embed_px_h = max(1, int(round(full_max_h_in * _edpi)))
+            image_size_label = _format_condition_report_image_size(
+                image_width,
+                image_height,
+                self.project,
+                image_data,
+            )
             
             # Get portal URL (construct from base_url and project/image IDs)
             portal_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}/images/{image_id}"
@@ -2599,9 +2808,9 @@ class T2D2(object):
                     ann,
                     image_width,
                     image_height,
-                    padding_percent,
-                    crop_min_width_fraction,
-                    crop_min_height_fraction,
+                    page_layout["padding_percent"],
+                    page_layout["crop_min_width_fraction"],
+                    page_layout["crop_min_height_fraction"],
                 )
                 
                 if cropped_img is None or crop_bbox is None:
@@ -2611,7 +2820,7 @@ class T2D2(object):
                     cropped_img, ann, image_width, image_height, crop_bbox
                 )
                 cropped_for_doc = resize_pil_to_fit_box(
-                    cropped_with_annotation, _crop_embed_px_w, _crop_embed_px_h
+                    cropped_with_annotation, crop_embed_px_w, crop_embed_px_h
                 )
                 cropped_bytes = pil_image_to_jpeg_bytes(
                     cropped_for_doc, quality=report_jpeg_quality
@@ -2620,8 +2829,8 @@ class T2D2(object):
                     doc,
                     cropped_bytes,
                     cropped_for_doc,
-                    _CROP_MAX_W_IN,
-                    _CROP_MAX_H_IN,
+                    crop_max_w_in,
+                    crop_max_h_in,
                     space_before_pt=0,
                     space_after_pt=1,
                     keep_with_next=True,
@@ -2643,7 +2852,7 @@ class T2D2(object):
                     original_with_annotations, crop_bbox
                 )
                 original_for_doc = resize_pil_to_fit_box(
-                    original_with_annotations, _full_embed_px_w, _full_embed_px_h
+                    original_with_annotations, full_embed_px_w, full_embed_px_h
                 )
                 original_bytes = pil_image_to_jpeg_bytes(
                     original_for_doc, quality=report_jpeg_quality
@@ -2652,8 +2861,8 @@ class T2D2(object):
                     doc,
                     original_bytes,
                     original_for_doc,
-                    _FULL_MAX_W_IN,
-                    _FULL_MAX_H_IN,
+                    full_max_w_in,
+                    full_max_h_in,
                     space_before_pt=0,
                     space_after_pt=1,
                     keep_with_next=True,
@@ -2683,9 +2892,9 @@ class T2D2(object):
                     ("Condition", condition_name),
                     ("Region", region_name),
                     ("Tags", tags_str),
+                    ("Size", image_size_label),
                 ]
                 table = doc.add_table(rows=len(meta_rows) + 1, cols=2)
-                table.autofit = False
                 _docx_fill_label_value_table(table, meta_rows)
                 link_cell = table.cell(len(meta_rows), 1)
                 table.cell(len(meta_rows), 0).text = "Image"
@@ -2695,7 +2904,12 @@ class T2D2(object):
                     portal_url,
                     "Click Here to See the Image",
                 )
-                _docx_format_report_table(table, label_width_in=1.55)
+                _docx_format_report_table(
+                    table,
+                    label_width_in=1.55,
+                    center=True,
+                    table_width_in=_CONTENT_W_IN,
+                )
                 for row in table.rows:
                     for cell in row.cells:
                         for paragraph in cell.paragraphs:
