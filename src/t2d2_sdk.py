@@ -47,12 +47,14 @@ from PIL import Image as PILImage
 from condition_report_service import (
     ImageAnnotationCropper,
     pil_image_to_jpeg_bytes,
+    resize_pil_max_long_edge,
     resize_pil_to_fit_box,
 )
 
 
 TIMEOUT = 60
 BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
+PORTAL_BASE_URL = os.getenv("T2D2_PORTAL_URL", "https://app.t2d2.ai").rstrip("/")
 # DEV https://api-v3-dev.t2d2.ai/api/
 
 
@@ -180,6 +182,93 @@ def safe_condition_report_filename_stem(project_name: str) -> str:
     if not name:
         name = "project"
     return name[:150]
+
+
+def _resolve_image_record_dimensions(img: dict):
+    """
+    Resolve width/height from an API image record (photos and orthomosaics).
+    Orthomosaics often store dimensions under ``info``, not top-level ``width``/``height``.
+    """
+    info = img.get("info") if isinstance(img.get("info"), dict) else {}
+    width = (
+        img.get("width")
+        or img.get("image_width")
+        or info.get("width")
+        or info.get("image_width")
+    )
+    height = (
+        img.get("height")
+        or img.get("image_height")
+        or info.get("height")
+        or info.get("image_height")
+    )
+    try:
+        w = int(width) if width is not None else None
+        h = int(height) if height is not None else None
+    except (TypeError, ValueError):
+        return None, None
+    if w and w > 0 and h and h > 0:
+        return w, h
+    return None, None
+
+
+def _resolve_original_image_display_dimensions(image_data: dict):
+    """
+    Original API image dimensions for the report metadata Size row.
+
+    Annotation drawing still uses downscaled working_dimensions; this returns the
+    pre-downscale size from annotation_space (set at report build time).
+    """
+    if not image_data:
+        return None, None
+    space = image_data.get("annotation_space") or {}
+    width = (
+        image_data.get("original_width")
+        or space.get("width")
+        or space.get("image_width")
+    )
+    height = (
+        image_data.get("original_height")
+        or space.get("height")
+        or space.get("image_height")
+    )
+    try:
+        w = int(width) if width is not None else None
+        h = int(height) if height is not None else None
+    except (TypeError, ValueError):
+        return None, None
+    if w and w > 0 and h and h > 0:
+        return w, h
+    return None, None
+
+
+def _ortho_condition_report_output_path(base_output_path: str, image_data: dict) -> str:
+    """Build a per-orthomosaic output path from a base report filename."""
+    base, ext = os.path.splitext(base_output_path)
+    if not ext:
+        ext = ".docx"
+    image_id = image_data.get("image_id", "")
+    filename_stem = os.path.splitext(image_data.get("filename") or "")[0]
+    name_part = safe_condition_report_filename_stem(filename_stem or f"ortho_{image_id}")
+    return f"{base}_{name_part}_{image_id}{ext}"
+
+
+def _portal_project_dashboard_url(project_id) -> str:
+    return f"{PORTAL_BASE_URL}/project/{project_id}/dashboard"
+
+
+def _portal_image_files_url(project_id, image_id, filename, image_type=1) -> str:
+    name = os.path.splitext(filename or "")[0] or str(image_id)
+    query = urlencode(
+        {
+            "id": image_id,
+            "name": name,
+            "image_type": image_type if image_type is not None else 1,
+            "page": 0,
+            "limit": 10,
+        }
+    )
+    return f"{PORTAL_BASE_URL}/project/{project_id}/files/images?{query}"
 
 
 def ts2date(ts):
@@ -440,6 +529,13 @@ def _image_is_orthomosaic(image: dict) -> bool:
     return "orthomosaic" in combined or "/orthomosaics/" in combined
 
 
+# T2D2 project.unit enum from GET project/{id} (API returns integers).
+_PROJECT_UNIT_ENUM = {
+    1: "m",
+    3: "ft",
+}
+
+
 def _get_project_measurement_unit(project: dict):
     """Best-effort measurement unit from the active project payload."""
     if not project:
@@ -458,8 +554,247 @@ def _get_project_measurement_unit(project: dict):
         candidates.append(measurement.get("unit"))
     for value in candidates:
         if value is not None and str(value).strip():
-            return str(value).strip()
+            return _resolve_measurement_unit_label(value)
     return None
+
+
+def _resolve_measurement_unit_label(unit) -> str:
+    """Map API unit enum IDs to labels (e.g. 3 -> ft); pass through string units."""
+    if unit is None:
+        return None
+    raw = str(unit).strip()
+    if not raw:
+        return None
+    if raw.isdigit():
+        mapped = _PROJECT_UNIT_ENUM.get(int(raw))
+        return mapped if mapped is not None else raw
+    return raw
+
+
+def _normalize_measurement_unit(unit) -> str:
+    unit = _resolve_measurement_unit_label(unit) or unit
+    return (unit or "").strip().lower().rstrip(".")
+
+
+def _is_physical_measurement_unit(unit) -> bool:
+    u = _normalize_measurement_unit(unit)
+    return u in (
+        "ft", "feet", "foot",
+        "m", "meter", "meters", "metre", "metres",
+        "in", "inch", "inches",
+        "cm", "centimeter", "centimeters",
+        "mm", "millimeter", "millimeters",
+    )
+
+
+def _format_area_in_unit(area_val: float, unit: str) -> str:
+    u = _normalize_measurement_unit(unit)
+    if u in ("ft", "feet", "foot"):
+        return f"{area_val:.2f} sq ft"
+    if u in ("m", "meter", "meters", "metre", "metres"):
+        return f"{area_val:.2f} m²"
+    if u in ("in", "inch", "inches"):
+        return f"{area_val:.2f} sq in"
+    return f"{area_val:.2f} sq {unit}"
+
+
+def _format_length_in_unit(length_val: float, unit: str) -> str:
+    u = _normalize_measurement_unit(unit)
+    if u in ("ft", "feet", "foot"):
+        return f"{length_val:.2f} ft"
+    if u in ("m", "meter", "meters", "metre", "metres"):
+        return f"{length_val:.2f} m"
+    if u in ("in", "inch", "inches"):
+        return f"{length_val:.2f} in"
+    return f"{length_val:.2f} {unit}"
+
+
+def _parse_image_scale(image_meta: dict, project: dict):
+    """Return (units_per_pixel, unit_label) when image scale is configured."""
+    scale = (image_meta or {}).get("scale") if image_meta else None
+    if not isinstance(scale, dict):
+        return None
+    if scale.get("enabled") is False:
+        return None
+    scale_value = scale.get("value")
+    if scale_value is None:
+        scale_value = scale.get("pixel_size") or scale.get("size")
+    if scale_value is None:
+        return None
+    try:
+        units_per_pixel = float(scale_value)
+    except (TypeError, ValueError):
+        return None
+    if units_per_pixel <= 0:
+        return None
+    unit = (
+        _resolve_measurement_unit_label(scale.get("unit"))
+        or _get_project_measurement_unit(project)
+        or "ft"
+    )
+    return units_per_pixel, unit
+
+
+def _to_feet(value, unit) -> float:
+    """Convert a linear measurement to feet."""
+    u = _normalize_measurement_unit(unit)
+    amount = float(value)
+    if u in ("ft", "feet", "foot"):
+        return amount
+    if u in ("m", "meter", "meters", "metre", "metres"):
+        return amount * 3.280839895
+    if u in ("in", "inch", "inches"):
+        return amount / 12.0
+    if u in ("cm", "centimeter", "centimeters"):
+        return amount / 30.48
+    if u in ("mm", "millimeter", "millimeters"):
+        return amount / 304.8
+    return amount
+
+
+def _sq_units_to_sq_feet(area_in_sq_units, unit) -> float:
+    """Convert an area in square project units to square feet."""
+    linear_ft = _to_feet(1.0, unit)
+    return float(area_in_sq_units) * (linear_ft ** 2)
+
+
+def _format_dimensions_in_unit(width, height, unit: str) -> str:
+    """Format width × height in project length units (ft, m, etc.)."""
+    u = _normalize_measurement_unit(unit)
+    if u in ("ft", "feet", "foot"):
+        suffix = "ft"
+    elif u in ("m", "meter", "meters", "metre", "metres"):
+        suffix = "m"
+    elif u in ("in", "inch", "inches"):
+        suffix = "in"
+    else:
+        suffix = unit
+    return f"{width:.2f} × {height:.2f} {suffix}"
+
+
+def _scaled_photo_annotation_area_is_pixels(
+    area_val: float,
+    units_per_pixel: float,
+    unit: str,
+    image_width,
+    image_height,
+) -> bool:
+    """True when API area looks like pixel² on a scaled photo (not project sq units)."""
+    if not image_width or not image_height:
+        return False
+    feet_per_pixel = _to_feet(units_per_pixel, unit)
+    physical_sq_ft = _sq_units_to_sq_feet(area_val, unit)
+    max_image_sq_ft = (
+        image_width * feet_per_pixel * image_height * feet_per_pixel
+    )
+    return physical_sq_ft > max_image_sq_ft
+
+
+def _scaled_photo_annotation_length_is_pixels(
+    length_val: float,
+    units_per_pixel: float,
+    unit: str,
+    image_width,
+    image_height,
+) -> bool:
+    """True when API length looks like pixels on a scaled photo (not project units)."""
+    if not image_width or not image_height:
+        return False
+    feet_per_pixel = _to_feet(units_per_pixel, unit)
+    physical_ft = _to_feet(length_val, unit)
+    max_image_ft = (image_width ** 2 + image_height ** 2) ** 0.5 * feet_per_pixel
+    return physical_ft > max_image_ft
+
+
+def _format_condition_report_annotation_measurements(
+    ann: dict,
+    project: dict,
+    image_meta: dict = None,
+    image_width=None,
+    image_height=None,
+    is_orthomosaic: bool = False,
+) -> tuple:
+    """
+    Return (area_label, length_label) for report metadata.
+
+    * Orthomosaic: API area/length are project physical units (ft, m).
+    * Photo with image scale: physical when plausible, else convert from pixels.
+    * Photo without scale: pixel units.
+    """
+    scale_parsed = _parse_image_scale(image_meta, project)
+    area_raw = ann.get("area")
+    length_raw = ann.get("length")
+    project_unit = _get_project_measurement_unit(project)
+
+    if scale_parsed:
+        units_per_pixel, unit = scale_parsed
+        area_label = length_label = None
+
+        if area_raw is not None:
+            try:
+                area_val = float(area_raw)
+            except (TypeError, ValueError):
+                area_val = 0
+            if area_val > 0:
+                if is_orthomosaic or not _scaled_photo_annotation_area_is_pixels(
+                    area_val, units_per_pixel, unit, image_width, image_height
+                ):
+                    area_label = _format_area_in_unit(area_val, unit)
+                else:
+                    area_label = _format_area_in_unit(
+                        area_val * (units_per_pixel ** 2), unit
+                    )
+
+        if length_raw is not None:
+            try:
+                length_val = float(length_raw)
+            except (TypeError, ValueError):
+                length_val = 0
+            if length_val > 0:
+                if is_orthomosaic or not _scaled_photo_annotation_length_is_pixels(
+                    length_val, units_per_pixel, unit, image_width, image_height
+                ):
+                    length_label = _format_length_in_unit(length_val, unit)
+                else:
+                    length_label = _format_length_in_unit(
+                        length_val * units_per_pixel, unit
+                    )
+
+        return area_label, length_label
+
+    area_label = length_label = None
+    if is_orthomosaic and project_unit and _is_physical_measurement_unit(project_unit):
+        if area_raw is not None:
+            try:
+                area_val = float(area_raw)
+                if area_val > 0:
+                    area_label = _format_area_in_unit(area_val, project_unit)
+            except (TypeError, ValueError):
+                pass
+        if length_raw is not None:
+            try:
+                length_val = float(length_raw)
+                if length_val > 0:
+                    length_label = _format_length_in_unit(length_val, project_unit)
+            except (TypeError, ValueError):
+                pass
+        return area_label, length_label
+
+    if area_raw is not None:
+        try:
+            area_val = float(area_raw)
+            if area_val > 0:
+                area_label = f"{area_val:.2f} px²"
+        except (TypeError, ValueError):
+            pass
+    if length_raw is not None:
+        try:
+            length_val = float(length_raw)
+            if length_val > 0:
+                length_label = f"{length_val:.2f} px"
+        except (TypeError, ValueError):
+            pass
+    return area_label, length_label
 
 
 def _format_condition_report_image_size(
@@ -467,32 +802,25 @@ def _format_condition_report_image_size(
     height,
     project: dict,
     image_meta: dict = None,
+    is_orthomosaic: bool = False,
 ) -> str:
-    """Pixel dimensions; physical size when image scale is available; project unit label."""
+    """Image dimensions in project units when scale is set; else pixel resolution."""
     try:
         w = int(width)
         h = int(height)
     except (TypeError, ValueError):
         return "N/A"
-    unit = _get_project_measurement_unit(project)
-    scale = (image_meta or {}).get("scale") if image_meta else None
-    if isinstance(scale, dict):
-        scale_value = scale.get("value")
-        if scale_value is None:
-            scale_value = scale.get("pixel_size") or scale.get("size")
-        if scale_value is not None:
-            try:
-                sv = float(scale_value)
-                scale_unit = scale.get("unit") or unit or ""
-                pw = w * sv
-                ph = h * sv
-                if scale_unit:
-                    return f"{w} × {h} px ({pw:.2f} × {ph:.2f} {scale_unit})"
-                return f"{w} × {h} px ({pw:.2f} × {ph:.2f})"
-            except (TypeError, ValueError):
-                pass
-    if unit:
-        return f"{w} × {h} px ({unit})"
+
+    scale_parsed = _parse_image_scale(image_meta, project)
+    if scale_parsed:
+        units_per_pixel, unit = scale_parsed
+        width_u = w * units_per_pixel
+        height_u = h * units_per_pixel
+        physical = _format_dimensions_in_unit(width_u, height_u, unit)
+        if is_orthomosaic:
+            return physical
+        return f"{w} × {h} px ({physical})"
+
     return f"{w} × {h} px"
 
 
@@ -512,9 +840,11 @@ def _resolve_condition_report_page_layout(
             "crop_max_h_in": 4.0,
             "full_max_w_in": 4.5,
             "full_max_h_in": 2.25,
-            "padding_percent": 0.12,
-            "crop_min_width_fraction": 0.06,
-            "crop_min_height_fraction": 0.06,
+            "padding_percent": 0.10,
+            "crop_min_width_fraction": 0.015,
+            "crop_min_height_fraction": 0.015,
+            # Cap embedded crop pixels (full-res crop is downscaled for JPEG only).
+            "crop_embed_max_long_edge": 800,
         }
     return {
         "crop_max_w_in": 6.0,
@@ -540,6 +870,32 @@ def _docx_picture_size_inches(pil_image, max_width_in: float, max_height_in: flo
     return width_in, height_in
 
 
+def _docx_picture_size_inches_sharp(
+    pil_image,
+    max_width_in: float,
+    max_height_in: float,
+    embed_dpi: float,
+):
+    """
+    Layout size capped so Word does not upscale beyond embed_dpi (avoids blurry crops).
+    """
+    w_px, h_px = pil_image.size
+    if w_px <= 0 or h_px <= 0 or embed_dpi <= 0:
+        return _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    layout_w, layout_h = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    native_w = w_px / float(embed_dpi)
+    native_h = h_px / float(embed_dpi)
+    width_in = min(layout_w, native_w)
+    height_in = width_in * (h_px / float(w_px))
+    if height_in > max_height_in:
+        height_in = min(layout_h, native_h, max_height_in)
+        width_in = height_in * (w_px / float(h_px))
+    if width_in > max_width_in:
+        width_in = max_width_in
+        height_in = width_in * (h_px / float(w_px))
+    return width_in, height_in
+
+
 def _docx_add_centered_figure(
     doc,
     jpeg_bytes,
@@ -549,8 +905,14 @@ def _docx_add_centered_figure(
     space_before_pt: int = 6,
     space_after_pt: int = 4,
     keep_with_next: bool = False,
+    embed_dpi: float = None,
 ):
-    width_in, height_in = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    if embed_dpi and embed_dpi > 0:
+        width_in, height_in = _docx_picture_size_inches_sharp(
+            pil_image, max_width_in, max_height_in, embed_dpi
+        )
+    else:
+        width_in, height_in = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
     para = doc.add_paragraph()
     para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     para.paragraph_format.space_before = Pt(space_before_pt)
@@ -2533,12 +2895,14 @@ class T2D2(object):
         
         :param orthomosaic_report: Force embed profile selection. ``True`` always uses the
             orthomosaic profile; ``False`` always uses the standard photo profile; ``None``
-            (default) auto-detects from image type and URL.
+            (default) auto-detects from image type and URL. When the report is orthomosaic-only
+            and multiple ortho images are included, one ``.docx`` file is written per ortho.
         :type orthomosaic_report: bool or None
         :default orthomosaic_report: None
         
-        :return: Path to the generated document
-        :rtype: str
+        :return: Path to the generated document, or a list of paths when multiple
+            orthomosaic images are processed (one file per ortho).
+        :rtype: str or list[str]
         
         :raises ValueError: If no project is currently set
         
@@ -2626,17 +2990,23 @@ class T2D2(object):
                     logger.warning(f"No URL found for image {image_id}, skipping...")
                     continue
             
-            # Get image dimensions
-            width = img.get('width') or img.get('image_width') or 1920
-            height = img.get('height') or img.get('image_height') or 1080
+            # Dimensions annotations were drawn against (API info for orthos; top-level for photos)
+            ref_width, ref_height = _resolve_image_record_dimensions(img)
+            api_info = img.get("info") if isinstance(img.get("info"), dict) else {}
             
             # Format image data for ImageAnnotationCropper
             image_data = {
                 'url': image_url,
                 'info': {
-                    'width': width,
-                    'height': height
+                    'width': ref_width,
+                    'height': ref_height,
                 },
+                'annotation_space': {
+                    'width': ref_width,
+                    'height': ref_height,
+                },
+                'original_width': ref_width,
+                'original_height': ref_height,
                 'annotations': visible_annotations,
                 'image_id': img.get('id'),
                 'filename': img.get('filename', ''),
@@ -2645,13 +3015,17 @@ class T2D2(object):
                 'image_type': img.get('image_type') or img.get('type'),
                 'scale': img.get('scale'),
             }
-            if _image_is_orthomosaic(
+            for key in ("orientation_1", "orientation_2", "scale"):
+                if api_info.get(key) is not None:
+                    image_data["info"][key] = api_info.get(key)
+            is_ortho_record = _image_is_orthomosaic(
                 {
                     "image_type": image_data["image_type"],
                     "url": image_url,
                     "filename": image_data["filename"],
                 }
-            ):
+            )
+            if is_ortho_record:
                 image_data["image_type"] = image_data["image_type"] or 3
             image_data_list.append(image_data)
         
@@ -2677,10 +3051,12 @@ class T2D2(object):
             all_orthomosaic_report = detected_orthomosaic
         _report_profile = (
             {
-                "report_max_long_edge": 8192,
-                "report_max_megapixels": 120.0,
-                "report_jpeg_quality": 85,
-                "report_embed_dpi": 280,
+                # Overview only; detail crops use full-resolution source.
+                "report_max_long_edge": 3200,
+                "report_max_megapixels": 22.0,
+                "report_jpeg_quality": 64,
+                "report_embed_dpi": 115,
+                "report_jpeg_subsampling": 2,
             }
             if all_orthomosaic_report
             else {
@@ -2698,17 +3074,72 @@ class T2D2(object):
             report_jpeg_quality = _report_profile["report_jpeg_quality"]
         if report_embed_dpi is None:
             report_embed_dpi = _report_profile["report_embed_dpi"]
+        report_jpeg_subsampling = _report_profile.get("report_jpeg_subsampling", 0)
         logger.info(
-            "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s)",
+            "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s, chroma=%s)",
             "orthomosaic" if all_orthomosaic_report else "standard",
             report_jpeg_quality,
             report_embed_dpi,
             report_max_long_edge,
             report_max_megapixels,
+            report_jpeg_subsampling,
         )
-        
+
+        write_kwargs = {
+            "project_info": project_info,
+            "padding_percent": padding_percent,
+            "crop_min_width_fraction": crop_min_width_fraction,
+            "crop_min_height_fraction": crop_min_height_fraction,
+            "all_orthomosaic_report": all_orthomosaic_report,
+            "report_max_long_edge": report_max_long_edge,
+            "report_max_megapixels": report_max_megapixels,
+            "report_jpeg_quality": report_jpeg_quality,
+            "report_embed_dpi": report_embed_dpi,
+            "report_jpeg_subsampling": report_jpeg_subsampling,
+        }
+
+        if all_orthomosaic_report and len(image_data_list) > 1:
+            logger.info(
+                "Generating %d separate orthomosaic condition report(s)",
+                len(image_data_list),
+            )
+            doc_paths = []
+            for image_data in image_data_list:
+                per_output_path = _ortho_condition_report_output_path(
+                    output_path, image_data
+                )
+                doc_paths.append(
+                    self._write_condition_report_from_image_data(
+                        image_data_list=[image_data],
+                        output_path=per_output_path,
+                        **write_kwargs,
+                    )
+                )
+            return doc_paths
+
+        return self._write_condition_report_from_image_data(
+            image_data_list=image_data_list,
+            output_path=output_path,
+            **write_kwargs,
+        )
+
+    def _write_condition_report_from_image_data(
+        self,
+        project_info,
+        image_data_list,
+        output_path,
+        padding_percent=0.2,
+        crop_min_width_fraction=0.20,
+        crop_min_height_fraction=0.20,
+        all_orthomosaic_report=False,
+        report_max_long_edge=3200,
+        report_max_megapixels=28.0,
+        report_jpeg_quality=25,
+        report_embed_dpi=150,
+        report_jpeg_subsampling=0,
+    ):
         logger.info(f"Processing {len(image_data_list)} images with annotations")
-        
+
         # Initialize ImageAnnotationCropper
         logger.debug("Initializing ImageAnnotationCropper")
         cropper = ImageAnnotationCropper(image_data_list)
@@ -2718,14 +3149,14 @@ class T2D2(object):
             max_long_edge=report_max_long_edge,
             max_megapixels=report_max_megapixels,
         )
-        
+
         # Create Word document
         logger.info("Creating Word document structure")
         doc = Document()
         _docx_configure_report_fonts(doc)
         project_name = project_info.get("name") or "Project"
         generated_on = datetime.now().strftime("%d %b %Y")
-        project_link_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}"
+        project_link_url = _portal_project_dashboard_url(self.project["id"])
         logo_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "t2d2_image", "t2d2.png"
         )
@@ -2745,13 +3176,12 @@ class T2D2(object):
         # Process each image and annotation
         figure_counter = 1
         first_annotation = True
-        
+
         for img_idx, (image_data, pil_image) in enumerate(cropper.images):
             if pil_image is None:
                 continue
-            
-            image_width = pil_image.size[0]
-            image_height = pil_image.size[1]
+
+            image_width, image_height = cropper.working_dimensions(image_data, pil_image)
             annotations = image_data['annotations']
             image_id = image_data.get('image_id', '')
             filename = image_data.get('filename', '')
@@ -2778,16 +3208,32 @@ class T2D2(object):
             crop_embed_px_h = max(1, int(round(crop_max_h_in * _edpi)))
             full_embed_px_w = max(1, int(round(full_max_w_in * _edpi)))
             full_embed_px_h = max(1, int(round(full_max_h_in * _edpi)))
+            display_width, display_height = _resolve_original_image_display_dimensions(
+                image_data
+            )
+            if not display_width or not display_height:
+                display_width, display_height = image_width, image_height
             image_size_label = _format_condition_report_image_size(
-                image_width,
-                image_height,
+                display_width,
+                display_height,
                 self.project,
                 image_data,
+                is_orthomosaic=is_ortho_image,
             )
-            
-            # Get portal URL (construct from base_url and project/image IDs)
-            portal_url = f"{self.base_url.replace('/api/', '')}/project/{self.project['id']}/images/{image_id}"
-            
+
+            portal_url = _portal_image_files_url(
+                self.project["id"],
+                image_id,
+                filename,
+                image_data.get("image_type"),
+            )
+
+            crop_source_pil = image_data.get("crop_source_image") or pil_image
+            crop_source_w, crop_source_h = display_width, display_height
+            if not crop_source_w or not crop_source_h:
+                crop_source_w, crop_source_h = image_width, image_height
+                crop_source_pil = pil_image
+
             # Process each annotation
             for ann in annotations:
                 # Add page break before each annotation to ensure one condition per page
@@ -2801,29 +3247,49 @@ class T2D2(object):
                     or ann.get("annotation_class", {}).get("annotation_class_name")
                     or "Finding"
                 )
+                annotation_id = ann.get("id")
+                annotation_label = (
+                    f"{ann_class_name} (ID: {annotation_id})"
+                    if annotation_id is not None
+                    else ann_class_name
+                )
 
-                # Crop annotation
+                # Crop from full-resolution source for sharp detail figures
                 cropped_img, crop_bbox = cropper.crop_annotation(
-                    pil_image,
+                    crop_source_pil,
                     ann,
-                    image_width,
-                    image_height,
+                    crop_source_w,
+                    crop_source_h,
                     page_layout["padding_percent"],
                     page_layout["crop_min_width_fraction"],
                     page_layout["crop_min_height_fraction"],
+                    image_data=image_data,
                 )
-                
+
                 if cropped_img is None or crop_bbox is None:
                     continue
-                
+
                 cropped_with_annotation = cropper.draw_annotation_on_image(
-                    cropped_img, ann, image_width, image_height, crop_bbox
+                    cropped_img,
+                    ann,
+                    crop_source_w,
+                    crop_source_h,
+                    crop_bbox,
+                    image_data=image_data,
                 )
+                crop_embed_max_edge = page_layout.get("crop_embed_max_long_edge")
+                cropped_for_doc = cropped_with_annotation
+                if crop_embed_max_edge:
+                    cropped_for_doc = resize_pil_max_long_edge(
+                        cropped_for_doc, int(crop_embed_max_edge)
+                    )
                 cropped_for_doc = resize_pil_to_fit_box(
-                    cropped_with_annotation, crop_embed_px_w, crop_embed_px_h
+                    cropped_for_doc, crop_embed_px_w, crop_embed_px_h
                 )
                 cropped_bytes = pil_image_to_jpeg_bytes(
-                    cropped_for_doc, quality=report_jpeg_quality
+                    cropped_for_doc,
+                    quality=report_jpeg_quality,
+                    subsampling=report_jpeg_subsampling,
                 )
                 _docx_add_centered_figure(
                     doc,
@@ -2834,6 +3300,7 @@ class T2D2(object):
                     space_before_pt=0,
                     space_after_pt=1,
                     keep_with_next=True,
+                    embed_dpi=_edpi,
                 )
                 _docx_add_figure_caption(
                     doc,
@@ -2844,18 +3311,30 @@ class T2D2(object):
                 figure_counter += 1
 
                 original_with_annotations = pil_image.copy()
-                for visible_ann in annotations:
-                    original_with_annotations = cropper.draw_annotation_on_image(
-                        original_with_annotations, visible_ann, image_width, image_height
-                    )
+                original_with_annotations = cropper.draw_annotation_on_image(
+                    original_with_annotations,
+                    ann,
+                    image_width,
+                    image_height,
+                    image_data=image_data,
+                )
+                overview_crop_bbox = ImageAnnotationCropper.scale_bbox_to_working(
+                    crop_bbox,
+                    crop_source_w,
+                    crop_source_h,
+                    image_width,
+                    image_height,
+                )
                 original_with_annotations = cropper.highlight_crop_callout_on_image(
-                    original_with_annotations, crop_bbox
+                    original_with_annotations, overview_crop_bbox
                 )
                 original_for_doc = resize_pil_to_fit_box(
                     original_with_annotations, full_embed_px_w, full_embed_px_h
                 )
                 original_bytes = pil_image_to_jpeg_bytes(
-                    original_for_doc, quality=report_jpeg_quality
+                    original_for_doc,
+                    quality=report_jpeg_quality,
+                    subsampling=report_jpeg_subsampling,
                 )
                 _docx_add_centered_figure(
                     doc,
@@ -2885,15 +3364,27 @@ class T2D2(object):
                     ", ".join([tag.get("name", "") for tag in tags if isinstance(tag, dict)])
                     or "N/A"
                 )
+                area_label, length_label = _format_condition_report_annotation_measurements(
+                    ann,
+                    self.project,
+                    image_data,
+                    image_width,
+                    image_height,
+                    is_orthomosaic=is_ortho_image,
+                )
 
                 meta_rows = [
                     ("File Name", filename or "N/A"),
-                    ("Annotation", ann_class_name),
+                    ("Annotation", annotation_label),
                     ("Condition", condition_name),
                     ("Region", region_name),
                     ("Tags", tags_str),
-                    ("Size", image_size_label),
                 ]
+                if area_label:
+                    meta_rows.append(("Area", area_label))
+                if length_label:
+                    meta_rows.append(("Length", length_label))
+                meta_rows.append(("Size", image_size_label))
                 table = doc.add_table(rows=len(meta_rows) + 1, cols=2)
                 _docx_fill_label_value_table(table, meta_rows)
                 link_cell = table.cell(len(meta_rows), 1)
@@ -2915,7 +3406,9 @@ class T2D2(object):
                         for paragraph in cell.paragraphs:
                             paragraph.paragraph_format.space_before = Pt(1)
                             paragraph.paragraph_format.space_after = Pt(1)
-        
+
+            cropper.release_crop_source_images()
+
         # Save document
         logger.info(f"Saving condition report document to: {output_path}")
         doc.save(output_path)
@@ -2928,7 +3421,7 @@ class T2D2(object):
             )
         except OSError:
             logger.info("Condition report document saved successfully: %s", output_path)
-        
+
         return output_path
 
     ################################################################################################
