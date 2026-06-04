@@ -44,10 +44,12 @@ _T2D2_KNOWN_SHAPE_STYLES = {
 }
 
 
-def pil_image_to_jpeg_bytes(img: Image.Image, quality: int = 93) -> io.BytesIO:
+def pil_image_to_jpeg_bytes(
+    img: Image.Image, quality: int = 93, subsampling: int = 0
+) -> io.BytesIO:
     """
-    Encode a PIL image as high-quality JPEG for embedding in documents (smaller than PNG
-    at typical report display sizes). Uses 4:4:4 chroma when supported for sharper edges.
+    Encode a PIL image as JPEG for embedding in documents (smaller than PNG).
+    subsampling: 0 = 4:4:4 (largest), 2 = 4:2:0 (smaller files, fine at report display size).
     """
     work = img
     if work.mode in ("RGBA", "LA"):
@@ -64,7 +66,14 @@ def pil_image_to_jpeg_bytes(img: Image.Image, quality: int = 93) -> io.BytesIO:
         work = work.convert("RGB")
     buf = io.BytesIO()
     try:
-        work.save(buf, format="JPEG", quality=quality, optimize=True, subsampling=0, progressive=True)
+        work.save(
+            buf,
+            format="JPEG",
+            quality=quality,
+            optimize=True,
+            subsampling=subsampling,
+            progressive=True,
+        )
     except TypeError:
         buf = io.BytesIO()
         try:
@@ -87,6 +96,23 @@ def resize_pil_to_fit_box(img: Image.Image, max_width: int, max_height: int) -> 
     if w <= max_width and h <= max_height:
         return img
     scale = min(max_width / float(w), max_height / float(h))
+    nw = max(1, int(round(w * scale)))
+    nh = max(1, int(round(h * scale)))
+    try:
+        resample = Image.Resampling.LANCZOS
+    except AttributeError:
+        resample = Image.LANCZOS  # type: ignore[attr-defined]
+    return img.resize((nw, nh), resample)
+
+
+def resize_pil_max_long_edge(img: Image.Image, max_long_edge: int) -> Image.Image:
+    """Downscale so max(width, height) <= max_long_edge (no upscale)."""
+    if max_long_edge <= 0:
+        return img
+    w, h = img.size
+    if max(w, h) <= max_long_edge:
+        return img
+    scale = max_long_edge / float(max(w, h))
     nw = max(1, int(round(w * scale)))
     nh = max(1, int(round(h * scale)))
     try:
@@ -149,6 +175,7 @@ class ImageAnnotationCropper:
             for idx, (image_data, pil_image) in enumerate(self.images):
                 if pil_image is None:
                     continue
+                image_data["crop_source_image"] = pil_image
                 self._sync_working_dimensions(image_data, pil_image)
             return
         try:
@@ -166,6 +193,8 @@ class ImageAnnotationCropper:
                 mp = (w * h) / 1_000_000.0
                 if mp > max_megapixels:
                     scale = min(scale, math.sqrt(max_megapixels / mp))
+            # Keep full-resolution PIL for detail crops; downscaled copy for overview only.
+            image_data["crop_source_image"] = pil_image
             if scale >= 0.999:
                 self._sync_working_dimensions(image_data, pil_image)
                 continue
@@ -175,6 +204,32 @@ class ImageAnnotationCropper:
             self.images[idx] = (image_data, resized)
             self._sync_working_dimensions(image_data, resized)
             logger.info(f"Downscaled for report: {w}x{h} -> {new_w}x{new_h} (scale {scale:.4f})")
+
+    def release_crop_source_images(self) -> None:
+        """Free full-resolution references after all crops for an image are done."""
+        for image_data, _ in self.images:
+            image_data.pop("crop_source_image", None)
+
+    @staticmethod
+    def scale_bbox_to_working(
+        bbox: Tuple[int, int, int, int],
+        source_width: int,
+        source_height: int,
+        working_width: int,
+        working_height: int,
+    ) -> Tuple[int, int, int, int]:
+        """Map a crop box from source/full pixels to the downscaled overview image."""
+        if not bbox or source_width <= 0 or source_height <= 0:
+            return bbox
+        sx = working_width / float(source_width)
+        sy = working_height / float(source_height)
+        x0, y0, x1, y1 = bbox
+        return (
+            int(round(x0 * sx)),
+            int(round(y0 * sy)),
+            int(round(x1 * sx)),
+            int(round(y1 * sy)),
+        )
 
     @staticmethod
     def _aspect_ratio(width: int, height: int) -> float:
@@ -540,13 +595,25 @@ class ImageAnnotationCropper:
         y_max = min(image_height, y_max + padding_y)
         return (x_min, y_min, x_max, y_max)
 
-    def enforce_minimum_crop_extent(self, bbox, image_width, image_height,
-                                     min_width_fraction=0.20, min_height_fraction=0.20):
+    def enforce_minimum_crop_extent(
+        self,
+        bbox,
+        image_width,
+        image_height,
+        min_width_fraction=0.20,
+        min_height_fraction=0.20,
+        max_min_crop_width_px: Union[int, None] = None,
+        max_min_crop_height_px: Union[int, None] = None,
+    ):
         x_min, y_min, x_max, y_max = bbox
         bw = x_max - x_min
         bh = y_max - y_min
         min_w = max(1, int(image_width * min_width_fraction))
         min_h = max(1, int(image_height * min_height_fraction))
+        if max_min_crop_width_px is not None:
+            min_w = min(min_w, int(max_min_crop_width_px))
+        if max_min_crop_height_px is not None:
+            min_h = min(min_h, int(max_min_crop_height_px))
         target_w = min(image_width, max(bw, min_w))
         target_h = min(image_height, max(bh, min_h))
         cx = (x_min + x_max) // 2

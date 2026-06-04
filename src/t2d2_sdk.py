@@ -47,6 +47,7 @@ from PIL import Image as PILImage
 from condition_report_service import (
     ImageAnnotationCropper,
     pil_image_to_jpeg_bytes,
+    resize_pil_max_long_edge,
     resize_pil_to_fit_box,
 )
 
@@ -200,6 +201,36 @@ def _resolve_image_record_dimensions(img: dict):
         or img.get("image_height")
         or info.get("height")
         or info.get("image_height")
+    )
+    try:
+        w = int(width) if width is not None else None
+        h = int(height) if height is not None else None
+    except (TypeError, ValueError):
+        return None, None
+    if w and w > 0 and h and h > 0:
+        return w, h
+    return None, None
+
+
+def _resolve_original_image_display_dimensions(image_data: dict):
+    """
+    Original API image dimensions for the report metadata Size row.
+
+    Annotation drawing still uses downscaled working_dimensions; this returns the
+    pre-downscale size from annotation_space (set at report build time).
+    """
+    if not image_data:
+        return None, None
+    space = image_data.get("annotation_space") or {}
+    width = (
+        image_data.get("original_width")
+        or space.get("width")
+        or space.get("image_width")
+    )
+    height = (
+        image_data.get("original_height")
+        or space.get("height")
+        or space.get("image_height")
     )
     try:
         w = int(width) if width is not None else None
@@ -809,9 +840,11 @@ def _resolve_condition_report_page_layout(
             "crop_max_h_in": 4.0,
             "full_max_w_in": 4.5,
             "full_max_h_in": 2.25,
-            "padding_percent": 0.12,
-            "crop_min_width_fraction": 0.06,
-            "crop_min_height_fraction": 0.06,
+            "padding_percent": 0.10,
+            "crop_min_width_fraction": 0.015,
+            "crop_min_height_fraction": 0.015,
+            # Cap embedded crop pixels (full-res crop is downscaled for JPEG only).
+            "crop_embed_max_long_edge": 800,
         }
     return {
         "crop_max_w_in": 6.0,
@@ -837,6 +870,32 @@ def _docx_picture_size_inches(pil_image, max_width_in: float, max_height_in: flo
     return width_in, height_in
 
 
+def _docx_picture_size_inches_sharp(
+    pil_image,
+    max_width_in: float,
+    max_height_in: float,
+    embed_dpi: float,
+):
+    """
+    Layout size capped so Word does not upscale beyond embed_dpi (avoids blurry crops).
+    """
+    w_px, h_px = pil_image.size
+    if w_px <= 0 or h_px <= 0 or embed_dpi <= 0:
+        return _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    layout_w, layout_h = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    native_w = w_px / float(embed_dpi)
+    native_h = h_px / float(embed_dpi)
+    width_in = min(layout_w, native_w)
+    height_in = width_in * (h_px / float(w_px))
+    if height_in > max_height_in:
+        height_in = min(layout_h, native_h, max_height_in)
+        width_in = height_in * (w_px / float(h_px))
+    if width_in > max_width_in:
+        width_in = max_width_in
+        height_in = width_in * (h_px / float(w_px))
+    return width_in, height_in
+
+
 def _docx_add_centered_figure(
     doc,
     jpeg_bytes,
@@ -846,8 +905,14 @@ def _docx_add_centered_figure(
     space_before_pt: int = 6,
     space_after_pt: int = 4,
     keep_with_next: bool = False,
+    embed_dpi: float = None,
 ):
-    width_in, height_in = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
+    if embed_dpi and embed_dpi > 0:
+        width_in, height_in = _docx_picture_size_inches_sharp(
+            pil_image, max_width_in, max_height_in, embed_dpi
+        )
+    else:
+        width_in, height_in = _docx_picture_size_inches(pil_image, max_width_in, max_height_in)
     para = doc.add_paragraph()
     para.alignment = WD_ALIGN_PARAGRAPH.CENTER
     para.paragraph_format.space_before = Pt(space_before_pt)
@@ -2940,6 +3005,8 @@ class T2D2(object):
                     'width': ref_width,
                     'height': ref_height,
                 },
+                'original_width': ref_width,
+                'original_height': ref_height,
                 'annotations': visible_annotations,
                 'image_id': img.get('id'),
                 'filename': img.get('filename', ''),
@@ -2984,10 +3051,12 @@ class T2D2(object):
             all_orthomosaic_report = detected_orthomosaic
         _report_profile = (
             {
-                "report_max_long_edge": 8192,
-                "report_max_megapixels": 120.0,
-                "report_jpeg_quality": 85,
-                "report_embed_dpi": 280,
+                # Overview only; detail crops use full-resolution source.
+                "report_max_long_edge": 3200,
+                "report_max_megapixels": 22.0,
+                "report_jpeg_quality": 64,
+                "report_embed_dpi": 115,
+                "report_jpeg_subsampling": 2,
             }
             if all_orthomosaic_report
             else {
@@ -3005,13 +3074,15 @@ class T2D2(object):
             report_jpeg_quality = _report_profile["report_jpeg_quality"]
         if report_embed_dpi is None:
             report_embed_dpi = _report_profile["report_embed_dpi"]
+        report_jpeg_subsampling = _report_profile.get("report_jpeg_subsampling", 0)
         logger.info(
-            "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s)",
+            "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s, chroma=%s)",
             "orthomosaic" if all_orthomosaic_report else "standard",
             report_jpeg_quality,
             report_embed_dpi,
             report_max_long_edge,
             report_max_megapixels,
+            report_jpeg_subsampling,
         )
 
         write_kwargs = {
@@ -3024,6 +3095,7 @@ class T2D2(object):
             "report_max_megapixels": report_max_megapixels,
             "report_jpeg_quality": report_jpeg_quality,
             "report_embed_dpi": report_embed_dpi,
+            "report_jpeg_subsampling": report_jpeg_subsampling,
         }
 
         if all_orthomosaic_report and len(image_data_list) > 1:
@@ -3064,6 +3136,7 @@ class T2D2(object):
         report_max_megapixels=28.0,
         report_jpeg_quality=25,
         report_embed_dpi=150,
+        report_jpeg_subsampling=0,
     ):
         logger.info(f"Processing {len(image_data_list)} images with annotations")
 
@@ -3135,9 +3208,14 @@ class T2D2(object):
             crop_embed_px_h = max(1, int(round(crop_max_h_in * _edpi)))
             full_embed_px_w = max(1, int(round(full_max_w_in * _edpi)))
             full_embed_px_h = max(1, int(round(full_max_h_in * _edpi)))
+            display_width, display_height = _resolve_original_image_display_dimensions(
+                image_data
+            )
+            if not display_width or not display_height:
+                display_width, display_height = image_width, image_height
             image_size_label = _format_condition_report_image_size(
-                image_width,
-                image_height,
+                display_width,
+                display_height,
                 self.project,
                 image_data,
                 is_orthomosaic=is_ortho_image,
@@ -3149,6 +3227,12 @@ class T2D2(object):
                 filename,
                 image_data.get("image_type"),
             )
+
+            crop_source_pil = image_data.get("crop_source_image") or pil_image
+            crop_source_w, crop_source_h = display_width, display_height
+            if not crop_source_w or not crop_source_h:
+                crop_source_w, crop_source_h = image_width, image_height
+                crop_source_pil = pil_image
 
             # Process each annotation
             for ann in annotations:
@@ -3170,12 +3254,12 @@ class T2D2(object):
                     else ann_class_name
                 )
 
-                # Crop annotation
+                # Crop from full-resolution source for sharp detail figures
                 cropped_img, crop_bbox = cropper.crop_annotation(
-                    pil_image,
+                    crop_source_pil,
                     ann,
-                    image_width,
-                    image_height,
+                    crop_source_w,
+                    crop_source_h,
                     page_layout["padding_percent"],
                     page_layout["crop_min_width_fraction"],
                     page_layout["crop_min_height_fraction"],
@@ -3188,16 +3272,24 @@ class T2D2(object):
                 cropped_with_annotation = cropper.draw_annotation_on_image(
                     cropped_img,
                     ann,
-                    image_width,
-                    image_height,
+                    crop_source_w,
+                    crop_source_h,
                     crop_bbox,
                     image_data=image_data,
                 )
+                crop_embed_max_edge = page_layout.get("crop_embed_max_long_edge")
+                cropped_for_doc = cropped_with_annotation
+                if crop_embed_max_edge:
+                    cropped_for_doc = resize_pil_max_long_edge(
+                        cropped_for_doc, int(crop_embed_max_edge)
+                    )
                 cropped_for_doc = resize_pil_to_fit_box(
-                    cropped_with_annotation, crop_embed_px_w, crop_embed_px_h
+                    cropped_for_doc, crop_embed_px_w, crop_embed_px_h
                 )
                 cropped_bytes = pil_image_to_jpeg_bytes(
-                    cropped_for_doc, quality=report_jpeg_quality
+                    cropped_for_doc,
+                    quality=report_jpeg_quality,
+                    subsampling=report_jpeg_subsampling,
                 )
                 _docx_add_centered_figure(
                     doc,
@@ -3208,6 +3300,7 @@ class T2D2(object):
                     space_before_pt=0,
                     space_after_pt=1,
                     keep_with_next=True,
+                    embed_dpi=_edpi,
                 )
                 _docx_add_figure_caption(
                     doc,
@@ -3225,14 +3318,23 @@ class T2D2(object):
                     image_height,
                     image_data=image_data,
                 )
+                overview_crop_bbox = ImageAnnotationCropper.scale_bbox_to_working(
+                    crop_bbox,
+                    crop_source_w,
+                    crop_source_h,
+                    image_width,
+                    image_height,
+                )
                 original_with_annotations = cropper.highlight_crop_callout_on_image(
-                    original_with_annotations, crop_bbox
+                    original_with_annotations, overview_crop_bbox
                 )
                 original_for_doc = resize_pil_to_fit_box(
                     original_with_annotations, full_embed_px_w, full_embed_px_h
                 )
                 original_bytes = pil_image_to_jpeg_bytes(
-                    original_for_doc, quality=report_jpeg_quality
+                    original_for_doc,
+                    quality=report_jpeg_quality,
+                    subsampling=report_jpeg_subsampling,
                 )
                 _docx_add_centered_figure(
                     doc,
@@ -3304,6 +3406,8 @@ class T2D2(object):
                         for paragraph in cell.paragraphs:
                             paragraph.paragraph_format.space_before = Pt(1)
                             paragraph.paragraph_format.space_after = Pt(1)
+
+            cropper.release_crop_source_images()
 
         # Save document
         logger.info(f"Saving condition report document to: {output_path}")
