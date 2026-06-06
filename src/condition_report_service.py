@@ -295,10 +295,8 @@ class ImageAnnotationCropper:
         Flatten nested point lists into a single flat list.
         Handles both [x1, y1, x2, y2] and [[x1, y1], [x2, y2]] formats.
 
-        NOTE on T2D2 coordinate order: the API stores nested points as
-        [row_norm, col_norm] i.e. [y, x] order.  flatten_points preserves
-        whatever order the caller passes in; the caller is responsible for
-        normalising the order before use (see _reorder_yx_to_xy).
+        flatten_points preserves API order; use _reorder_points_for_shape
+        before denormalizing (shape-specific [y, x] vs [x, y] conventions).
         """
         flat_points = []
         for point in points:
@@ -309,28 +307,53 @@ class ImageAnnotationCropper:
         return flat_points
 
     @staticmethod
+    def _shape_key(shape) -> Union[int, None]:
+        if shape is None:
+            return None
+        try:
+            return int(shape)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
     def _reorder_yx_to_xy(flat_points: List[float]) -> List[float]:
         """
-        FIX: T2D2 nested annotation points are stored as [row_norm, col_norm]
-        (Y-first, X-second), matching typical image/matrix convention.
-        The portal renders them correctly as vertical features when the first
-        value has a larger range than the second.
-
-        This method swaps every consecutive pair so the flat list becomes
-        [x0, y0, x1, y1, ...] — the order expected by the rest of the pipeline.
-
-        Only applied to nested-point annotations (shape types that use [[y, x], ...]
-        format).  Flat annotations such as rectangle [x0, y0, x1, y1] and circle
-        [cx, cy, r] already arrive in the correct order and must NOT be swapped.
+        Swap consecutive pairs from [row_norm, col_norm] to [col_norm, row_norm]
+        i.e. [y, x] -> [x, y] for each vertex/corner.
         """
         if len(flat_points) % 2 != 0:
             return flat_points  # malformed; leave unchanged
         reordered = []
         for i in range(0, len(flat_points), 2):
-            y_val = flat_points[i]      # first value in pair = row = y
-            x_val = flat_points[i + 1]  # second value in pair = col = x
+            y_val = flat_points[i]
+            x_val = flat_points[i + 1]
             reordered.extend([x_val, y_val])
         return reordered
+
+    def _reorder_points_for_shape(
+        self,
+        flat_points: List[float],
+        shape,
+        is_nested: bool,
+    ) -> List[float]:
+        """
+        Normalize API point order to [x, y, ...] before denormalizing.
+
+        T2D2 uses inconsistent storage across shape types on orthomosaics:
+        - Shape 2/5 nested (polyline, line): [[y, x], ...]
+        - Shape 3 flat (rectangle): [y0, x0, y1, x1]
+        - Shape 4 nested (polygon): [[x, y], ...] (no swap)
+        """
+        shape_key = self._shape_key(shape)
+        if shape_key in (T2D2_SHAPE_POLYLINE, T2D2_SHAPE_LINE):
+            return self._reorder_yx_to_xy(flat_points)
+        if shape_key == T2D2_SHAPE_RECTANGLE:
+            return self._reorder_yx_to_xy(flat_points)
+        if shape_key == T2D2_SHAPE_POLYGON:
+            return flat_points
+        if is_nested:
+            return self._reorder_yx_to_xy(flat_points)
+        return flat_points
 
     @staticmethod
     def _is_nested_points(points) -> bool:
@@ -358,18 +381,20 @@ class ImageAnnotationCropper:
             return True
         return max(w, h) / min(w, h) >= aspect_threshold
 
-    def _normalized_coords_list(self, points) -> List[Tuple[float, float]]:
+    def _normalized_coords_list(
+        self, points, shape=None
+    ) -> List[Tuple[float, float]]:
         if not points:
             return []
-        if self._is_nested_points(points):
-            out = []
-            for p in points:
-                if isinstance(p, (list, tuple)) and len(p) >= 2:
-                    # FIX: nested points are [row, col] = [y, x] — swap to (x, y)
-                    out.append((float(p[1]), float(p[0])))
-            return out
+        is_nested = self._is_nested_points(points)
         flat = self.flatten_points(points)
-        return [(float(flat[i]), float(flat[i + 1])) for i in range(0, len(flat) - 1, 2)]
+        if len(flat) % 2:
+            flat = flat[:-1]
+        flat = self._reorder_points_for_shape(flat, shape, is_nested)
+        return [
+            (float(flat[i]), float(flat[i + 1]))
+            for i in range(0, len(flat) - 1, 2)
+        ]
 
     def _infer_draw_style(self, points) -> str:
         """Infer render style from point layout when shape id is missing or unknown."""
@@ -384,8 +409,6 @@ class ImageAnnotationCropper:
         if not nested and len(flat) == 3:
             return "circle"
         if nested:
-            # _normalized_coords_list now returns (x, y) after swap, so
-            # _path_is_thin operates on correctly-ordered coords
             norm_coords = self._normalized_coords_list(points)
             if n == 2:
                 return "line"
@@ -480,18 +503,13 @@ class ImageAnnotationCropper:
         image_width: int,
         image_height: int,
         image_data: dict = None,
+        shape=None,
     ) -> List[int]:
         """
         Convert normalized coordinates to pixel coordinates on the working image.
 
-        FIX — T2D2 coordinate order:
-        The T2D2 API stores nested annotation points as [[row_norm, col_norm], ...]
-        i.e. [y_norm, x_norm] order (row-major / image-matrix convention).
-        The portal renders them correctly; this method now applies _reorder_yx_to_xy
-        to swap each pair before converting to pixels so the result matches the portal.
-
-        Flat annotations (rectangle [x0,y0,x1,y1], circle [cx,cy,r]) are NOT nested
-        and therefore NOT reordered — they already arrive in x-first order.
+        Point order is normalized per shape via _reorder_points_for_shape before
+        scaling to pixel space.
         """
         is_nested = self._is_nested_points(normalized_points)
         flat_points = self.flatten_points(normalized_points)
@@ -503,9 +521,7 @@ class ImageAnnotationCropper:
             )
             flat_points = flat_points[:-1]
 
-        # FIX: nested points are stored [y, x]; reorder to [x, y] before denormalising
-        if is_nested:
-            flat_points = self._reorder_yx_to_xy(flat_points)
+        flat_points = self._reorder_points_for_shape(flat_points, shape, is_nested)
 
         use_normalized = self._coordinates_are_normalized(flat_points)
         ref_w, ref_h = image_width, image_height
@@ -546,12 +562,15 @@ class ImageAnnotationCropper:
         image_width: int,
         image_height: int,
         image_data: dict = None,
+        shape=None,
     ) -> Tuple[int, int, int, int]:
         """
         Get bounding box from annotation points.
         Returns: (x_min, y_min, x_max, y_max) inclusive pixel indices.
         """
-        pixel_coords = self.denormalize_coordinates(points, image_width, image_height, image_data=image_data)
+        pixel_coords = self.denormalize_coordinates(
+            points, image_width, image_height, image_data=image_data, shape=shape
+        )
         if len(pixel_coords) < 2:
             logger.warning(f"Insufficient coordinates for bounding box: {len(pixel_coords)}")
             return None
@@ -696,7 +715,13 @@ class ImageAnnotationCropper:
         try:
             logger.debug("Cropping annotation %s", annotation["id"])
             points = annotation['points']
-            bbox = self.get_bounding_box(points, image_width, image_height, image_data=image_data)
+            bbox = self.get_bounding_box(
+                points,
+                image_width,
+                image_height,
+                image_data=image_data,
+                shape=annotation.get('shape'),
+            )
             if bbox is None:
                 logger.warning(f"Invalid bounding box for annotation {annotation['id']}")
                 return None, None
@@ -727,7 +752,9 @@ class ImageAnnotationCropper:
             color_rgb = tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
             fill_color = color_rgb + (80,)
             outline_color = color_rgb + (255,)
-            pixel_coords = self.denormalize_coordinates(points, image_width, image_height, image_data=image_data)
+            pixel_coords = self.denormalize_coordinates(
+                points, image_width, image_height, image_data=image_data, shape=shape
+            )
             if bbox:
                 x_offset, y_offset = bbox[0], bbox[1]
                 pixel_coords = [
