@@ -43,6 +43,9 @@ _T2D2_KNOWN_SHAPE_STYLES = {
     T2D2_SHAPE_POINT: "point",
 }
 
+# Point / polyline / line are drawn as edge callout arrows, not raw geometry.
+_ARROW_CALLOUT_STYLES = frozenset({"point", "polyline", "line"})
+
 
 def pil_image_to_jpeg_bytes(
     img: Image.Image, quality: int = 93, subsampling: int = 0
@@ -446,23 +449,26 @@ class ImageAnnotationCropper:
         fill_color: Tuple[int, int, int, int],
         image_width: int,
         image_height: int,
+        canvas_width: int = None,
+        canvas_height: int = None,
     ) -> None:
         """Draw annotation geometry for any supported or inferred style."""
+        cw = canvas_width if canvas_width is not None else image_width
+        ch = canvas_height if canvas_height is not None else image_height
+        if style in _ARROW_CALLOUT_STYLES:
+            target = self._annotation_callout_target(style, coords_list)
+            if target is not None:
+                self._draw_callout_arrow_to_target(
+                    draw, cw, ch, target, outline_color, line_width=5, head_len=22.0
+                )
+            return
         if style == "rectangle" and len(pixel_coords) >= 4:
             xs = [pixel_coords[0], pixel_coords[2]]
             ys = [pixel_coords[1], pixel_coords[3]]
             draw.rectangle([(min(xs), min(ys)), (max(xs), max(ys))], outline=outline_color, fill=fill_color, width=3)
             return
-        if style in ("polyline", "line") and len(coords_list) >= 2:
-            draw.line(coords_list, fill=outline_color, width=4)
-            return
         if style == "polygon" and len(coords_list) >= 3:
             draw.polygon(coords_list, outline=outline_color, fill=fill_color, width=3)
-            return
-        if style == "point" and len(coords_list) >= 1:
-            cx, cy = coords_list[0]
-            radius = 15
-            draw.ellipse([(cx - radius, cy - radius), (cx + radius, cy + radius)], outline=outline_color, fill=fill_color, width=3)
             return
         if style in ("circle", "ellipse"):
             if len(pixel_coords) >= 6:
@@ -678,6 +684,60 @@ class ImageAnnotationCropper:
             (int(round(p2[0])), int(round(p2[1]))),
         ], fill=fill)
 
+    @staticmethod
+    def _annotation_callout_target(
+        style: str, coords_list: List[Tuple[int, int]]
+    ) -> Union[Tuple[float, float], None]:
+        if not coords_list:
+            return None
+        if style == "point" or len(coords_list) == 1:
+            return (float(coords_list[0][0]), float(coords_list[0][1]))
+        xs = [c[0] for c in coords_list]
+        ys = [c[1] for c in coords_list]
+        return ((min(xs) + max(xs)) / 2.0, (min(ys) + max(ys)) / 2.0)
+
+    def _draw_callout_arrow_to_target(
+        self,
+        draw: ImageDraw.ImageDraw,
+        canvas_width: int,
+        canvas_height: int,
+        target: Tuple[float, float],
+        color: Tuple[int, int, int, int],
+        line_width: int = 5,
+        head_len: float = 22.0,
+    ) -> None:
+        """Draw an arrow from the nearest image edge toward the annotation target."""
+        cx, cy = target
+        W, H = canvas_width, canvas_height
+        margin = max(16, min(W, H) // 40)
+        dists = [cy, H - cy, cx, W - cx]
+        idx = min(range(4), key=lambda i: dists[i])
+        if idx == 0:
+            start = (max(margin, min(W - margin, cx)), margin)
+        elif idx == 1:
+            start = (max(margin, min(W - margin, cx)), H - margin)
+        elif idx == 2:
+            start = (margin, max(margin, min(H - margin, cy)))
+        else:
+            start = (W - margin, max(margin, min(H - margin, cy)))
+        vx, vy = cx - start[0], cy - start[1]
+        length = math.hypot(vx, vy)
+        if length <= 8:
+            radius = max(6, min(W, H) // 80)
+            draw.ellipse(
+                [
+                    (int(round(cx - radius)), int(round(cy - radius))),
+                    (int(round(cx + radius)), int(round(cy + radius))),
+                ],
+                outline=color,
+                width=3,
+            )
+            return
+        shorten = min(28.0, length * 0.08)
+        unit_x, unit_y = vx / length, vy / length
+        end = (cx - shorten * unit_x, cy - shorten * unit_y)
+        self._draw_arrow_line(draw, start, end, color, line_width=line_width, head_len=head_len)
+
     def highlight_crop_callout_on_image(self, image: Image.Image, crop_bbox) -> Image.Image:
         x0, y0, x1, y1 = crop_bbox
         W, H = image.size
@@ -766,8 +826,19 @@ class ImageAnnotationCropper:
             if not coords_list and not pixel_coords:
                 logger.warning("Annotation %s has no drawable coordinates (shape=%s)", annotation["id"], shape)
             else:
-                self._render_annotation_geometry(draw, draw_style, pixel_coords, coords_list,
-                                                  outline_color, fill_color, image_width, image_height)
+                cw, ch = img_copy.size
+                self._render_annotation_geometry(
+                    draw,
+                    draw_style,
+                    pixel_coords,
+                    coords_list,
+                    outline_color,
+                    fill_color,
+                    image_width,
+                    image_height,
+                    canvas_width=cw,
+                    canvas_height=ch,
+                )
             logger.debug("Successfully drew annotation %s", annotation["id"])
             return img_copy
         except Exception as e:
