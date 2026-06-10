@@ -242,6 +242,24 @@ def _resolve_original_image_display_dimensions(image_data: dict):
     return None, None
 
 
+def _resolve_condition_report_image_display_name(image_data: dict) -> str:
+    """Human-readable image/orthomosaic label for the report cover (filename or region)."""
+    if not image_data:
+        return "N/A"
+    filename = image_data.get("filename") or ""
+    stem = os.path.splitext(filename)[0].strip()
+    if stem:
+        return _report_title_case(stem.replace("_", " ").replace("-", " "))
+    region = image_data.get("region") or {}
+    region_name = region.get("name") if isinstance(region, dict) else None
+    if region_name:
+        return _report_title_case(str(region_name))
+    image_id = image_data.get("image_id")
+    if image_id is not None:
+        return f"Image {image_id}"
+    return "N/A"
+
+
 def _ortho_condition_report_output_path(base_output_path: str, image_data: dict) -> str:
     """Build a per-orthomosaic output path from a base report filename."""
     base, ext = os.path.splitext(base_output_path)
@@ -829,6 +847,7 @@ def _resolve_condition_report_page_layout(
     padding_percent: float,
     crop_min_width_fraction: float,
     crop_min_height_fraction: float,
+    crop_embed_max_long_edge: int | None = None,
 ) -> dict:
     """
     On-page figure sizes and crop behaviour. Cropped detail is shown larger than the
@@ -844,7 +863,7 @@ def _resolve_condition_report_page_layout(
             "crop_min_width_fraction": 0.015,
             "crop_min_height_fraction": 0.015,
             # Cap embedded crop pixels (full-res crop is downscaled for JPEG only).
-            "crop_embed_max_long_edge": 800,
+            "crop_embed_max_long_edge": crop_embed_max_long_edge if crop_embed_max_long_edge is not None else 800,
         }
     return {
         "crop_max_w_in": 6.0,
@@ -1099,6 +1118,8 @@ def _docx_add_condition_report_cover(
     project_info: dict,
     project_link_url: str,
     logo_path=None,
+    image_data: dict = None,
+    is_orthomosaic: bool = False,
 ) -> None:
     project_name = project_info.get("name") or "Project"
     accent = _docx_add_sized_table(doc, 1, 1, 6.5)
@@ -1136,8 +1157,15 @@ def _docx_add_condition_report_cover(
     rows = [
         ("Project ID", str(project_info.get("id", "N/A"))),
         ("Project Link", project_link_url),
-        ("Address", project_info.get("address") or "N/A"),
     ]
+    if is_orthomosaic and image_data:
+        rows.append(
+            ("Orthomosaic", _resolve_condition_report_image_display_name(image_data))
+        )
+        rows.append(
+            ("Orthomosaic ID", str(image_data.get("image_id", "N/A")))
+        )
+    rows.append(("Address", project_info.get("address") or "N/A"))
     description = project_info.get("description")
     if description:
         rows.append(("Description", html_to_plain_text(description)))
@@ -2815,16 +2843,17 @@ class T2D2(object):
 
     def generate_condition_report_document(
         self,
-        image_ids=None,
+        image_ids,
         output_path=None,
         padding_percent=0.2,
         crop_min_width_fraction=0.20,
         crop_min_height_fraction=0.20,
-        include_orthomosaics=False,
         report_max_long_edge=None,
         report_max_megapixels=None,
         report_jpeg_quality=None,
         report_embed_dpi=None,
+        report_jpeg_subsampling=None,
+        crop_embed_max_long_edge=None,
         orthomosaic_report=None,
     ):
         """
@@ -2839,11 +2868,12 @@ class T2D2(object):
           * Original image (middle)
           * Metadata table (bottom) with file name, link, condition, region, tags
         
-        :param image_ids: List of specific image IDs to include, or None to include all images.
-            IDs are resolved with ``GET …/images/{id}``, so orthomosaic images (type ``3``) work
-            the same as regular images when you pass their id (e.g. ``image_ids=[694791]``).
-        :type image_ids: list or None
-        :default image_ids: None
+        :param image_ids: **Required.** One or more image/orthomosaic IDs to include in the report.
+            Pass a single id (``752355``) or a list (``[752355, 602824]``). Each id is resolved
+            with ``GET …/images/{id}`` — orthomosaics (type ``3``) and regular photos use the
+            same call. For multiple ortho ids, one ``.docx`` is written per ortho when
+            ``orthomosaic_report=True``.
+        :type image_ids: int, str, or list[int | str]
         
         :param output_path: Path where the Word document should be saved. If ``None``, uses
             ``{project_name}_condition_report.docx`` in the current working directory (project name
@@ -2862,12 +2892,6 @@ class T2D2(object):
         :param crop_min_height_fraction: Minimum crop height as a fraction of the full image height
         :type crop_min_height_fraction: float
         :default crop_min_height_fraction: 0.20
-        
-        :param include_orthomosaics: When ``image_ids`` is None, also include orthomosaic images
-            (API image type ``3``) that are not already in the default image list. Ignored when
-            ``image_ids`` is provided.
-        :type include_orthomosaics: bool
-        :default include_orthomosaics: False
         
         :param report_max_long_edge: After download, scale images so the longest side is at most
             this many pixels (reduces memory and .docx size). Pass ``None`` to disable. When
@@ -2904,22 +2928,35 @@ class T2D2(object):
             orthomosaic images are processed (one file per ortho).
         :rtype: str or list[str]
         
-        :raises ValueError: If no project is currently set
+        :raises ValueError: If no project is set, or ``image_ids`` is missing/empty
         
         :example:
-            >>> # Generate report for all images
-            >>> doc_path = client.generate_condition_report_document()
-            >>> print(f"Report saved to: {doc_path}")
-            
-            >>> # Generate report for specific images
+            >>> # Orthomosaic condition report (one .docx per ortho when multiple ids)
             >>> doc_path = client.generate_condition_report_document(
-            ...     image_ids=['img_123', 'img_456'],
-            ...     output_path='custom_report.docx'
+            ...     image_ids=752355,
+            ...     orthomosaic_report=True,
+            ... )
+            
+            >>> # Regular photo(s)
+            >>> doc_path = client.generate_condition_report_document(
+            ...     image_ids=[602824, 602825],
+            ...     output_path='custom_report.docx',
             ... )
         """
         if not self.project:
             logger.error("Cannot generate condition report: Project not set")
             raise ValueError("Project not set")
+
+        if image_ids is None:
+            raise ValueError(
+                "image_ids is required. Pass one or more image/orthomosaic ids, "
+                "e.g. image_ids=752355 or image_ids=[752355, 602824]."
+            )
+        if not isinstance(image_ids, (list, tuple)):
+            image_ids = [image_ids]
+        image_ids = [i for i in image_ids if i is not None and str(i).strip() != ""]
+        if not image_ids:
+            raise ValueError("image_ids must contain at least one image id")
         
         project_info = self.get_project_info()
         if output_path is None:
@@ -2929,31 +2966,11 @@ class T2D2(object):
         
         logger.info(
             f"Starting condition report generation. Output: {output_path}, "
-            f"Image IDs: {image_ids or 'All'}, include_orthomosaics: {include_orthomosaics}"
+            f"Image IDs: {image_ids}"
         )
         
-        # Get images (orthomosaics are often listed under image_types=[3]; merge when listing all)
-        if image_ids is None:
-            logger.info("Fetching all images for condition report")
-            images = list(self.get_images())
-            if include_orthomosaics:
-                seen = {img.get('id') for img in images if img.get('id') is not None}
-                try:
-                    ortho_images = self.get_images(params={"image_types": [3]})
-                    added = 0
-                    for img in ortho_images:
-                        oid = img.get('id')
-                        if oid is not None and oid not in seen:
-                            images.append(img)
-                            seen.add(oid)
-                            added += 1
-                    if added:
-                        logger.info(f"Merged {added} orthomosaic image(s) into condition report source list")
-                except Exception as e:
-                    logger.warning(f"Could not fetch orthomosaics for condition report: {e}")
-        else:
-            logger.info(f"Fetching {len(image_ids)} specific images for condition report")
-            images = self.get_images(image_ids=image_ids)
+        logger.info(f"Fetching {len(image_ids)} specific image(s) for condition report")
+        images = self.get_images(image_ids=image_ids)
         
         if not images:
             logger.error("No images found for condition report")
@@ -3074,7 +3091,8 @@ class T2D2(object):
             report_jpeg_quality = _report_profile["report_jpeg_quality"]
         if report_embed_dpi is None:
             report_embed_dpi = _report_profile["report_embed_dpi"]
-        report_jpeg_subsampling = _report_profile.get("report_jpeg_subsampling", 0)
+        if report_jpeg_subsampling is None:
+            report_jpeg_subsampling = _report_profile.get("report_jpeg_subsampling", 0)
         logger.info(
             "Condition report embed profile: %s (jpeg=%s, dpi=%s, long_edge=%s, mp=%s, chroma=%s)",
             "orthomosaic" if all_orthomosaic_report else "standard",
@@ -3096,6 +3114,7 @@ class T2D2(object):
             "report_jpeg_quality": report_jpeg_quality,
             "report_embed_dpi": report_embed_dpi,
             "report_jpeg_subsampling": report_jpeg_subsampling,
+            "crop_embed_max_long_edge": crop_embed_max_long_edge,
         }
 
         if all_orthomosaic_report and len(image_data_list) > 1:
@@ -3137,6 +3156,7 @@ class T2D2(object):
         report_jpeg_quality=25,
         report_embed_dpi=150,
         report_jpeg_subsampling=0,
+        crop_embed_max_long_edge=None,
     ):
         logger.info(f"Processing {len(image_data_list)} images with annotations")
 
@@ -3170,7 +3190,28 @@ class T2D2(object):
             content_width_in=_CONTENT_W_IN,
             cover_page=True,
         )
-        _docx_add_condition_report_cover(doc, project_info, project_link_url, logo_path)
+        cover_image_data = image_data_list[0] if image_data_list else None
+        cover_is_ortho = bool(
+            all_orthomosaic_report
+            or (
+                cover_image_data
+                and _image_is_orthomosaic(
+                    {
+                        "image_type": cover_image_data.get("image_type"),
+                        "url": cover_image_data.get("url"),
+                        "filename": cover_image_data.get("filename"),
+                    }
+                )
+            )
+        )
+        _docx_add_condition_report_cover(
+            doc,
+            project_info,
+            project_link_url,
+            logo_path,
+            image_data=cover_image_data if cover_is_ortho else None,
+            is_orthomosaic=cover_is_ortho,
+        )
         doc.add_page_break()
 
         # Process each image and annotation
@@ -3199,6 +3240,7 @@ class T2D2(object):
                 padding_percent,
                 crop_min_width_fraction,
                 crop_min_height_fraction,
+                crop_embed_max_long_edge=crop_embed_max_long_edge,
             )
             crop_max_w_in = page_layout["crop_max_w_in"]
             crop_max_h_in = page_layout["crop_max_h_in"]
