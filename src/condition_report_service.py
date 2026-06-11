@@ -46,6 +46,9 @@ _T2D2_KNOWN_SHAPE_STYLES = {
 # Point / polyline / line are drawn as edge callout arrows, not raw geometry.
 _ARROW_CALLOUT_STYLES = frozenset({"point", "polyline", "line"})
 
+# Rectangle, polygon, circle, ellipse: outline only (no interior fill).
+_OUTLINE_ONLY_STYLES = frozenset({"rectangle", "polygon", "circle", "ellipse"})
+
 
 def pil_image_to_jpeg_bytes(
     img: Image.Image, quality: int = 93, subsampling: int = 0
@@ -462,37 +465,63 @@ class ImageAnnotationCropper:
                     draw, cw, ch, target, outline_color, line_width=5, head_len=22.0
                 )
             return
+        outline_fill = None if style in _OUTLINE_ONLY_STYLES else fill_color
         if style == "rectangle" and len(pixel_coords) >= 4:
             xs = [pixel_coords[0], pixel_coords[2]]
             ys = [pixel_coords[1], pixel_coords[3]]
-            draw.rectangle([(min(xs), min(ys)), (max(xs), max(ys))], outline=outline_color, fill=fill_color, width=3)
+            draw.rectangle(
+                [(min(xs), min(ys)), (max(xs), max(ys))],
+                outline=outline_color,
+                fill=outline_fill,
+                width=3,
+            )
             return
         if style == "polygon" and len(coords_list) >= 3:
-            draw.polygon(coords_list, outline=outline_color, fill=fill_color, width=3)
+            draw.polygon(coords_list, outline=outline_color, fill=outline_fill, width=3)
             return
         if style in ("circle", "ellipse"):
             if len(pixel_coords) >= 6:
                 xs = pixel_coords[0::2]; ys = pixel_coords[1::2]
-                draw.ellipse([(min(xs), min(ys)), (max(xs), max(ys))], outline=outline_color, fill=fill_color, width=3)
+                draw.ellipse(
+                    [(min(xs), min(ys)), (max(xs), max(ys))],
+                    outline=outline_color,
+                    fill=outline_fill,
+                    width=3,
+                )
                 return
             if len(pixel_coords) >= 4:
                 xs = pixel_coords[0::2]; ys = pixel_coords[1::2]
-                draw.ellipse([(min(xs), min(ys)), (max(xs), max(ys))], outline=outline_color, fill=fill_color, width=3)
+                draw.ellipse(
+                    [(min(xs), min(ys)), (max(xs), max(ys))],
+                    outline=outline_color,
+                    fill=outline_fill,
+                    width=3,
+                )
                 return
             if len(pixel_coords) >= 3:
                 cx, cy, r = pixel_coords[0], pixel_coords[1], pixel_coords[2]
                 if r <= 1:
                     r = int(round(r * min(image_width, image_height)))
                 r = max(3, int(r))
-                draw.ellipse([(cx - r, cy - r), (cx + r, cy + r)], outline=outline_color, fill=fill_color, width=3)
+                draw.ellipse(
+                    [(cx - r, cy - r), (cx + r, cy + r)],
+                    outline=outline_color,
+                    fill=outline_fill,
+                    width=3,
+                )
                 return
         if len(coords_list) >= 3:
-            draw.polygon(coords_list, outline=outline_color, fill=fill_color, width=3)
+            draw.polygon(coords_list, outline=outline_color, fill=None, width=3)
         elif len(coords_list) >= 2:
             draw.line(coords_list, fill=outline_color, width=4)
         elif len(coords_list) >= 1:
             cx, cy = coords_list[0]; radius = 15
-            draw.ellipse([(cx - radius, cy - radius), (cx + radius, cy + radius)], outline=outline_color, fill=fill_color, width=3)
+            draw.ellipse(
+                [(cx - radius, cy - radius), (cx + radius, cy + radius)],
+                outline=outline_color,
+                fill=None,
+                width=3,
+            )
 
     def _coordinates_are_normalized(self, flat_points: List[float]) -> bool:
         if not flat_points:
