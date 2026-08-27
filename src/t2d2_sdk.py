@@ -341,12 +341,52 @@ def download_file(url: str, file_path: str):
         }
 
 
+# S3 error codes that mean the bucket will not accept a canned ACL argument.
+# Buckets created since April 2023 default to Object Ownership
+# "Bucket owner enforced", which disables ACLs entirely and rejects any request
+# carrying an ACL. AccessDenied is included because a bucket policy may allow
+# s3:PutObject while denying s3:PutObjectAcl.
+_S3_ACL_UNSUPPORTED_ERROR_CODES = frozenset(
+    {
+        "AccessControlListNotSupported",
+        "AccessDenied",
+        "InvalidArgument",
+        "NotImplemented",
+    }
+)
+
+
+def _s3_error_code(error: Exception) -> str:
+    """
+    Best-effort extraction of the S3 error code from a boto3 exception.
+
+    :param error: Exception raised by a boto3 S3 call
+    :type error: Exception
+
+    :return: S3 error code, or an empty string if none could be determined
+    :rtype: str
+    """
+    response = getattr(error, "response", None)
+    if isinstance(response, dict):
+        code = response.get("Error", {}).get("Code")
+        if code:
+            return str(code)
+
+    # boto3's managed transfer wraps ClientError in S3UploadFailedError, which keeps
+    # the original message (and therefore the error code) in its string form.
+    match = re.search(r"An error occurred \(([^)]+)\)", str(error))
+    return match.group(1) if match else ""
+
+
 def upload_file(file_path: str, url: str):
     """
     Upload a file from a local path to an S3 URL.
     
     This function parses the S3 URL to extract bucket and key information,
     then uploads the file from the specified local path with public-read ACL.
+    If the bucket rejects the ACL (for example when Object Ownership is set to
+    "Bucket owner enforced"), the upload is retried without any ExtraArgs so
+    access is governed by the bucket policy instead.
     
     :param file_path: Local path of the file to upload
     :type file_path: str
@@ -362,12 +402,26 @@ def upload_file(file_path: str, url: str):
         >>> upload_file('/local/path/file.jpg', 's3://my-bucket/path/to/file.jpg')
         {'success': True, 'message': 'File uploaded'}
     """
+    bucket = key = None
     try:
         s3 = boto3.client("s3")
         parsed_url = urlparse(url)
         bucket = parsed_url.netloc.split(".")[0]
         key = parsed_url.path[1:]
-        s3.upload_file(file_path, bucket, key, ExtraArgs={"ACL": "public-read"})
+        try:
+            s3.upload_file(file_path, bucket, key, ExtraArgs={"ACL": "public-read"})
+        except Exception as acl_error:
+            error_code = _s3_error_code(acl_error)
+            if error_code not in _S3_ACL_UNSUPPORTED_ERROR_CODES:
+                raise
+            logger.warning(
+                "S3 rejected the public-read ACL for s3://%s/%s (%s); "
+                "retrying upload without ACL.",
+                bucket,
+                key,
+                error_code,
+            )
+            s3.upload_file(file_path, bucket, key)
         return {"success": True, "message": "File uploaded"}
     except Exception as e:
         return {
