@@ -445,14 +445,35 @@ def ts2date(ts):
     return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _is_s3_url(url: str) -> bool:
+    """True for s3:// and virtual-hosted Amazon S3 HTTPS URLs."""
+    parsed = urlparse(url)
+    if parsed.scheme == "s3":
+        return True
+    host = (parsed.netloc or "").lower()
+    return host.endswith(".amazonaws.com") and "s3" in host.split(".")
+
+
+def _s3_bucket_and_key(url: str):
+    """Parse bucket and object key from an s3:// or virtual-hosted S3 URL."""
+    parsed = urlparse(url)
+    if parsed.scheme == "s3":
+        return parsed.netloc.split(".")[0], parsed.path.lstrip("/")
+    host = parsed.netloc
+    # bucket.s3.amazonaws.com or bucket.s3.region.amazonaws.com
+    bucket = host.split(".s3")[0]
+    return bucket, parsed.path.lstrip("/")
+
+
 def download_file(url: str, file_path: str):
     """
-    Download a file from an S3 URL to a local path.
+    Download a file from S3 or HTTPS (CloudFront/CDN) to a local path.
+
+    Image records from the T2D2 API typically use CloudFront HTTPS URLs.
+    Those must be fetched over HTTP; treating them as S3 bucket names fails
+    (e.g. ``s3.download_file("dvd30yayquknd", ...)``) and leaves no local file.
     
-    This function parses the S3 URL to extract bucket and key information,
-    then downloads the file to the specified local path.
-    
-    :param url: S3 URL of the file to download
+    :param url: HTTPS, CloudFront, or S3 URL of the file to download
     :type url: str
     :param file_path: Local path where the file should be saved
     :type file_path: str
@@ -460,20 +481,33 @@ def download_file(url: str, file_path: str):
     :return: Dictionary containing success status and message
     :rtype: dict
     
-    :raises Exception: If there is an error during download
-    
     :example:
+        >>> download_file('https://cdn.example.net/projects/1/images/a.jpg', '/tmp/a.jpg')
+        {'success': True, 'message': 'File downloaded'}
         >>> download_file('s3://my-bucket/path/to/file.jpg', '/local/path/file.jpg')
         {'success': True, 'message': 'File downloaded'}
     """
+    bucket = key = None
     try:
+        dest_dir = os.path.dirname(file_path)
+        if dest_dir:
+            os.makedirs(dest_dir, exist_ok=True)
+
+        if not _is_s3_url(url):
+            res = requests.get(url, timeout=TIMEOUT, stream=True)
+            res.raise_for_status()
+            with open(file_path, "wb") as out:
+                for chunk in res.iter_content(chunk_size=1024 * 1024):
+                    if chunk:
+                        out.write(chunk)
+            return {"success": True, "message": "File downloaded"}
+
         s3 = boto3.client("s3")
-        parsed_url = urlparse(url)
-        bucket = parsed_url.netloc.split(".")[0]
-        key = parsed_url.path[1:]
+        bucket, key = _s3_bucket_and_key(url)
         s3.download_file(bucket, key, file_path)
         return {"success": True, "message": "File downloaded"}
     except Exception as e:
+        logger.error("Failed to download %s to %s: %s", url, file_path, e)
         return {
             "success": False,
             "message": f"{str(e)} \n{bucket} \n{key} \n{file_path}",
