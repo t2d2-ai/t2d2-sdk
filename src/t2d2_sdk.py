@@ -4,6 +4,7 @@ T2D2 SDK Client Library
 ========================
 """
 
+import base64
 import inspect
 import json
 import logging
@@ -53,9 +54,143 @@ from condition_report_service import (
 
 
 TIMEOUT = 60
-BASE_URL = os.getenv("T2D2_API_URL", "https://api-v3.t2d2.ai/api/")
-PORTAL_BASE_URL = os.getenv("T2D2_PORTAL_URL", "https://app.t2d2.ai").rstrip("/")
-# DEV https://api-v3-dev.t2d2.ai/api/
+
+# Named T2D2 deployments. Switch with T2D2_ENV=dev|prod or T2D2(..., env="dev").
+# Portal (frontend) and API hosts are different:
+#   prod portal: https://app.t2d2.ai          API: https://api-v3.t2d2.ai/api/
+#   dev  portal: https://develop-v3.t2d2.ai   API: https://api-v3-dev.t2d2.ai/api/
+ENVIRONMENTS = {
+    "prod": {
+        "api_url": "https://api-v3.t2d2.ai/api/",
+        "portal_url": "https://app.t2d2.ai",
+        "api_key_env": "T2D2_API_KEY",
+    },
+    "dev": {
+        "api_url": "https://api-v3-dev.t2d2.ai/api/",
+        "portal_url": "https://develop-v3.t2d2.ai",
+        "api_key_env": "T2D2_DEV_API_KEY",
+    },
+}
+_ENV_ALIASES = {
+    "prod": "prod",
+    "production": "prod",
+    "dev": "dev",
+    "develop": "dev",
+    "development": "dev",
+}
+
+
+def normalize_t2d2_env(env=None) -> str:
+    """Return 'dev' or 'prod' from an argument or T2D2_ENV (default prod)."""
+    raw = env if env is not None else os.getenv("T2D2_ENV", "prod")
+    name = _ENV_ALIASES.get(str(raw).strip().lower())
+    if not name:
+        raise ValueError(
+            f"Unknown T2D2 environment '{raw}'. Use 'dev' or 'prod'."
+        )
+    return name
+
+
+def decode_jwt_payload(token):
+    """Decode a JWT payload without verifying the signature. Returns dict or None."""
+    if not token or not isinstance(token, str):
+        return None
+    parts = token.split(".")
+    if len(parts) != 3:
+        return None
+    try:
+        padded = parts[1] + "=" * (-len(parts[1]) % 4)
+        data = json.loads(base64.urlsafe_b64decode(padded.encode("ascii")))
+        return data if isinstance(data, dict) else None
+    except Exception:
+        return None
+
+
+def environment_from_token(token):
+    """
+    Map a JWT ``environment`` claim to 'dev' or 'prod'.
+
+    T2D2 API keys encode this in the token, e.g. ``"environment": "development"``.
+    Production keys may omit the claim; returns None in that case.
+    """
+    payload = decode_jwt_payload(token)
+    if not payload:
+        return None
+    claim = payload.get("environment")
+    if claim is None or claim == "":
+        return None
+    return _ENV_ALIASES.get(str(claim).strip().lower())
+
+
+def environment_from_credentials(credentials):
+    """Read the JWT environment claim from api_key or access_token credentials."""
+    if not isinstance(credentials, dict):
+        return None
+    token = credentials.get("api_key") or credentials.get("access_token")
+    return environment_from_token(token)
+
+
+def resolve_t2d2_env(credentials=None, env=None) -> str:
+    """
+    Choose 'dev' or 'prod'.
+
+    Order: JWT ``environment`` claim on the token, then explicit ``env``,
+    then ``T2D2_ENV``, then prod.
+    """
+    detected = environment_from_credentials(credentials)
+    if detected:
+        logger.info(
+            "Selected env=%s from token environment claim",
+            detected,
+        )
+        return detected
+    if env is not None:
+        return normalize_t2d2_env(env)
+    return normalize_t2d2_env(None)
+
+
+def get_environment_config(env=None, credentials=None) -> dict:
+    """Resolve API URL, portal URL, and API-key env var for a T2D2 environment."""
+    name = resolve_t2d2_env(credentials=credentials, env=env)
+    cfg = dict(ENVIRONMENTS[name])
+    cfg["name"] = name
+    if name == "dev":
+        cfg["api_url"] = os.getenv("T2D2_DEV_API_URL", cfg["api_url"])
+        cfg["portal_url"] = os.getenv("T2D2_DEV_PORTAL_URL", cfg["portal_url"])
+    else:
+        cfg["api_url"] = os.getenv("T2D2_API_URL", cfg["api_url"])
+        cfg["portal_url"] = os.getenv("T2D2_PORTAL_URL", cfg["portal_url"])
+    if not str(cfg["api_url"]).endswith("/"):
+        cfg["api_url"] = str(cfg["api_url"]) + "/"
+    cfg["portal_url"] = str(cfg["portal_url"]).rstrip("/")
+    return cfg
+
+
+def credentials_from_env(env=None) -> dict:
+    """
+    Build SDK credentials from environment variables.
+
+    Key selection: explicit ``env``, else ``T2D2_ENV``, else prod.
+    ``T2D2.__init__`` then reads the JWT ``environment`` claim on that key
+    to choose the API host (development → dev, production/omitted → prod).
+    """
+    prod_key = os.getenv("T2D2_API_KEY", "")
+    dev_key = os.getenv("T2D2_DEV_API_KEY", "")
+    name = normalize_t2d2_env(env)
+    if name == "dev":
+        api_key = dev_key or prod_key
+        key_var = "T2D2_DEV_API_KEY" if dev_key else "T2D2_API_KEY"
+    else:
+        api_key = prod_key or dev_key
+        key_var = "T2D2_API_KEY" if prod_key else "T2D2_DEV_API_KEY"
+    if not api_key:
+        raise ValueError(f"{key_var} is not set")
+    return {"api_key": api_key}
+
+
+_ENV_CONFIG = get_environment_config()
+BASE_URL = _ENV_CONFIG["api_url"]
+PORTAL_BASE_URL = _ENV_CONFIG["portal_url"]
 
 
 ####################################################################################################
@@ -271,11 +406,14 @@ def _ortho_condition_report_output_path(base_output_path: str, image_data: dict)
     return f"{base}_{name_part}_{image_id}{ext}"
 
 
-def _portal_project_dashboard_url(project_id) -> str:
-    return f"{PORTAL_BASE_URL}/project/{project_id}/dashboard"
+def _portal_project_dashboard_url(project_id, portal_base_url=None) -> str:
+    base = (portal_base_url or PORTAL_BASE_URL).rstrip("/")
+    return f"{base}/project/{project_id}/dashboard"
 
 
-def _portal_image_files_url(project_id, image_id, filename, image_type=1) -> str:
+def _portal_image_files_url(
+    project_id, image_id, filename, image_type=1, portal_base_url=None
+) -> str:
     name = os.path.splitext(filename or "")[0] or str(image_id)
     query = urlencode(
         {
@@ -286,7 +424,8 @@ def _portal_image_files_url(project_id, image_id, filename, image_type=1) -> str
             "limit": 10,
         }
     )
-    return f"{PORTAL_BASE_URL}/project/{project_id}/files/images?{query}"
+    base = (portal_base_url or PORTAL_BASE_URL).rstrip("/")
+    return f"{base}/project/{project_id}/files/images?{query}"
 
 
 def ts2date(ts):
@@ -1259,8 +1398,12 @@ class T2D2(object):
     project management, and manipulation of various data types including images, annotations,
     drawings, videos, reports, and more.
     
+    :ivar env: Active environment name ('dev' or 'prod')
+    :vartype env: str
     :ivar base_url: The base URL for the T2D2 API endpoints
     :vartype base_url: str
+    :ivar portal_base_url: The frontend portal URL for this environment
+    :vartype portal_base_url: str
     :ivar headers: Headers sent with each API request (includes content type and authorization)
     :vartype headers: dict
     :ivar s3_base_url: The base URL for S3 storage where data is stored or retrieved
@@ -1279,7 +1422,10 @@ class T2D2(object):
     :vartype debug: bool
     """
 
+    env: str
+    token_claims: dict
     base_url: str
+    portal_base_url: str
     headers: dict
     s3_base_url: str
     aws_region: str
@@ -1289,7 +1435,7 @@ class T2D2(object):
     project: dict = None
     debug: bool = True
 
-    def __init__(self, credentials, base_url=BASE_URL):
+    def __init__(self, credentials, base_url=None, env=None):
         """
         Initialize the T2D2 client and authenticate with the API.
         
@@ -1302,23 +1448,41 @@ class T2D2(object):
                         - 'username'/'password': For login-based authentication
                         - 'api_key': API key for authentication
         :type credentials: dict
-        :param base_url: Base URL for T2D2 API endpoints
-        :type base_url: str
-        :default base_url: Uses the global BASE_URL value
+        :param base_url: Base URL for T2D2 API endpoints. Defaults to the URL for ``env``.
+        :type base_url: str or None
+        :param env: Deployment to use: ``'dev'`` or ``'prod'``. If omitted, the JWT
+                    ``environment`` claim on the API key/token is used
+                    (``development`` → dev, ``production`` → prod). Falls back to
+                    ``T2D2_ENV``, then prod. Explicit ``env`` is ignored when the
+                    token includes an ``environment`` claim.
+        :type env: str or None
         
-        :raises ValueError: If the base_url does not end with a forward slash or if 
-                        authentication fails
+        :raises ValueError: If the environment name is invalid or authentication fails
         
         :example:
             >>> client = T2D2({'api_key': 'your-api-key'})
+            >>> client = T2D2({'api_key': 'your-dev-key'})  # env from JWT claim
             >>> client = T2D2({'access_token': 'your-token'})
             >>> client = T2D2({'username': 'user@example.com', 'password': 'pass123'})
         """
+        cfg = get_environment_config(env=env, credentials=credentials)
+        self.env = cfg["name"]
+        self.token_claims = decode_jwt_payload(
+            (credentials or {}).get("api_key")
+            or (credentials or {}).get("access_token")
+        )
+        self.portal_base_url = cfg["portal_url"]
+        if base_url is None:
+            base_url = cfg["api_url"]
         if not base_url.endswith("/"):
             base_url += "/"
         self.base_url = base_url
         self.headers = {"Content-Type": "application/json"}
-        logger.info(f"Initializing T2D2 client with base_url: {base_url}")
+        jwt_env = (self.token_claims or {}).get("environment")
+        logger.info(
+            f"Initializing T2D2 client env={self.env} jwt_environment={jwt_env!r} "
+            f"base_url={base_url} portal={self.portal_base_url}"
+        )
         self.login(credentials)
         self.project = {}
         logger.debug("T2D2 client initialized successfully")
@@ -3230,7 +3394,9 @@ class T2D2(object):
         _docx_configure_report_fonts(doc)
         project_name = project_info.get("name") or "Project"
         generated_on = datetime.now().strftime("%d %b %Y")
-        project_link_url = _portal_project_dashboard_url(self.project["id"])
+        project_link_url = _portal_project_dashboard_url(
+            self.project["id"], portal_base_url=self.portal_base_url
+        )
         logo_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)), "t2d2_image", "t2d2.png"
         )
@@ -3322,6 +3488,7 @@ class T2D2(object):
                 image_id,
                 filename,
                 image_data.get("image_type"),
+                portal_base_url=self.portal_base_url,
             )
 
             crop_source_pil = image_data.get("crop_source_image") or pil_image
