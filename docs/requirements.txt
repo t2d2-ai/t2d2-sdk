@@ -1,6 +1,6 @@
+sphinx
 myst-parser
-jinja2==3.1
+jinja2
 requests
 boto3
 sentry-sdk
-sphinx-rtd-theme
