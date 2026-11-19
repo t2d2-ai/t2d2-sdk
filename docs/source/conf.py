@@ -39,11 +39,6 @@ autodoc_mock_imports = [
     'boto3',
     'botocore',
     'sentry_sdk',
-    'docx',
-    'PIL',
-    'matplotlib',
-    'numpy',
-    'condition_report_service'
 ]
 
 # -- Options for HTML output -------------------------------------------------

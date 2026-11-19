@@ -16,8 +16,6 @@ dependencies = [
   "boto3",
   "requests",
   "sentry_sdk",
-  "python-docx",
-  "Pillow",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",

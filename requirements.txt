@@ -1,9 +1,5 @@
 boto3
 requests
 sentry_sdk
-Pillow
-matplotlib
-numpy
-python-docx
 python-dotenv
 
